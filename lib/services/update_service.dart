@@ -10,7 +10,7 @@ class UpdateInfo {
 
 class UpdateService {
   static const _api =
-      'https://api.github.com/repos/tuo-utente/sona/releases/latest';
+      'https://api.github.com/repos/Carmine0033/Sona/releases/latest';
 
   static Future<UpdateInfo?> check() async {
     try {
@@ -32,7 +32,6 @@ class UpdateService {
     }
   }
 
-  /// Confronto semantico: true se `remote` > `local`.
   static bool _isNewer(String remote, String local) {
     List<int> parse(String v) =>
         v.split('.').map((e) => int.tryParse(e.trim()) ?? 0).toList();

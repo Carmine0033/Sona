@@ -1,11 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../models/now_playing.dart';
 import '../services/playback_controller.dart';
 import '../services/smtc_channel.dart';
 import '../services/smtc_playback_controller.dart';
 import '../models/lyrics.dart';
 import '../services/lyrics_service.dart';
+import '../services/update_service.dart';
 
 final playbackControllerProvider= Provider<PlaybackController>((ref) {
   return SmtcPlaybackController();
@@ -18,6 +20,16 @@ final nowPlayingProvider= StreamProvider<NowPlaying?>((ref) {
   });
 });
 
+
+//check for updates
+final updateProvider = FutureProvider<UpdateInfo?>((ref) async {
+  return UpdateService.check();
+});
+
+final appVersionProvider = FutureProvider<String>((ref) async {
+  final info = await PackageInfo.fromPlatform();
+  return info.version;
+});
 
 enum AppSection { player, options }
 enum SeekBarStyle { line, wave }

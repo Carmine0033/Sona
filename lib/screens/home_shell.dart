@@ -5,6 +5,7 @@ import '../providers/app_providers.dart';
 import '../widgets/sidebar.dart';
 import 'player_screen.dart';
 import 'options_panel.dart';
+import '../widgets/update_banner.dart';
 
 class HomeShell extends ConsumerWidget {
   const HomeShell({super.key});
@@ -19,10 +20,17 @@ class HomeShell extends ConsumerWidget {
         children: [
           const Sidebar(),
           Expanded(
-            child: switch (section) {
-              AppSection.player => const PlayerScreen(),
-              AppSection.options => const OptionsPanel(),
-            },
+            child: Column(
+              children: [
+                const UpdateBanner(),
+                Expanded(
+                  child: switch (section) {
+                    AppSection.player => const PlayerScreen(),
+                    AppSection.options => const OptionsPanel(),
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),

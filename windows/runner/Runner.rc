@@ -91,12 +91,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Carmine Iannone" "\0"
             VALUE "FileDescription", "Sona" "\0"
-            VALUE "FileVersion", VERSION_AS_STRING "\0"
+            VALUE "FileVersion", "0.1.1" "\0"
             VALUE "InternalName", "Sona" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 Carmine Iannone." "\0"
             VALUE "OriginalFilename", "Sona.exe" "\0"
             VALUE "ProductName", "Sona" "\0"
-            VALUE "ProductVersion", "0.1.0" "\0"
+            VALUE "ProductVersion", "0.1.1" "\0"
         END
     END
     BLOCK "VarFileInfo"

@@ -92,3 +92,6 @@ app.*.map.json
 .env.*
 *.env
 
+sona.iss
+release.ps1
+installer/

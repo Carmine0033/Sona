@@ -10,11 +10,12 @@ class OptionsPanel extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const _repoUrl = 'https://github.com/Carmine0033/Sona.git';
-    const _releasesUrl = 'https://github.com/tuo-utente/sona/releases';
+    const repoUrl = 'https://github.com/Carmine0033/Sona';
+    const releasesUrl = 'https://github.com/Carmine0033/Sona/releases/latest';
     final isOpaque = ref.watch(opaqueBackgroundProvider);
     final onTop = ref.watch(alwaysOnTopProvider);
     final seekBarStyle = ref.watch(seekBarStyleProvider);
+    final appVersion = ref.watch(appVersionProvider).asData?.value ?? '0.1.0';
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -125,19 +126,21 @@ class OptionsPanel extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Sona v0.1.0',
-                        style: TextStyle(color: Colors.white38, fontSize: 12)),
+                    Text(
+                      'Sona v$appVersion',
+                      style: const TextStyle(color: Colors.white38, fontSize: 12),
+                    ),
                     Row(
                       children: [
                         TextButton.icon(
                           icon: const Icon(Icons.code, size: 16),
                           label: const Text('Source'),
-                          onPressed: () => _open(_repoUrl),
+                          onPressed: () => _open(repoUrl),
                         ),
                         TextButton.icon(
                           icon: const Icon(Icons.download, size: 16),
                           label: const Text('Releases'),
-                          onPressed: () => _open(_releasesUrl),
+                          onPressed: () => _open(releasesUrl),
                         ),
                       ],
                     ),

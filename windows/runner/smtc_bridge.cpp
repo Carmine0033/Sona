@@ -29,6 +29,8 @@ using flutter::EncodableValue;
 
 namespace {
 
+std::mutex g_state_mutex;
+
 // Channels & Sinks
 std::unique_ptr<flutter::MethodChannel<EncodableValue>> g_method_channel;
 std::unique_ptr<flutter::EventChannel<EncodableValue>> g_event_channel;
@@ -169,6 +171,7 @@ void DrainQueue() {
     std::lock_guard<std::mutex> lk(g_queue_mutex);
     std::swap(local, g_queue);
   }
+  if (!g_running.load()) return;
   std::lock_guard<std::mutex> lk(g_sink_mutex);
   if (!g_sink || !g_running.load()) return;
   while (!local.empty()) {
@@ -181,6 +184,8 @@ void DrainQueue() {
 }
 
 void EmitUpdate() {
+  if (!g_running.load()) return;
+  std::lock_guard<std::mutex> state_lk(g_state_mutex);
   if (!g_running.load() || g_state == nullptr) return;
   GlobalSystemMediaTransportControlsSession sess{nullptr};
   {
@@ -192,32 +197,34 @@ void EmitUpdate() {
   }
 }
 
-void DetachSession_nolock() {
-  if (g_state && g_state->session) {
+void DetachSession_nolock_state(SmtcState* state) {
+  if (state && state->session) {
     try {
-      if (g_state->tokMedia.value != 0) {
-        g_state->session.MediaPropertiesChanged(g_state->tokMedia);
-        g_state->tokMedia = {};
+      if (state->tokMedia.value != 0) {
+        state->session.MediaPropertiesChanged(state->tokMedia);
+        state->tokMedia = {};
       }
-      if (g_state->tokPlayback.value != 0) {
-        g_state->session.PlaybackInfoChanged(g_state->tokPlayback);
-        g_state->tokPlayback = {};
+      if (state->tokPlayback.value != 0) {
+        state->session.PlaybackInfoChanged(state->tokPlayback);
+        state->tokPlayback = {};
       }
-      if (g_state->tokTimeline.value != 0) {
-        g_state->session.TimelinePropertiesChanged(g_state->tokTimeline);
-        g_state->tokTimeline = {};
+      if (state->tokTimeline.value != 0) {
+        state->session.TimelinePropertiesChanged(state->tokTimeline);
+        state->tokTimeline = {};
       }
     } catch (...) {
     }
-    g_state->session = nullptr;
+    state->session = nullptr;
   }
 }
 
 void OnSessionChanged() {
+  if (!g_running.load()) return;
+  std::lock_guard<std::mutex> state_lk(g_state_mutex);
   if (!g_running.load() || !g_state) return;
   {
     std::lock_guard<std::recursive_mutex> lk(g_state->m);
-    DetachSession_nolock();
+    DetachSession_nolock_state(g_state);
     try {
       auto s = g_state->manager
                    ? g_state->manager.GetCurrentSession()
@@ -234,7 +241,16 @@ void OnSessionChanged() {
     } catch (...) {
     }
   }
-  EmitUpdate();
+  if (g_running.load()) {
+    GlobalSystemMediaTransportControlsSession sess{nullptr};
+    {
+      std::lock_guard<std::recursive_mutex> lk(g_state->m);
+      sess = g_state->session;
+    }
+    if (sess) {
+      Enqueue(BuildPayload(sess));
+    }
+  }
 }
 
 void WorkerMain() {
@@ -242,12 +258,15 @@ void WorkerMain() {
   try {
     auto manager =
         GlobalSystemMediaTransportControlsSessionManager::RequestAsync().get();
-    if (g_running.load() && g_state) {
-      std::lock_guard<std::recursive_mutex> lk(g_state->m);
-      g_state->manager = manager;
-      if (manager) {
-        g_state->tokCurrent = manager.CurrentSessionChanged(
-            [](auto const&, auto const&) { OnSessionChanged(); });
+    if (g_running.load()) {
+      std::lock_guard<std::mutex> state_lk(g_state_mutex);
+      if (g_running.load() && g_state) {
+        std::lock_guard<std::recursive_mutex> lk(g_state->m);
+        g_state->manager = manager;
+        if (manager) {
+          g_state->tokCurrent = manager.CurrentSessionChanged(
+              [](auto const&, auto const&) { OnSessionChanged(); });
+        }
       }
     }
     OnSessionChanged();
@@ -261,15 +280,20 @@ void WorkerMain() {
 
   // Cleanup
   try {
-    if (g_state) {
-      std::lock_guard<std::recursive_mutex> lk(g_state->m);
-      DetachSession_nolock();
-      if (g_state->manager) {
-        if (g_state->tokCurrent.value != 0) {
-          g_state->manager.CurrentSessionChanged(g_state->tokCurrent);
-          g_state->tokCurrent = {};
+    SmtcState* s = nullptr;
+    {
+      std::lock_guard<std::mutex> state_lk(g_state_mutex);
+      s = g_state;
+    }
+    if (s) {
+      std::lock_guard<std::recursive_mutex> lk(s->m);
+      DetachSession_nolock_state(s);
+      if (s->manager) {
+        if (s->tokCurrent.value != 0) {
+          s->manager.CurrentSessionChanged(s->tokCurrent);
+          s->tokCurrent = {};
         }
-        g_state->manager = nullptr;
+        s->manager = nullptr;
       }
     }
   } catch (...) {
@@ -282,21 +306,17 @@ void StartListening(std::unique_ptr<flutter::EventSink<EncodableValue>>&& sink) 
     std::lock_guard<std::mutex> lk(g_sink_mutex);
     g_sink = std::move(sink);
   }
-  g_state = new SmtcState();
-  g_running = true;
+  {
+    std::lock_guard<std::mutex> state_lk(g_state_mutex);
+    g_state = new SmtcState();
+  }
+  g_running.store(true);
   g_worker = std::thread(WorkerMain);
 }
 
 void StopListening() {
-  g_running = false;
+  g_running.store(false);
   g_cv.notify_all();
-  if (g_worker.joinable()) {
-    try {
-      g_worker.join();
-    } catch (...) {
-      g_worker.detach();
-    }
-  }
 
   {
     std::lock_guard<std::mutex> lk(g_sink_mutex);
@@ -309,9 +329,34 @@ void StopListening() {
     std::swap(g_queue, empty);
   }
 
-  SmtcState* old = g_state;
-  g_state = nullptr;
+  if (g_worker.joinable()) {
+    try {
+      g_worker.join();
+    } catch (...) {
+      g_worker.detach();
+    }
+  }
+
+  SmtcState* old = nullptr;
+  {
+    std::lock_guard<std::mutex> state_lk(g_state_mutex);
+    old = g_state;
+    g_state = nullptr;
+  }
+
   if (old) {
+    try {
+      std::lock_guard<std::recursive_mutex> lk(old->m);
+      DetachSession_nolock_state(old);
+      if (old->manager) {
+        if (old->tokCurrent.value != 0) {
+          old->manager.CurrentSessionChanged(old->tokCurrent);
+          old->tokCurrent = {};
+        }
+        old->manager = nullptr;
+      }
+    } catch (...) {
+    }
     delete old;
   }
 }
@@ -430,5 +475,17 @@ void Register(flutter::FlutterEngine* engine) {
           });
 
   g_event_channel->SetStreamHandler(std::move(handler));
+}
+
+void CleanUp() {
+  StopListening();
+
+  g_method_channel.reset();
+  g_event_channel.reset();
+
+  if (g_msg_window != nullptr && IsWindow(g_msg_window)) {
+    DestroyWindow(g_msg_window);
+    g_msg_window = nullptr;
+  }
 }
 }  // namespace smtc_bridge

@@ -7,6 +7,7 @@
 
 namespace smtc_bridge {
     void Register(flutter::FlutterEngine* engine);
+    void CleanUp();
 }
 
 #endif

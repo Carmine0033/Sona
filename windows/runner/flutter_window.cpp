@@ -41,6 +41,8 @@ bool FlutterWindow::OnCreate() {
 }
 
 void FlutterWindow::OnDestroy() {
+  smtc_bridge::CleanUp();
+
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }
