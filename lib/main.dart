@@ -18,7 +18,7 @@ Future<void> main() async {
     backgroundColor: Colors.transparent,
     skipTaskbar: false,
     titleBarStyle: TitleBarStyle.normal,
-    title: 'Media Overlay',
+    title: 'Sona',
   );
 
   await windowManager.waitUntilReadyToShow(options, () async {
@@ -40,4 +40,4 @@ class SonaApp extends StatelessWidget {
       home: const HomeShell(),
     );
   }
-}
+}

@@ -13,6 +13,8 @@ dependencies:
   flutter_acrylic: ^1.1.4
   flutter_riverpod: ^3.4.3
   http: ^1.6.0
+  package_info_plus: ^10.2.2
+  url_launcher: ^6.3.3
   win32: ^6.4.0
   window_manager: ^0.5.2
 

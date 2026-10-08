@@ -3,12 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
 import '../core/theme.dart';
 import '../providers/app_providers.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OptionsPanel extends ConsumerWidget {
   const OptionsPanel({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    const _repoUrl = 'https://github.com/Carmine0033/Sona.git';
+    const _releasesUrl = 'https://github.com/tuo-utente/sona/releases';
     final isOpaque = ref.watch(opaqueBackgroundProvider);
     final onTop = ref.watch(alwaysOnTopProvider);
     final seekBarStyle = ref.watch(seekBarStyleProvider);
@@ -116,12 +119,43 @@ class OptionsPanel extends ConsumerWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 16),
+                const Divider(color: Colors.white12),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('Sona v0.1.0',
+                        style: TextStyle(color: Colors.white38, fontSize: 12)),
+                    Row(
+                      children: [
+                        TextButton.icon(
+                          icon: const Icon(Icons.code, size: 16),
+                          label: const Text('Source'),
+                          onPressed: () => _open(_repoUrl),
+                        ),
+                        TextButton.icon(
+                          icon: const Icon(Icons.download, size: 16),
+                          label: const Text('Releases'),
+                          onPressed: () => _open(_releasesUrl),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _open(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 }
 
