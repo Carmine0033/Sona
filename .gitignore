@@ -1,0 +1,94 @@
+# Miscellaneous / OS files
+*.class
+*.log
+*.pyc
+*.swp
+*.tmp
+*.temp
+*.bak
+*~
+.history
+
+# Windows OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Trashes
+
+# Linux
+.fuse_hidden*
+.directory
+.trash
+
+# IDEs and Editors
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Visual Studio / C++ / CMake (Flutter Windows)
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+x64/
+x86/
+ARM/
+ARM64/
+*.[Cc]ache
+!*.[Cc]ache/
+
+# Flutter / Dart / Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Windows specific Flutter Desktop
+windows/flutter/ephemeral/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio / Gradle
+/android/app/debug
+/android/app/profile
+/android/app/release
+/android/.gradle/
+/android/local.properties
+
+# Widget Preview related
+.widget_preview/
+
+# Environment / Secret files
+.env
+.env.*
+*.env
+
