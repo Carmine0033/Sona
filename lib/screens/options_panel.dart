@@ -1,12 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:media_overlay/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 import '../core/theme.dart';
 import '../providers/app_providers.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'dart:io';
-import '../services/smtc_channel.dart';
 import '../services/settings_service.dart';
+import '../services/smtc_channel.dart';
+import '../widgets/accent_picker.dart';
 
 class OptionsPanel extends ConsumerWidget {
   const OptionsPanel({super.key});
@@ -19,6 +21,21 @@ class OptionsPanel extends ConsumerWidget {
     final onTop = ref.watch(alwaysOnTopProvider);
     final seekBarStyle = ref.watch(seekBarStyleProvider);
     final appVersion = ref.watch(appVersionProvider).asData?.value ?? '0.1.0';
+    final accent = ref.watch(accentColorProvider);
+    final l10n = AppLocalizations.of(context)!;
+
+    Widget sectionHeader(String title) => Padding(
+          padding: const EdgeInsets.only(top: 16, bottom: 12),
+          child: Text(
+            title.toUpperCase(),
+            style: TextStyle(
+              color: accent,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.2,
+            ),
+          ),
+        );
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -29,17 +46,27 @@ class OptionsPanel extends ConsumerWidget {
             constraints: const BoxConstraints(maxWidth: 500),
             padding: const EdgeInsets.all(32),
             decoration: BoxDecoration(
-              color: ThemeColors.surfaceElevated.withValues(alpha: 0.35),
+              color: Color.alphaBlend(
+                accent.withValues(alpha: 0.10),
+                ThemeColors.surfaceElevated.withValues(alpha: 0.45),
+              ),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: ThemeColors.luminescenceSubtle.withValues(alpha: 0.15),
-                width: 1,
+                color: accent.withValues(alpha: 0.28),
+                width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.35),
-                  blurRadius: 24,
+                  color: accent.withValues(alpha: 0.14),
+                  blurRadius: 36,
                   spreadRadius: 2,
+                  offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  blurRadius: 28,
+                  spreadRadius: 4,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
@@ -47,54 +74,68 @@ class OptionsPanel extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'SETTINGS',
-                  style: TextStyle(
-                    color: ThemeColors.luminescencePure,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.5,
-                  ),
+                Row(
+                  children: [
+                    Container(
+                      width: 4,
+                      height: 22,
+                      decoration: BoxDecoration(
+                        color: accent,
+                        borderRadius: BorderRadius.circular(2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: accent.withValues(alpha: 0.6),
+                            blurRadius: 8,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      l10n.settings,
+                      style: const TextStyle(
+                        color: ThemeColors.luminescencePure,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 8),
+
+                // --- PERSONALIZATION ---
+                sectionHeader(l10n.personalization),
+                const AccentPickerRow(),
+                const SizedBox(height: 16),
                 _OptionTile(
-                  title: 'Opaque background',
-                  subtitle: 'Use solid background instead of glass effect',
+                  title: l10n.opaqueBackground,
+                  subtitle: l10n.opaqueBackgroundSubtitle,
                   value: isOpaque,
                   onChanged: (v) {
                     ref.read(opaqueBackgroundProvider.notifier).state = v;
                   },
                 ),
-                const Divider(color: Colors.white12, height: 32),
-                _OptionTile(
-                  title: 'Always on top',
-                  subtitle: 'Keep window above other applications',
-                  value: onTop,
-                  onChanged: (v) {
-                    ref.read(alwaysOnTopProvider.notifier).state = v;
-                    windowManager.setAlwaysOnTop(v);
-                  },
-                ),
-                const Divider(color: Colors.white12, height: 32),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Progress bar style',
-                            style: TextStyle(
+                            l10n.progressBarStyle,
+                            style: const TextStyle(
                               color: ThemeColors.luminescencePure,
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(height: 4),
+                          const SizedBox(height: 4),
                           Text(
-                            'Choose between standard line or animated wave',
-                            style: TextStyle(
+                            l10n.progressBarStyleSubtitle,
+                            style: const TextStyle(
                               color: ThemeColors.luminescenceSubtle,
                               fontSize: 12,
                             ),
@@ -105,7 +146,7 @@ class OptionsPanel extends ConsumerWidget {
                     Row(
                       children: [
                         _StyleChip(
-                          label: 'Line',
+                          label: l10n.line,
                           selected: seekBarStyle == SeekBarStyle.line,
                           onTap: () => ref
                               .read(seekBarStyleProvider.notifier)
@@ -113,7 +154,7 @@ class OptionsPanel extends ConsumerWidget {
                         ),
                         const SizedBox(width: 8),
                         _StyleChip(
-                          label: 'Wave',
+                          label: l10n.wave,
                           selected: seekBarStyle == SeekBarStyle.wave,
                           onTap: () => ref
                               .read(seekBarStyleProvider.notifier)
@@ -124,65 +165,97 @@ class OptionsPanel extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Divider(color: Colors.white12),
-                const SizedBox(height: 8),
                 Row(
                   children: [
-                    const SizedBox(
-                        width: 120,
-                        child: Text('Disc image',
-                            style: TextStyle(color: Colors.white70))),
+                    SizedBox(
+                      width: 120,
+                      child: Text(
+                        l10n.discImage,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                    ),
                     TextButton.icon(
-                      icon: const Icon(Icons.image, size: 16),
-                      label: const Text('Choose'),
+                      icon: Icon(Icons.image, size: 16, color: accent),
+                      label: Text(l10n.choose, style: TextStyle(color: accent)),
                       onPressed: () => _pickMedia(ref),
                     ),
                     if (ref.watch(customMediaPathProvider) != null)
                       TextButton(
                         onPressed: () => _resetMedia(ref),
-                        child: const Text('Reset'),
+                        child: Text(
+                          l10n.reset,
+                          style: TextStyle(
+                            color: accent.withValues(alpha: 0.8),
+                          ),
+                        ),
                       ),
                   ],
                 ),
-                 const SizedBox(height: 8),
-                 Row(
+                const SizedBox(height: 12),
+                Row(
                   children: [
-                    const SizedBox(
-                        width: 120,
-                        child: Text('Disc style',
-                            style: TextStyle(color: Colors.white70))),
+                    SizedBox(
+                      width: 120,
+                      child: Text(
+                        l10n.discStyle,
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                    ),
                     _StyleChip(
-                      label: 'Vinyl',
-                      selected: ref.watch(discStyleProvider) == DiscStyle.vinyl,
+                      label: l10n.vinyl,
+                      selected:
+                          ref.watch(discStyleProvider) == DiscStyle.vinyl,
                       onTap: () => ref.read(discStyleProvider.notifier).state =
                           DiscStyle.vinyl,
                     ),
                     const SizedBox(width: 8),
                     _StyleChip(
-                      label: 'Album',
-                      selected: ref.watch(discStyleProvider) == DiscStyle.fullAlbum,
+                      label: l10n.album,
+                      selected:
+                          ref.watch(discStyleProvider) == DiscStyle.fullAlbum,
                       onTap: () => ref.read(discStyleProvider.notifier).state =
                           DiscStyle.fullAlbum,
                     ),
                   ],
                 ),
+
+                const SizedBox(height: 16),
+                const Divider(color: Colors.white12),
+
+                // --- GENERAL ---
+                sectionHeader(l10n.general),
+                _OptionTile(
+                  title: l10n.alwaysOnTop,
+                  subtitle: l10n.alwaysOnTopSubtitle,
+                  value: onTop,
+                  onChanged: (v) {
+                    ref.read(alwaysOnTopProvider.notifier).state = v;
+                    windowManager.setAlwaysOnTop(v);
+                  },
+                ),
+                const SizedBox(height: 16),
+                const Divider(color: Colors.white12),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Sona v$appVersion',
-                      style: const TextStyle(color: Colors.white38, fontSize: 12),
+                      style:
+                          const TextStyle(color: Colors.white38, fontSize: 12),
                     ),
                     Row(
                       children: [
                         TextButton.icon(
-                          icon: const Icon(Icons.code, size: 16),
-                          label: const Text('Source'),
+                          icon: Icon(Icons.code, size: 16, color: accent),
+                          label: Text(l10n.source,
+                              style: TextStyle(color: accent)),
                           onPressed: () => _open(repoUrl),
                         ),
                         TextButton.icon(
-                          icon: const Icon(Icons.download, size: 16),
-                          label: const Text('Releases'),
+                          icon: Icon(Icons.download, size: 16, color: accent),
+                          label: Text(l10n.releases,
+                              style: TextStyle(color: accent)),
                           onPressed: () => _open(releasesUrl),
                         ),
                       ],
@@ -204,7 +277,7 @@ class OptionsPanel extends ConsumerWidget {
     }
   }
 
-    Future<void> _pickMedia(WidgetRef ref) async {
+  Future<void> _pickMedia(WidgetRef ref) async {
     final src = await SmtcChannel.pickMedia();
     if (src == null) return;
 
@@ -218,7 +291,9 @@ class OptionsPanel extends ConsumerWidget {
     ref.read(customMediaPathProvider.notifier).state = dest;
     await SettingsService.setString('customMedia', dest);
     if (old != null) {
-      try { await File(old).delete(); } catch (_) {}
+      try {
+        await File(old).delete();
+      } catch (_) {}
     }
   }
 
@@ -227,10 +302,11 @@ class OptionsPanel extends ConsumerWidget {
     ref.read(customMediaPathProvider.notifier).state = null;
     SettingsService.remove('customMedia');
     if (old != null) {
-      try { File(old).delete(); } catch (_) {}
+      try {
+        File(old).delete();
+      } catch (_) {}
     }
   }
-
 }
 
 class _OptionTile extends StatelessWidget {
@@ -248,6 +324,7 @@ class _OptionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -277,8 +354,8 @@ class _OptionTile extends StatelessWidget {
         const SizedBox(width: 16),
         Switch(
           value: value,
-          activeThumbColor: ThemeColors.luminescencePure,
-          activeTrackColor: ThemeColors.primary,
+          activeThumbColor: Colors.white,
+          activeTrackColor: accent,
           inactiveThumbColor: Colors.white60,
           inactiveTrackColor: Colors.white12,
           onChanged: onChanged,
@@ -300,6 +377,7 @@ class _StyleChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
     return InkWell(
       borderRadius: BorderRadius.circular(8),
       onTap: onTap,
@@ -309,10 +387,10 @@ class _StyleChip extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           color: selected
-              ? ThemeColors.primary.withValues(alpha: 0.25)
+              ? accent.withValues(alpha: 0.25)
               : Colors.white.withValues(alpha: 0.06),
           border: Border.all(
-            color: selected ? ThemeColors.primaryLight : Colors.white24,
+            color: selected ? accent : Colors.white24,
             width: 1,
           ),
         ),
@@ -328,4 +406,3 @@ class _StyleChip extends StatelessWidget {
     );
   }
 }
-

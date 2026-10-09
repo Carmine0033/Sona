@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
 import 'settings_service.dart';
@@ -27,6 +28,12 @@ final class SettingsObserver extends ProviderObserver {
         p == null
             ? SettingsService.remove('customMedia')
             : SettingsService.setString('customMedia', p);
+        break;
+      case 'accent':
+        SettingsService.setInt('accent', (newValue as Color).toARGB32());
+        break;
+      case 'detached':
+        SettingsService.setBool('detached', newValue as bool);
         break;
     }
   }

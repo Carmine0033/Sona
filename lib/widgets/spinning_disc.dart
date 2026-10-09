@@ -57,9 +57,9 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
     final style = ref.watch(discStyleProvider);
     switch (style) {
       case DiscStyle.vinyl:
-        return _buildVinyl();
+        return _buildVinyl(context);
       case DiscStyle.fullAlbum:
-        return _buildFullAlbum();
+        return _buildFullAlbum(context);
     }
   }
 
@@ -87,15 +87,31 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
   }
 
   //Vynil + Album
-  Widget _buildVinyl() {
+  Widget _buildVinyl(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
     final s = widget.size;
     final labelD = s * 0.42;
     final holeD = s * 0.035;
     return RotationTransition(
       turns: _rotation,
-      child: SizedBox(
+      child: Container(
         width: s,
         height: s,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: accent.withValues(alpha: 0.22),
+              blurRadius: 24,
+              spreadRadius: 2,
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.5),
+              blurRadius: 16,
+              spreadRadius: 2,
+            ),
+          ],
+        ),
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -106,7 +122,7 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                    color: Colors.black.withValues(alpha: 0.55), width: 2),
+                    color: accent.withValues(alpha: 0.55), width: 2),
               ),
               child: ClipOval(child: _art()),
             ),
@@ -127,7 +143,8 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
   }
 
   //Full album
-  Widget _buildFullAlbum() {
+  Widget _buildFullAlbum(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
     final s = widget.size;
     return RotationTransition(
       turns: _rotation,
@@ -137,6 +154,11 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           boxShadow: [
+            BoxShadow(
+              color: accent.withValues(alpha: 0.25),
+              blurRadius: 24,
+              spreadRadius: 2,
+            ),
             BoxShadow(
                 color: Colors.black.withValues(alpha: 0.5),
                 blurRadius: 20,
@@ -155,7 +177,7 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
                 shape: BoxShape.circle,
                 color: const Color(0xCC0A0A0A),
                 border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.2), width: 1),
+                    color: accent.withValues(alpha: 0.4), width: 1),
               ),
             ),
           ],

@@ -1,0 +1,61 @@
+{
+  "options": "Opzioni",
+  "player": "Riproduttore",
+  "nothingPlaying": "Nessun brano in riproduzione",
+  "error": "Errore: {error}",
+  "@error": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "cancel": "Annulla",
+  "apply": "Applica",
+
+  "detachCard": "Stacca Card Vinile",
+  "reattachCard": "Riaggancia alla finestra principale",
+  "detachedCardTitle": "Card Vinile Staccata",
+  "detachedCardSubtitle": "La card del vinile è ora in una finestra trasparente separata.",
+  "seekbarStyleWave": "Stile Barra (Onda)",
+  "seekbarStyleLine": "Stile Barra (Linea)",
+  "discStyleVinyl": "Stile Disco (Vinile)",
+  "discStyleAlbum": "Stile Disco (Copertina)",
+
+  "settings": "IMPOSTAZIONI",
+  "personalization": "Personalizzazione",
+  "accentColor": "Colore accento",
+  "opaqueBackground": "Sfondo opaco",
+  "opaqueBackgroundSubtitle": "Usa uno sfondo solido al posto dell'effetto vetro",
+  "progressBarStyle": "Stile barra di progresso",
+  "progressBarStyleSubtitle": "Scegli tra linea classica o onda animata",
+  "line": "Linea",
+  "wave": "Onda",
+  "discImage": "Immagine disco",
+  "choose": "Scegli",
+  "reset": "Ripristina",
+  "discStyle": "Stile disco",
+  "vinyl": "Vinile",
+  "album": "Copertina",
+  "general": "Generale",
+  "alwaysOnTop": "Sempre in primo piano",
+  "alwaysOnTopSubtitle": "Mantieni la finestra sopra le altre applicazioni",
+  "source": "Codice Sorgente",
+  "releases": "Rilasci",
+  "transparentBackground": "Sfondo trasparente",
+
+  "searchingLyrics": "Ricerca testo in corso...",
+  "syncingLyrics": "Sincronizzazione dei versi tramite LRCLIB",
+  "lyricsUnavailable": "Testo non disponibile",
+  "serverTimeout": "Timeout server (lrclib.net non raggiungibile)",
+  "noSyncedLyrics": "Nessun testo sincronizzato",
+  "noSyncedLyricsSubtitle": "Questo brano non ha un testo sincronizzato disponibile",
+
+  "newVersionAvailable": "Nuova versione disponibile (v{version})",
+  "@newVersionAvailable": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "update": "Aggiorna",
+  "downloadingUpdate": "Download aggiornamento in corso…",
+  "updateFailed": "Aggiornamento non riuscito"
+}

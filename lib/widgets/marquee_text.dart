@@ -4,7 +4,15 @@ class MarqueeText extends StatelessWidget {
   final String text;
   final TextStyle style;
   final double velocity; // px/sec
-  const MarqueeText(this.text, {super.key, required this.style, this.velocity = 28});
+  final Alignment alignment;
+
+  const MarqueeText(
+    this.text, {
+    super.key,
+    required this.style,
+    this.velocity = 28,
+    this.alignment = Alignment.center,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,11 +23,17 @@ class MarqueeText extends StatelessWidget {
         textDirection: TextDirection.ltr,
       )..layout();
 
-      // Se il testo entra, niente scroll.
+      // Se il testo entra, viene centrato.
       if (tp.width <= constraints.maxWidth) {
         return Align(
-          alignment: Alignment.centerLeft,
-          child: Text(text, style: style, maxLines: 1, overflow: TextOverflow.clip),
+          alignment: alignment,
+          child: Text(
+            text,
+            style: style,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.clip,
+          ),
         );
       }
       return _Scrolling(

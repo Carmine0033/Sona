@@ -57,19 +57,20 @@ abstract final class ThemeColors {
   static const onErrorContainer = Color(0xFFFFDAD6);
 }
 
-ThemeData buildTheme() {
+ThemeData buildTheme([Color? primaryAccent]) {
+  final primary = primaryAccent ?? ThemeColors.primary;
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: ThemeColors.background,
-    colorScheme: const ColorScheme.dark(
+    colorScheme: ColorScheme.dark(
       surface: ThemeColors.surface,
       surfaceContainerLow: ThemeColors.surfaceLow,
       surfaceContainerHigh: ThemeColors.surfaceHigh,
       surfaceContainerHighest: ThemeColors.surfaceHighest,
-      primary: ThemeColors.primary,
+      primary: primary,
       onPrimary: ThemeColors.onPrimary,
-      primaryContainer: ThemeColors.primaryContainer,
+      primaryContainer: primary,
       onPrimaryContainer: ThemeColors.onPrimaryContainer,
       secondary: ThemeColors.secondary,
       onSecondary: ThemeColors.onSecondary,

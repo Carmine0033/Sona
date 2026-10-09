@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../core/theme.dart';
 import '../models/now_playing.dart';
 import '../providers/app_providers.dart';
 
@@ -111,14 +110,15 @@ class _SeekBarState extends ConsumerState<SeekBar>
   }
 
   Widget _buildLine(double fraction) {
+    final accent = Theme.of(context).colorScheme.primary;
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
         trackHeight: 4,
         thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
         overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
-        activeTrackColor: ThemeColors.primary,
+        activeTrackColor: accent,
         inactiveTrackColor: Colors.white24,
-        thumbColor: ThemeColors.primary,
+        thumbColor: accent,
       ),
       child: Slider(
         value: fraction,
@@ -130,6 +130,7 @@ class _SeekBarState extends ConsumerState<SeekBar>
   }
 
   Widget _buildWave(double fraction) {
+    final accent = Theme.of(context).colorScheme.primary;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: LayoutBuilder(builder: (context, c) {
@@ -158,7 +159,7 @@ class _SeekBarState extends ConsumerState<SeekBar>
                 progress: _dragging ? _dragFraction : fraction,
                 phase: phase,
                 amplitude: amplitude,
-                played: ThemeColors.primary,
+                played: accent,
                 remaining: Colors.white24,
               ),
             ),

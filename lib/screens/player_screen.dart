@@ -1,15 +1,14 @@
 import 'dart:ui'; // ImageFilter.blur
 import 'package:flutter/material.dart';
+import 'package:media_overlay/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_overlay/models/now_playing.dart';
 import 'package:media_overlay/services/settings_service.dart';
 import '../core/theme.dart';
+import '../main.dart';
 import '../providers/app_providers.dart';
-import '../widgets/spinning_disc.dart';
-import '../widgets/seek_bar.dart';
 import '../widgets/full_lyrics_view.dart';
-import '../widgets/marquee_text.dart';
-import '../services/smtc_channel.dart';
+import '../widgets/vinyl_card.dart';
 
 class PlayerScreen extends ConsumerWidget {
   const PlayerScreen({super.key});
@@ -17,26 +16,30 @@ class PlayerScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     //preferences
-    ref.listen(alwaysOnTopProvider, (_, n) => SettingsService.setBool("alwaysOnTop", n));
-    
+    ref.listen(
+        alwaysOnTopProvider, (_, n) => SettingsService.setBool("alwaysOnTop", n));
+
+    final accent = Theme.of(context).colorScheme.primary;
     final nowPlaying = ref.watch(nowPlayingProvider);
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: ThemeColors.canvasAbyss,
       body: nowPlaying.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: ThemeColors.primary),
+        loading: () => Center(
+          child: CircularProgressIndicator(color: accent),
         ),
         error: (e, _) => Center(
           child: Text(
-            'Errore: $e',
+            l10n.error(e.toString()),
             style: const TextStyle(color: ThemeColors.onSurface),
           ),
         ),
         data: (info) => info == null
-            ? const Center(
+            ? Center(
                 child: Text(
-                  'Nessun brano in riproduzione',
-                  style: TextStyle(
+                  l10n.nothingPlaying,
+                  style: const TextStyle(
                     color: ThemeColors.onSurfaceVariant,
                     fontSize: 16,
                   ),
@@ -57,19 +60,19 @@ class _PlayerView extends ConsumerStatefulWidget {
 }
 
 class _PlayerViewState extends ConsumerState<_PlayerView> {
-  bool _isShuffle = false;
-  bool _isRepeat = false;
-  double _volume = 0.8;
-
   @override
   Widget build(BuildContext context) {
-    final controller = ref.read(playbackControllerProvider);
     final isOpaque = ref.watch(opaqueBackgroundProvider);
     final seekStyle = ref.watch(seekBarStyleProvider);
     final discStyle = ref.watch(discStyleProvider);
+    final detached = ref.watch(detachedProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     final art = widget.info.artwork;
     final hasArt = art != null && art.isNotEmpty;
+
+    final leftWidget =
+        detached ? _buildDetachedPlaceholder(l10n) : _buildPlayerCard();
 
     return Stack(
       fit: StackFit.expand,
@@ -105,7 +108,9 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                 icon: seekStyle == SeekBarStyle.wave
                     ? Icons.waves
                     : Icons.linear_scale,
-                tooltip: 'Seekbar Style',
+                tooltip: seekStyle == SeekBarStyle.wave
+                    ? l10n.seekbarStyleWave
+                    : l10n.seekbarStyleLine,
                 onTap: () {
                   ref.read(seekBarStyleProvider.notifier).state =
                       seekStyle == SeekBarStyle.wave
@@ -116,7 +121,9 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
               const SizedBox(width: 8),
               _HeaderIconButton(
                 icon: isOpaque ? Icons.dark_mode : Icons.blur_on,
-                tooltip: isOpaque ? 'Transparent Background' : 'Opaque Background',
+                tooltip: isOpaque
+                    ? l10n.transparentBackground
+                    : l10n.opaqueBackground,
                 onTap: () {
                   ref.read(opaqueBackgroundProvider.notifier).state = !isOpaque;
                 },
@@ -126,7 +133,9 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                 icon: discStyle == DiscStyle.vinyl
                     ? Icons.album
                     : Icons.disc_full,
-                tooltip: 'Disc Style (${discStyle == DiscStyle.vinyl ? "Vinyl" : "Album"})',
+                tooltip: discStyle == DiscStyle.vinyl
+                    ? l10n.discStyleVinyl
+                    : l10n.discStyleAlbum,
                 active: discStyle == DiscStyle.vinyl,
                 onTap: () {
                   ref.read(discStyleProvider.notifier).state =
@@ -150,16 +159,17 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                 if (isWide) {
                   return Row(
                     children: [
-                      // Sinistra: Card del Player (spostata a sinistra come richiesto)
+                      // Sinistra: Card del Player
                       Padding(
-                        padding: const EdgeInsets.only(left: 32, right: 16, bottom: 24, top: 12),
+                        padding: const EdgeInsets.only(
+                            left: 32, right: 16, bottom: 24, top: 12),
                         child: Center(
                           child: SingleChildScrollView(
-                            child: _buildPlayerCard(controller),
+                            child: leftWidget,
                           ),
                         ),
                       ),
-                      // Destra: Sezione dei Lyrics sincronizzati (simile allo screen)
+                      // Destra: Sezione dei Lyrics sincronizzati
                       const Expanded(
                         child: Padding(
                           padding: EdgeInsets.only(right: 24, bottom: 12),
@@ -171,10 +181,11 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                 } else {
                   // Layout compatto/verticale per schermi stretti
                   return SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 16),
                     child: Column(
                       children: [
-                        _buildPlayerCard(controller),
+                        leftWidget,
                         const SizedBox(height: 24),
                         const SizedBox(
                           height: 420,
@@ -192,217 +203,78 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    SmtcChannel.getVolume().then((v) {
-      if (v >= 0 && mounted) setState(() => _volume = v);
-    });
-  }
-
-  // Costruzione della Card del Player (spostata a sinistra, stile screenshot)
-  Widget _buildPlayerCard(dynamic controller) {
+  Widget _buildDetachedPlaceholder(AppLocalizations l10n) {
+    final accent = Theme.of(context).colorScheme.primary;
     return Container(
       width: 420,
-      padding: const EdgeInsets.all(28),
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 48),
       decoration: BoxDecoration(
-        color: ThemeColors.surfaceElevated.withValues(alpha: 0.38),
+        color: Color.alphaBlend(
+          accent.withValues(alpha: 0.06),
+          ThemeColors.surfaceElevated.withValues(alpha: 0.35),
+        ),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: ThemeColors.luminescenceSubtle.withValues(alpha: 0.18),
-          width: 1,
+          color: accent.withValues(alpha: 0.20),
+          width: 1.5,
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.45),
-            blurRadius: 28,
-            spreadRadius: 4,
-            offset: const Offset(0, 8),
-          ),
-        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Disco rotante con copertina
-          SpinningDisc(
-            albumArt: widget.info.artwork,
-            spinning: widget.info.isPlaying,
-            size: 185,
+          Icon(
+            Icons.push_pin_outlined,
+            size: 42,
+            color: accent.withValues(alpha: 0.8),
           ),
-          const SizedBox(height: 22),
-
-          // Titolo brano
-          SizedBox(
-            height: 28,
-            child: MarqueeText(
-              widget.info.title.isEmpty ? '—' : widget.info.title,
-              style: const TextStyle(
-                color: ThemeColors.luminescencePure,
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.4,
-              ),
+          const SizedBox(height: 16),
+          Text(
+            l10n.detachedCardTitle,
+            style: const TextStyle(
+              color: ThemeColors.luminescencePure,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 4),
-
-          // Artista
+          const SizedBox(height: 8),
           Text(
-            widget.info.artist.isEmpty ? '—' : widget.info.artist,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+            l10n.detachedCardSubtitle,
             textAlign: TextAlign.center,
             style: const TextStyle(
               color: ThemeColors.luminescenceSubtle,
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
+              fontSize: 13,
             ),
           ),
-          const SizedBox(height: 22),
-
-          // Barra di progresso / seek bar
-          const SeekBar(),
-          const SizedBox(height: 18),
-
-          // Pulsanti di controllo riproduzione (Shuffle, Prev, Play/Pause, Next, Repeat)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                icon: Icon(
-                  Icons.shuffle_rounded,
-                  size: 20,
-                  color: _isShuffle
-                      ? ThemeColors.primaryLight
-                      : Colors.white.withValues(alpha: 0.45),
-                ),
-                tooltip: 'Shuffle',
-                onPressed: () => setState(() => _isShuffle = !_isShuffle),
-              ),
-              _CtrlButton(
-                icon: Icons.skip_previous_rounded,
-                onTap: controller.previous,
-              ),
-              _CtrlButton(
-                icon: widget.info.isPlaying
-                    ? Icons.pause_rounded
-                    : Icons.play_arrow_rounded,
-                hero: true,
-                onTap: controller.playPause,
-              ),
-              _CtrlButton(
-                icon: Icons.skip_next_rounded,
-                onTap: controller.next,
-              ),
-              IconButton(
-                icon: Icon(
-                  Icons.repeat_rounded,
-                  size: 20,
-                  color: _isRepeat
-                      ? ThemeColors.primaryLight
-                      : Colors.white.withValues(alpha: 0.45),
-                ),
-                tooltip: 'Repeat',
-                onPressed: () => setState(() => _isRepeat = !_isRepeat),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Slider per il Volume / Barra di controllo bottom
-          Row(
-            children: [
-              Icon(
-                _volume == 0 ? Icons.volume_off : Icons.volume_down,
-                size: 16,
-                color: Colors.white.withValues(alpha: 0.5),
-              ),
-              Expanded(
-                child: SliderTheme(
-                  data: SliderTheme.of(context).copyWith(
-                    trackHeight: 3,
-                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 4),
-                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 8),
-                    activeTrackColor: Colors.white.withValues(alpha: 0.8),
-                    inactiveTrackColor: Colors.white.withValues(alpha: 0.2),
-                    thumbColor: Colors.white,
-                  ),
-                  child: Slider(
-                    value: _volume,
-                    onChanged: (v) {
-                      setState(() => _volume= v);
-                      SmtcChannel.setVolume(v);
-                    },
-                  ),
-                ),
-              ),
-              Icon(
-                Icons.volume_up,
-                size: 16,
-                color: Colors.white.withValues(alpha: 0.5),
-              ),
-            ],
+          const SizedBox(height: 24),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.push_pin, size: 16),
+            label: Text(l10n.reattachCard),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: accent,
+              side: BorderSide(color: accent.withValues(alpha: 0.5)),
+            ),
+            onPressed: () {
+              ref.read(detachedProvider.notifier).state = false;
+            },
           ),
         ],
       ),
     );
   }
-}
 
-class _CtrlButton extends StatelessWidget {
-  final IconData icon;
-  final VoidCallback onTap;
-  final bool hero;
-  const _CtrlButton({
-    required this.icon,
-    required this.onTap,
-    this.hero = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final size = hero ? 52.0 : 40.0;
-    final iconSize = hero ? 30.0 : 22.0;
-
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: hero
-                ? Colors.white
-                : Colors.white.withValues(alpha: 0.10),
-            border: Border.all(
-              color: hero
-                  ? Colors.white
-                  : Colors.white.withValues(alpha: 0.18),
-              width: 1,
-            ),
-            boxShadow: hero
-                ? [
-                    BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.35),
-                      blurRadius: 14,
-                      spreadRadius: 1,
-                    )
-                  ]
-                : null,
-          ),
-          child: Icon(
-            icon,
-            color: hero ? Colors.black : Colors.white,
-            size: iconSize,
-          ),
-        ),
-      ),
+  Widget _buildPlayerCard() {
+    return VinylCard(
+      info: widget.info,
+      isDetached: false,
+      onToggleDetach: () async {
+        ref.read(detachedProvider.notifier).state = true;
+        final proc = await openFramelessVinylWindow();
+        proc.exitCode.then((_) {
+          if (context.mounted) {
+            ref.read(detachedProvider.notifier).state = false;
+          }
+        });
+      },
     );
   }
 }
@@ -422,6 +294,7 @@ class _HeaderIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
     return Tooltip(
       message: tooltip,
       child: Material(
@@ -434,18 +307,18 @@ class _HeaderIconButton extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: active
-                  ? ThemeColors.primary.withValues(alpha: 0.25)
+                  ? accent.withValues(alpha: 0.25)
                   : Colors.black.withValues(alpha: 0.25),
               border: Border.all(
                 color: active
-                    ? ThemeColors.primaryLight.withValues(alpha: 0.4)
+                    ? accent.withValues(alpha: 0.4)
                     : Colors.white.withValues(alpha: 0.1),
               ),
             ),
             child: Icon(
               icon,
               size: 18,
-              color: active ? ThemeColors.primaryLight : Colors.white70,
+              color: active ? accent : Colors.white70,
             ),
           ),
         ),

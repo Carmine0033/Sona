@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:media_overlay/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme.dart';
 import '../models/lyrics.dart';
@@ -101,25 +102,26 @@ class _FullLyricsViewState extends ConsumerState<FullLyricsView>
     });
 
     final lyricsState = ref.watch(lyricsProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return lyricsState.when(
       loading: () => _buildStatusMessage(
         icon: Icons.search_rounded,
-        title: 'Ricerca testo in corso...',
-        subtitle: 'Sincronizzazione dei versi tramite LRCLIB',
+        title: l10n.searchingLyrics,
+        subtitle: l10n.syncingLyrics,
         showProgress: true,
       ),
       error: (e, _) => _buildStatusMessage(
         icon: Icons.cloud_off_rounded,
-        title: 'Lyrics unavailable',
-        subtitle: 'Timeout server (lrclib.net non raggiungibile)',
+        title: l10n.lyricsUnavailable,
+        subtitle: l10n.serverTimeout,
       ),
       data: (lines) {
         if (lines.isEmpty) {
           return _buildStatusMessage(
             icon: Icons.music_note_outlined,
-            title: 'Nessun testo sincronizzato',
-            subtitle: 'Questo brano non ha un testo sincronizzato disponibile',
+            title: l10n.noSyncedLyrics,
+            subtitle: l10n.noSyncedLyricsSubtitle,
           );
         }
 
@@ -187,7 +189,7 @@ class _FullLyricsViewState extends ConsumerState<FullLyricsView>
                         shadows: isActive
                             ? [
                                 Shadow(
-                                  color: ThemeColors.primary.withValues(alpha: 0.5),
+                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
                                   blurRadius: 18,
                                 ),
                               ]
@@ -217,8 +219,8 @@ class _FullLyricsViewState extends ConsumerState<FullLyricsView>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (showProgress)
-              const CircularProgressIndicator(
-                color: ThemeColors.primaryLight,
+              CircularProgressIndicator(
+                color: Theme.of(context).colorScheme.primary,
                 strokeWidth: 2.5,
               )
             else

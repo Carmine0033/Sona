@@ -1,0 +1,61 @@
+{
+  "options": "Options",
+  "player": "Player",
+  "nothingPlaying": "No track playing",
+  "error": "Error: {error}",
+  "@error": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "cancel": "Cancel",
+  "apply": "Apply",
+
+  "detachCard": "Detach Vinyl Card",
+  "reattachCard": "Re-attach to main window",
+  "detachedCardTitle": "Vinyl Card Detached",
+  "detachedCardSubtitle": "The vinyl card is currently in a separate transparent window.",
+  "seekbarStyleWave": "Seekbar Style (Wave)",
+  "seekbarStyleLine": "Seekbar Style (Line)",
+  "discStyleVinyl": "Disc Style (Vinyl)",
+  "discStyleAlbum": "Disc Style (Album)",
+
+  "settings": "SETTINGS",
+  "personalization": "Personalization",
+  "accentColor": "Accent color",
+  "opaqueBackground": "Opaque background",
+  "opaqueBackgroundSubtitle": "Use solid background instead of glass effect",
+  "progressBarStyle": "Progress bar style",
+  "progressBarStyleSubtitle": "Choose between standard line or animated wave",
+  "line": "Line",
+  "wave": "Wave",
+  "discImage": "Disc image",
+  "choose": "Choose",
+  "reset": "Reset",
+  "discStyle": "Disc style",
+  "vinyl": "Vinyl",
+  "album": "Album",
+  "general": "General",
+  "alwaysOnTop": "Always on top",
+  "alwaysOnTopSubtitle": "Keep window above other applications",
+  "source": "Source",
+  "releases": "Releases",
+  "transparentBackground": "Transparent background",
+
+  "searchingLyrics": "Searching lyrics...",
+  "syncingLyrics": "Syncing verses via LRCLIB",
+  "lyricsUnavailable": "Lyrics unavailable",
+  "serverTimeout": "Server timeout (lrclib.net unreachable)",
+  "noSyncedLyrics": "No synced lyrics",
+  "noSyncedLyricsSubtitle": "This track does not have synced lyrics available",
+
+  "newVersionAvailable": "New version available (v{version})",
+  "@newVersionAvailable": {
+    "placeholders": {
+      "version": {}
+    }
+  },
+  "update": "Update",
+  "downloadingUpdate": "Downloading update…",
+  "updateFailed": "Update failed"
+}

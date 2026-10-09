@@ -9,6 +9,7 @@ import '../models/lyrics.dart';
 import '../services/lyrics_service.dart';
 import '../services/update_service.dart';
 import '../services/settings_service.dart';
+import 'package:flutter/material.dart';
 
 
 //preferences
@@ -32,6 +33,15 @@ final discStyleProvider = StateProvider<DiscStyle>(
 final customMediaPathProvider = StateProvider<String?>(
     (ref) => SettingsService.getString('customMedia'),
     name: 'customMedia');
+
+final accentColorProvider= StateProvider<Color>(
+  (ref) => Color(SettingsService.getInt('accent', 0xFF8B5CF6)),
+  name: 'accent'
+);
+
+final detachedProvider = StateProvider<bool>(
+    (ref) => SettingsService.getBool('detached', false),
+    name: 'detached');
 
 
 final playbackControllerProvider= Provider<PlaybackController>((ref) {
