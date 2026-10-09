@@ -1,7 +1,7 @@
-name: media_overlay
+﻿name: media_overlay
 description: "A new Flutter project."
 publish_to: 'none'
-version: 0.1.1+2
+version: 0.1.2+4
 
 environment:
   sdk: ^3.13.5
@@ -25,3 +25,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+

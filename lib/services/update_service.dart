@@ -14,13 +14,21 @@ class UpdateService {
 
   static Future<UpdateInfo?> check() async {
     try {
-      final res = await http.get(Uri.parse(_api),
-          headers: {'Accept': 'application/vnd.github+json'});
+      final res = await http.get(
+        Uri.parse(_api),
+        headers: {
+          'Accept': 'application/vnd.github+json',
+          'User-Agent': 'SonaApp',
+        },
+      );
       if (res.statusCode != 200) return null;
 
       final json = jsonDecode(res.body) as Map<String, dynamic>;
-      final tag = (json['tag_name'] as String).replaceFirst('v', ''); 
-      final htmlUrl = json['html_url'] as String;
+      final rawTag = (json['tag_name'] as String? ?? '').trim();
+      final htmlUrl = (json['html_url'] as String? ?? '').trim();
+
+      // Rimuove qualsiasi prefisso non numerico (es. "v", "v.", "v-", ecc.)
+      final tag = rawTag.replaceAll(RegExp(r'^[^\d]+'), '');
 
       final info = await PackageInfo.fromPlatform();
       final current = info.version; // da pubspec.yaml
@@ -33,9 +41,19 @@ class UpdateService {
   }
 
   static bool _isNewer(String remote, String local) {
-    List<int> parse(String v) =>
-        v.split('.').map((e) => int.tryParse(e.trim()) ?? 0).toList();
-    final r = parse(remote), l = parse(local);
+    List<int> parse(String v) {
+      final clean = v
+          .replaceAll(RegExp(r'^[^\d]+'), '')
+          .split('+')
+          .first
+          .split('-')
+          .first
+          .trim();
+      return clean.split('.').map((e) => int.tryParse(e.trim()) ?? 0).toList();
+    }
+
+    final r = parse(remote);
+    final l = parse(local);
     for (int i = 0; i < 3; i++) {
       final rv = i < r.length ? r[i] : 0;
       final lv = i < l.length ? l[i] : 0;
