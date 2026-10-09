@@ -2,18 +2,23 @@ import 'dart:ui'; // ImageFilter.blur
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_overlay/models/now_playing.dart';
+import 'package:media_overlay/services/settings_service.dart';
 import '../core/theme.dart';
 import '../providers/app_providers.dart';
 import '../widgets/spinning_disc.dart';
 import '../widgets/seek_bar.dart';
 import '../widgets/full_lyrics_view.dart';
 import '../widgets/marquee_text.dart';
+import '../services/smtc_channel.dart';
 
 class PlayerScreen extends ConsumerWidget {
   const PlayerScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    //preferences
+    ref.listen(alwaysOnTopProvider, (_, n) => SettingsService.setBool("alwaysOnTop", n));
+    
     final nowPlaying = ref.watch(nowPlayingProvider);
     return Scaffold(
       backgroundColor: ThemeColors.canvasAbyss,
@@ -61,7 +66,7 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
     final controller = ref.read(playbackControllerProvider);
     final isOpaque = ref.watch(opaqueBackgroundProvider);
     final seekStyle = ref.watch(seekBarStyleProvider);
-    final alwaysOnTop = ref.watch(alwaysOnTopProvider);
+    final discStyle = ref.watch(discStyleProvider);
 
     final art = widget.info.artwork;
     final hasArt = art != null && art.isNotEmpty;
@@ -118,13 +123,16 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
               ),
               const SizedBox(width: 8),
               _HeaderIconButton(
-                icon: alwaysOnTop
-                    ? Icons.push_pin
-                    : Icons.push_pin_outlined,
-                tooltip: 'Always on Top',
-                active: alwaysOnTop,
+                icon: discStyle == DiscStyle.vinyl
+                    ? Icons.album
+                    : Icons.disc_full,
+                tooltip: 'Disc Style (${discStyle == DiscStyle.vinyl ? "Vinyl" : "Album"})',
+                active: discStyle == DiscStyle.vinyl,
                 onTap: () {
-                  ref.read(alwaysOnTopProvider.notifier).state = !alwaysOnTop;
+                  ref.read(discStyleProvider.notifier).state =
+                      discStyle == DiscStyle.vinyl
+                          ? DiscStyle.fullAlbum
+                          : DiscStyle.vinyl;
                 },
               ),
             ],
@@ -182,6 +190,14 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
         ),
       ],
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    SmtcChannel.getVolume().then((v) {
+      if (v >= 0 && mounted) setState(() => _volume = v);
+    });
   }
 
   // Costruzione della Card del Player (spostata a sinistra, stile screenshot)
@@ -315,7 +331,10 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                   ),
                   child: Slider(
                     value: _volume,
-                    onChanged: (v) => setState(() => _volume = v),
+                    onChanged: (v) {
+                      setState(() => _volume= v);
+                      SmtcChannel.setVolume(v);
+                    },
                   ),
                 ),
               ),

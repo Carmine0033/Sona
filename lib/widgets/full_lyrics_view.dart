@@ -110,9 +110,9 @@ class _FullLyricsViewState extends ConsumerState<FullLyricsView>
         showProgress: true,
       ),
       error: (e, _) => _buildStatusMessage(
-        icon: Icons.lyrics_outlined,
-        title: 'Testo non disponibile',
-        subtitle: 'Non è stato possibile caricare il testo per questo brano',
+        icon: Icons.cloud_off_rounded,
+        title: 'Lyrics unavailable',
+        subtitle: 'Timeout server (lrclib.net non raggiungibile)',
       ),
       data: (lines) {
         if (lines.isEmpty) {

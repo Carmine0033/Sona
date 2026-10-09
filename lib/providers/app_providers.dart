@@ -8,6 +8,31 @@ import '../services/smtc_playback_controller.dart';
 import '../models/lyrics.dart';
 import '../services/lyrics_service.dart';
 import '../services/update_service.dart';
+import '../services/settings_service.dart';
+
+
+//preferences
+
+final opaqueBackgroundProvider =
+    StateProvider<bool>((ref) => SettingsService.getBool('opaque', false),
+        name: 'opaque');
+
+final alwaysOnTopProvider =
+    StateProvider<bool>((ref) => SettingsService.getBool('alwaysOnTop', true),
+        name: 'alwaysOnTop');
+
+final seekBarStyleProvider = StateProvider<SeekBarStyle>(
+    (ref) => SeekBarStyle.values[SettingsService.getInt('seekStyle', 0)],
+    name: 'seekStyle');
+
+final discStyleProvider = StateProvider<DiscStyle>(
+    (ref) => DiscStyle.values[SettingsService.getInt('discStyle', 0)],
+    name: 'discStyle');
+
+final customMediaPathProvider = StateProvider<String?>(
+    (ref) => SettingsService.getString('customMedia'),
+    name: 'customMedia');
+
 
 final playbackControllerProvider= Provider<PlaybackController>((ref) {
   return SmtcPlaybackController();
@@ -33,12 +58,9 @@ final appVersionProvider = FutureProvider<String>((ref) async {
 
 enum AppSection { player, options }
 enum SeekBarStyle { line, wave }
+enum DiscStyle { vinyl, fullAlbum }
 
 final selectedSectionProvider =StateProvider<AppSection>((ref) => AppSection.player);
-
-final opaqueBackgroundProvider = StateProvider<bool>((ref) => false);
-final alwaysOnTopProvider = StateProvider<bool>((ref) => false);
-final seekBarStyleProvider = StateProvider<SeekBarStyle>((ref) => SeekBarStyle.line);
 
 
 class TrackRef {

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_acrylic/flutter_acrylic.dart';
 import 'package:media_overlay/screens/home_shell.dart';
+import 'package:media_overlay/services/settings_observer.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/theme.dart';
+import 'services/settings_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Window.initialize();
+  await SettingsService.init();
   await windowManager.ensureInitialized();
 
   const options = WindowOptions(
@@ -22,11 +23,13 @@ Future<void> main() async {
   );
 
   await windowManager.waitUntilReadyToShow(options, () async {
+    //load preferences
+    await windowManager.setAlwaysOnTop(SettingsService.getBool('alwaysOnTop', true));
     await windowManager.show();
     await windowManager.focus();
   });
 
-  runApp(const ProviderScope(child: SonaApp()));
+  runApp(ProviderScope(observers:[SettingsObserver()], child: const SonaApp()));
 }
 
 class SonaApp extends StatelessWidget {

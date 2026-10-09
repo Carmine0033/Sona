@@ -130,39 +130,42 @@ class _SeekBarState extends ConsumerState<SeekBar>
   }
 
   Widget _buildWave(double fraction) {
-    return LayoutBuilder(builder: (context, c) {
-      final width = c.maxWidth;
-      final phase = DateTime.now().millisecondsSinceEpoch / 1000.0 * 3.0;
-      final amplitude = _playing ? 5.0 : 1.5; // piatta in pausa
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: LayoutBuilder(builder: (context, c) {
+        final width = c.maxWidth;
+        final phase = DateTime.now().millisecondsSinceEpoch / 1000.0 * 3.0;
+        final amplitude = _playing ? 4.0 : 1.0; // ampiezza bilanciata per la card
 
-      void setFromX(double dx) =>
-          setState(() => _dragFraction = (dx / width).clamp(0.0, 1.0));
+        void setFromX(double dx) =>
+            setState(() => _dragFraction = (dx / width).clamp(0.0, 1.0));
 
-      return GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onHorizontalDragStart: (_) => setState(() => _dragging = true),
-        onHorizontalDragUpdate: (d) => setFromX(d.localPosition.dx),
-        onHorizontalDragEnd: (_) => _commitSeek(_dragFraction),
-        onTapDown: (d) {
-          setState(() => _dragging = true);
-          setFromX(d.localPosition.dx);
-        },
-        onTapUp: (_) => _commitSeek(_dragFraction),
-        child: SizedBox(
-          height: 26,
-          width: double.infinity,
-          child: CustomPaint(
-            painter: _WavePainter(
-              progress: _dragging ? _dragFraction : fraction,
-              phase: phase,
-              amplitude: amplitude,
-              played: ThemeColors.primary,
-              remaining: Colors.white24,
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onHorizontalDragStart: (_) => setState(() => _dragging = true),
+          onHorizontalDragUpdate: (d) => setFromX(d.localPosition.dx),
+          onHorizontalDragEnd: (_) => _commitSeek(_dragFraction),
+          onTapDown: (d) {
+            setState(() => _dragging = true);
+            setFromX(d.localPosition.dx);
+          },
+          onTapUp: (_) => _commitSeek(_dragFraction),
+          child: SizedBox(
+            height: 22,
+            width: double.infinity,
+            child: CustomPaint(
+              painter: _WavePainter(
+                progress: _dragging ? _dragFraction : fraction,
+                phase: phase,
+                amplitude: amplitude,
+                played: ThemeColors.primary,
+                remaining: Colors.white24,
+              ),
             ),
           ),
-        ),
-      );
-    });
+        );
+      }),
+    );
   }
 }
 

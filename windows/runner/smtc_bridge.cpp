@@ -20,6 +20,13 @@
 #include <thread>
 #include <vector>
 
+#include <windows.h>
+#include <commdlg.h>
+#pragma comment(lib, "comdlg32.lib")
+
+#include <mmdeviceapi.h>
+#include <audiopolicy.h>
+
 using namespace winrt;
 using namespace winrt::Windows::Media::Control;
 using namespace winrt::Windows::Storage::Streams;
@@ -396,6 +403,104 @@ EncodableValue ReadCurrentOnce() {
   }
 }
 
+
+//check for music player
+bool IsProcessNamed(DWORD pid, const wchar_t* name) {
+  if (pid == 0) return false;
+  HANDLE h= OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+  if (!h) return false;
+  wchar_t path[MAX_PATH];
+  DWORD size= MAX_PATH;
+  bool match= false;
+  if (QueryFullProcessImageNameW(h, 0, path, &size)) {
+    std::wstring p(path);
+    size_t slash = p.find_last_of(L"\\/");
+    std::wstring base = (slash == std::wstring::npos) ? p : p.substr(slash + 1);
+    match = (_wcsicmp(base.c_str(), name) == 0);
+  }
+  CloseHandle(h);
+  return match;
+}
+
+template <typename F>
+bool WithSpotifyVolume(F fn) {
+  bool found = false;
+  IMMDeviceEnumerator* enumerator = nullptr;
+  if (FAILED(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL,
+                              __uuidof(IMMDeviceEnumerator),
+                              (void**)&enumerator))) {
+    return false;
+  }
+  IMMDevice* device = nullptr;
+  if (SUCCEEDED(enumerator->GetDefaultAudioEndpoint(eRender, eConsole, &device))) {
+    IAudioSessionManager2* mgr = nullptr;
+    if (SUCCEEDED(device->Activate(__uuidof(IAudioSessionManager2), CLSCTX_ALL,
+                                   nullptr, (void**)&mgr))) {
+      IAudioSessionEnumerator* sessions = nullptr;
+      if (SUCCEEDED(mgr->GetSessionEnumerator(&sessions))) {
+        int count = 0;
+        sessions->GetCount(&count);
+        for (int i = 0; i < count && !found; i++) {
+          IAudioSessionControl* ctrl = nullptr;
+          if (SUCCEEDED(sessions->GetSession(i, &ctrl))) {
+            IAudioSessionControl2* ctrl2 = nullptr;
+            if (SUCCEEDED(ctrl->QueryInterface(__uuidof(IAudioSessionControl2),
+                                               (void**)&ctrl2))) {
+              DWORD pid = 0;
+              ctrl2->GetProcessId(&pid);
+              if (IsProcessNamed(pid, L"Spotify.exe")) {
+                ISimpleAudioVolume* vol = nullptr;
+                if (SUCCEEDED(ctrl2->QueryInterface(__uuidof(ISimpleAudioVolume),
+                                                    (void**)&vol))) {
+                  fn(vol);
+                  vol->Release();
+                  found = true;
+                }
+              }
+              ctrl2->Release();
+            }
+            ctrl->Release();
+          }
+        }
+        sessions->Release();
+      }
+      mgr->Release();
+    }
+    device->Release();
+  }
+  enumerator->Release();
+  return found;
+}
+
+bool SetSpotifyVolume(float level) {
+  return WithSpotifyVolume([level](ISimpleAudioVolume* vol) {
+    vol->SetMasterVolume(level, nullptr);
+  });
+}
+
+// Ritorna il volume [0..1], oppure -1 se Spotify non ha una sessione audio.
+float GetSpotifyVolume() {
+  float out = -1.0f;
+  WithSpotifyVolume([&out](ISimpleAudioVolume* vol) {
+    float v = 0;
+    if (SUCCEEDED(vol->GetMasterVolume(&v))) out = v;
+  });
+  return out;
+}
+std::string PickMediaFile() {
+  wchar_t file[MAX_PATH] = L"";
+  OPENFILENAMEW ofn = {};
+  ofn.lStructSize = sizeof(ofn);
+  ofn.lpstrFilter =
+      L"Immagini\0*.png;*.jpg;*.jpeg;*.gif;*.webp\0Tutti i file\0*.*\0";
+  ofn.lpstrFile = file;
+  ofn.nMaxFile = MAX_PATH;
+  ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
+  if (GetOpenFileNameW(&ofn)) {
+    return winrt::to_string(file);
+  }
+  return "";
+}
 }  // namespace
 
 namespace smtc_bridge {
@@ -451,7 +556,38 @@ void Register(flutter::FlutterEngine* engine) {
             } catch (...) {
             }
           }).detach();
-        } else {
+        } else if (method == "setVolume") {
+          double level = 1.0;
+          const auto* args = std::get_if<EncodableMap>(call.arguments());
+          if (args) {
+            auto it = args->find(EncodableValue("level"));
+            if (it != args->end()) {
+              if (auto* d = std::get_if<double>(&it->second)) level = *d;
+            }
+          }
+          auto shared= std::shared_ptr<flutter::MethodResult<EncodableValue>>(
+            result.release()
+          );
+          std::thread([shared, level]() {
+            winrt::init_apartment(winrt::apartment_type::multi_threaded);
+            bool ok = SetSpotifyVolume(static_cast<float>(level));
+            winrt::uninit_apartment();
+            shared->Success(EncodableValue(ok));
+          }).detach();
+        } else if(method == "getVolume") {
+          auto shared= std::shared_ptr<flutter::MethodResult<EncodableValue>>(
+            result.release()
+          );
+          std::thread([shared]() {
+            winrt::init_apartment(winrt::apartment_type::multi_threaded);
+            float v = GetSpotifyVolume();
+            winrt::uninit_apartment();
+            shared->Success(EncodableValue(static_cast<double>(v)));
+          }).detach();
+        }else if (method == "pickMedia") {
+          std::string path = PickMediaFile();
+          result->Success(EncodableValue(path));
+        }else {
           result->NotImplemented();
         }
       });

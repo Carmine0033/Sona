@@ -3,7 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  flutter_acrylic
+  file_selector_windows
   screen_retriever_windows
   url_launcher_windows
   window_manager

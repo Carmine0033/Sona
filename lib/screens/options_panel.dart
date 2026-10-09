@@ -4,6 +4,9 @@ import 'package:window_manager/window_manager.dart';
 import '../core/theme.dart';
 import '../providers/app_providers.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:io';
+import '../services/smtc_channel.dart';
+import '../services/settings_service.dart';
 
 class OptionsPanel extends ConsumerWidget {
   const OptionsPanel({super.key});
@@ -124,6 +127,46 @@ class OptionsPanel extends ConsumerWidget {
                 const Divider(color: Colors.white12),
                 const SizedBox(height: 8),
                 Row(
+                  children: [
+                    const SizedBox(
+                        width: 120,
+                        child: Text('Disc image',
+                            style: TextStyle(color: Colors.white70))),
+                    TextButton.icon(
+                      icon: const Icon(Icons.image, size: 16),
+                      label: const Text('Choose'),
+                      onPressed: () => _pickMedia(ref),
+                    ),
+                    if (ref.watch(customMediaPathProvider) != null)
+                      TextButton(
+                        onPressed: () => _resetMedia(ref),
+                        child: const Text('Reset'),
+                      ),
+                  ],
+                ),
+                 const SizedBox(height: 8),
+                 Row(
+                  children: [
+                    const SizedBox(
+                        width: 120,
+                        child: Text('Disc style',
+                            style: TextStyle(color: Colors.white70))),
+                    _StyleChip(
+                      label: 'Vinyl',
+                      selected: ref.watch(discStyleProvider) == DiscStyle.vinyl,
+                      onTap: () => ref.read(discStyleProvider.notifier).state =
+                          DiscStyle.vinyl,
+                    ),
+                    const SizedBox(width: 8),
+                    _StyleChip(
+                      label: 'Album',
+                      selected: ref.watch(discStyleProvider) == DiscStyle.fullAlbum,
+                      onTap: () => ref.read(discStyleProvider.notifier).state =
+                          DiscStyle.fullAlbum,
+                    ),
+                  ],
+                ),
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
@@ -160,6 +203,34 @@ class OptionsPanel extends ConsumerWidget {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
+
+    Future<void> _pickMedia(WidgetRef ref) async {
+    final src = await SmtcChannel.pickMedia();
+    if (src == null) return;
+
+    final dir = SettingsService.mediaDir();
+    final ext = src.split('.').last;
+    final dest =
+        '${dir.path}\\custom_${DateTime.now().millisecondsSinceEpoch}.$ext';
+    await File(src).copy(dest);
+
+    final old = ref.read(customMediaPathProvider);
+    ref.read(customMediaPathProvider.notifier).state = dest;
+    await SettingsService.setString('customMedia', dest);
+    if (old != null) {
+      try { await File(old).delete(); } catch (_) {}
+    }
+  }
+
+  void _resetMedia(WidgetRef ref) {
+    final old = ref.read(customMediaPathProvider);
+    ref.read(customMediaPathProvider.notifier).state = null;
+    SettingsService.remove('customMedia');
+    if (old != null) {
+      try { File(old).delete(); } catch (_) {}
+    }
+  }
+
 }
 
 class _OptionTile extends StatelessWidget {

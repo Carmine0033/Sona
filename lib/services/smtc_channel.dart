@@ -29,4 +29,17 @@ class SmtcChannel {
       await _method.invokeMethod<bool>(
           'seek', {'positionMs': position.inMilliseconds}) ??
       false;
+
+  static Future<bool> setVolume(double level) async =>
+      await _method.invokeMethod<bool>(
+          'setVolume', {'level': level.clamp(0.0, 1.0)}) ??
+      false;
+
+  static Future<double> getVolume() async =>
+      (await _method.invokeMethod<double>('getVolume')) ?? -1.0;
+    
+  static Future<String?> pickMedia() async {
+    final p = await _method.invokeMethod<String>('pickMedia');
+    return (p == null || p.isEmpty) ? null : p;
+  }
 }
