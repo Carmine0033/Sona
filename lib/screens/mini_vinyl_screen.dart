@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
@@ -51,7 +52,10 @@ class MiniVinylScreen extends ConsumerWidget {
                     child: VinylCard(
                       info: info,
                       isDetached: true,
-                      onToggleDetach: () => windowManager.close(),
+                      onToggleDetach: () async {
+                        await windowManager.destroy();
+                        exit(0);
+                      },
                     ),
                   ),
                 ),

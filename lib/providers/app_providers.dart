@@ -42,9 +42,7 @@ final accentColorProvider= StateProvider<Color>(
   name: 'accent'
 );
 
-final detachedProvider = StateProvider<bool>(
-    (ref) => SettingsService.getBool('detached', false),
-    name: 'detached');
+final detachedProvider = StateProvider<bool>((ref) => false, name: 'detached');
 
 
 final playbackControllerProvider= Provider<PlaybackController>((ref) {

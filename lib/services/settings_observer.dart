@@ -32,9 +32,6 @@ final class SettingsObserver extends ProviderObserver {
       case 'accent':
         SettingsService.setInt('accent', (newValue as Color).toARGB32());
         break;
-      case 'detached':
-        SettingsService.setBool('detached', newValue as bool);
-        break;
     }
   }
 }

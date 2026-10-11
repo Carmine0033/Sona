@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui'; // ImageFilter.blur
 import 'package:flutter/material.dart';
 import 'package:media_overlay/l10n/app_localizations.dart';
@@ -60,6 +61,34 @@ class _PlayerView extends ConsumerStatefulWidget {
 }
 
 class _PlayerViewState extends ConsumerState<_PlayerView> {
+  Process? _miniProcess;
+
+  @override
+  void dispose() {
+    _miniProcess?.kill();
+    _miniProcess = null;
+    super.dispose();
+  }
+
+  void _reattach() {
+    _miniProcess?.kill();
+    _miniProcess = null;
+    ref.read(detachedProvider.notifier).state = false;
+  }
+
+  Future<void> _detach() async {
+    ref.read(detachedProvider.notifier).state = true;
+    _miniProcess?.kill();
+    final proc = await openFramelessVinylWindow();
+    _miniProcess = proc;
+    proc.exitCode.then((_) {
+      if (mounted && _miniProcess == proc) {
+        _miniProcess = null;
+        ref.read(detachedProvider.notifier).state = false;
+      }
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
     final isOpaque = ref.watch(opaqueBackgroundProvider);
@@ -253,9 +282,7 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
               foregroundColor: accent,
               side: BorderSide(color: accent.withValues(alpha: 0.5)),
             ),
-            onPressed: () {
-              ref.read(detachedProvider.notifier).state = false;
-            },
+            onPressed: _reattach,
           ),
         ],
       ),
@@ -266,15 +293,7 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
     return VinylCard(
       info: widget.info,
       isDetached: false,
-      onToggleDetach: () async {
-        ref.read(detachedProvider.notifier).state = true;
-        final proc = await openFramelessVinylWindow();
-        proc.exitCode.then((_) {
-          if (context.mounted) {
-            ref.read(detachedProvider.notifier).state = false;
-          }
-        });
-      },
+      onToggleDetach: _detach,
     );
   }
 }
