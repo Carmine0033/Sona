@@ -35,6 +35,8 @@ class SmtcChannel {
           'setVolume', {'level': level.clamp(0.0, 1.0)}) ??
       false;
 
+  static Future<bool> setPlayerVolume(double level) => setVolume(level);
+
   static Future<double> getVolume() async =>
       (await _method.invokeMethod<double>('getVolume')) ?? -1.0;
     

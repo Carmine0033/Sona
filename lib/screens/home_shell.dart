@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme.dart';
 import '../providers/app_providers.dart';
 import '../widgets/sidebar.dart';
+import '../widgets/settings_card.dart';
 import 'player_screen.dart';
-import 'options_panel.dart';
 import '../widgets/update_banner.dart';
 
 class HomeShell extends ConsumerWidget {
@@ -12,26 +12,35 @@ class HomeShell extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isSettingsOpen = ref.watch(settingsOpenProvider);
     final section = ref.watch(selectedSectionProvider);
 
     return Scaffold(
       backgroundColor: ThemeColors.canvasAbyss,
-      body: Row(
+      body: Stack(
         children: [
-          const Sidebar(),
-          Expanded(
-            child: Column(
-              children: [
-                const UpdateBanner(),
-                Expanded(
-                  child: switch (section) {
-                    AppSection.player => const PlayerScreen(),
-                    AppSection.options => const OptionsPanel(),
-                  },
+          Row(
+            children: [
+              const Sidebar(),
+              Expanded(
+                child: Column(
+                  children: [
+                    const UpdateBanner(),
+                    Expanded(
+                      child: switch (section) {
+                        AppSection.player => const PlayerScreen(),
+                        AppSection.options => const PlayerScreen(),
+                      },
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
+          if (isSettingsOpen)
+            const Positioned.fill(
+              child: SettingsOverlay(),
+            ),
         ],
       ),
     );

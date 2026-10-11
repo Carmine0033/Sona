@@ -32,7 +32,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
   void initState() {
     super.initState();
     SmtcChannel.getVolume().then((v) {
-      if (v >= 0 && mounted) setState(() => _volume = v);
+      if (v >= 0 && mounted) setState(() => _volume = v.clamp(0.0, 1.0));
     });
   }
 
@@ -274,10 +274,12 @@ class _VinylCardState extends ConsumerState<VinylCard> {
                     thumbColor: accent,
                   ),
                   child: Slider(
-                    value: _volume,
+                    value: _volume.clamp(0.0, 1.0),
+                    min: 0.0,
+                    max: 1.0,
                     onChanged: (v) {
                       setState(() => _volume = v);
-                      SmtcChannel.setVolume(v);
+                      controller.setPlayerVolume(v);
                     },
                   ),
                 ),

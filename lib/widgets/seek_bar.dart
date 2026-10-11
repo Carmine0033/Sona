@@ -154,13 +154,15 @@ class _SeekBarState extends ConsumerState<SeekBar>
           child: SizedBox(
             height: 22,
             width: double.infinity,
-            child: CustomPaint(
-              painter: _WavePainter(
-                progress: _dragging ? _dragFraction : fraction,
-                phase: phase,
-                amplitude: amplitude,
-                played: accent,
-                remaining: Colors.white24,
+            child: RepaintBoundary(
+              child: CustomPaint(
+                painter: _WavePainter(
+                  progress: _dragging ? _dragFraction : fraction,
+                  phase: phase,
+                  amplitude: amplitude,
+                  played: accent,
+                  remaining: Colors.white24,
+                ),
               ),
             ),
           ),

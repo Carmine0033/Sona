@@ -1,4 +1,21 @@
-﻿---------------------------
+---------------------------
+Release Sona V0.1.3
+---------------------------
+
+### Added
+
+* feat: add detachable mini player mode
+* feat: add accent color customization in a Personalization section
+* 
+
+### Changed
+
+* refactor: remove non-functional shuffle and repeat buttons
+
+### Fixed
+
+* Auto Updates
+---------------------------
 Release Sona V0.1.2
 ---------------------------
 
@@ -31,5 +48,6 @@ Release Sona V0.1.2
 ### Fixed
 
 *
+
 
 

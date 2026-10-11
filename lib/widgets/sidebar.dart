@@ -9,6 +9,7 @@ class Sidebar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sel = ref.watch(selectedSectionProvider);
+    final isSettingsOpen = ref.watch(settingsOpenProvider);
     final accent = Theme.of(context).colorScheme.primary;
     final l10n = AppLocalizations.of(context)!;
 
@@ -33,17 +34,20 @@ class Sidebar extends ConsumerWidget {
           _NavItem(
             icon: Icons.graphic_eq,
             label: l10n.player,
-            active: sel == AppSection.player,
-            onTap: () => ref.read(selectedSectionProvider.notifier).state =
-                AppSection.player,
+            active: !isSettingsOpen && sel == AppSection.player,
+            onTap: () {
+              ref.read(settingsOpenProvider.notifier).state = false;
+              ref.read(selectedSectionProvider.notifier).state =
+                  AppSection.player;
+            },
           ),
           const SizedBox(height: 4),
           _NavItem(
             icon: Icons.tune,
             label: l10n.options,
-            active: sel == AppSection.options,
-            onTap: () => ref.read(selectedSectionProvider.notifier).state =
-                AppSection.options,
+            active: isSettingsOpen,
+            onTap: () =>
+                ref.read(settingsOpenProvider.notifier).update((v) => !v),
           ),
         ],
       ),

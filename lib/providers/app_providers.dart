@@ -11,23 +11,26 @@ import '../services/update_service.dart';
 import '../services/settings_service.dart';
 import 'package:flutter/material.dart';
 
-
 //preferences
 
 final opaqueBackgroundProvider =
     StateProvider<bool>((ref) => SettingsService.getBool('opaque', false),
         name: 'opaque');
 
+
 final alwaysOnTopProvider =
     StateProvider<bool>((ref) => SettingsService.getBool('alwaysOnTop', true),
         name: 'alwaysOnTop');
 
+T _enumAt<T>(List<T> values, int i) =>
+    (i >= 0 && i < values.length) ? values[i] : values[0];
+
 final seekBarStyleProvider = StateProvider<SeekBarStyle>(
-    (ref) => SeekBarStyle.values[SettingsService.getInt('seekStyle', 0)],
+    (ref) => _enumAt(SeekBarStyle.values, SettingsService.getInt('seekStyle', 0)),
     name: 'seekStyle');
 
 final discStyleProvider = StateProvider<DiscStyle>(
-    (ref) => DiscStyle.values[SettingsService.getInt('discStyle', 0)],
+    (ref) => _enumAt(DiscStyle.values, SettingsService.getInt('discStyle', 0)),
     name: 'discStyle');
 
 final customMediaPathProvider = StateProvider<String?>(
@@ -71,7 +74,10 @@ enum SeekBarStyle { line, wave }
 enum DiscStyle { vinyl, fullAlbum }
 
 final selectedSectionProvider =StateProvider<AppSection>((ref) => AppSection.player);
+final settingsOpenProvider = StateProvider<bool>((ref) => false);
 
+enum SettingsSection { appearance, background, audio, window, about }
+final settingsSectionProvider= StateProvider<SettingsSection>((ref) => SettingsSection.appearance);
 
 class TrackRef {
   final String title, artist, album;

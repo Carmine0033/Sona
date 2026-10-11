@@ -151,4 +151,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get updateFailed => 'Update failed';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get background => 'Background';
+
+  @override
+  String get audio => 'Audio';
+
+  @override
+  String get window => 'Window';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get systemVolume => 'System volume';
+
+  @override
+  String get systemVolumeSubtitle => 'Control playback volume';
+
+  @override
+  String get checkForUpdates => 'Check for updates';
+
+  @override
+  String get upToDate => 'You are up to date';
+
+  @override
+  String get checkingUpdates => 'Checking for updates...';
+
+  @override
+  String updateAvailable(Object version) {
+    return 'Update available: v$version';
+  }
 }

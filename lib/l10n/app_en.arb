@@ -57,5 +57,21 @@
   },
   "update": "Update",
   "downloadingUpdate": "Downloading update…",
-  "updateFailed": "Update failed"
+  "updateFailed": "Update failed",
+  "appearance": "Appearance",
+  "background": "Background",
+  "audio": "Audio",
+  "window": "Window",
+  "about": "About",
+  "systemVolume": "System volume",
+  "systemVolumeSubtitle": "Control playback volume",
+  "checkForUpdates": "Check for updates",
+  "upToDate": "You are up to date",
+  "checkingUpdates": "Checking for updates...",
+  "updateAvailable": "Update available: v{version}",
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {}
+    }
+  }
 }

@@ -14,4 +14,10 @@ class SmtcPlaybackController implements PlaybackController {
 
   @override
   Future<bool> seek(Duration position) => SmtcChannel.seek(position);
+
+  @override
+  Future<bool> setPlayerVolume(double level) => SmtcChannel.setPlayerVolume(level);
+
+  @override
+  Future<bool> setVolume(double level) => SmtcChannel.setVolume(level);
 }

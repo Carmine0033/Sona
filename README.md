@@ -27,7 +27,7 @@ The main objective of **SONA** is to seamlessly work with **any music or media p
 * **Universal Player Compatibility:** Interfaces with system-level media session APIs to detect, display, and control whatever audio is currently playing across any application.
 * **Deep Customization:** Tailor themes, overlay layouts, visualizers, HUD positioning, transparency, typography, and controls to match your desktop aesthetic.
 * **Ethereal Glassmorphic Overlay:** Non-disruptive, ultra-sleek HUD design powered by dark violet glassmorphism, precise telemetry, and zero-distraction ambient visuals for gaming and creative workflows.
-* **Low Footprint & High Performance:** Built on Flutter Desktop with efficient native bindings (`win32`, `ffi`, `window_manager`, `flutter_acrylic`).
+* **Low Footprint & High Performance:** Built on Flutter Desktop with efficient native bindings (`win32`, `ffi`, `window_manager`).
 
 ---
 
@@ -45,7 +45,7 @@ Whether you want to create custom modules, add support for new platforms, design
 
 * **Framework:** [Flutter](https://flutter.dev) (Desktop)
 * **State Management:** [Riverpod](https://riverpod.dev)
-* **Window & Glass FX:** `flutter_acrylic`, `window_manager`
+* **Window Management:** `window_manager`
 * **Native System Interop:** `win32`, `ffi`
 
 ---

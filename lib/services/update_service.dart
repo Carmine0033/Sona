@@ -66,10 +66,29 @@ class UpdateService {
       await sink.close();
 
 
-      await Process.start(file.path, ['/SILENT'],
-          mode: ProcessStartMode.detached);
+      // lancio ritardato: l'app esce, POI l'installer parte a file liberi
+      await Process.start(
+        'cmd',
+        [
+          '/c',
+          'timeout',
+          '/t',
+          '2',
+          '/nobreak',
+          '>',
+          'nul',
+          '&',
+          'start',
+          '',
+          '/b',
+          file.path,
+          '/SILENT',
+        ],
+        runInShell: true,
+        mode: ProcessStartMode.detached,
+      );
       await windowManager.destroy();
-      exit(0);
+      exit(0); // a questo punto l'installer è ancora in attesa (timeout + mutex)
     } finally {
       client.close();
     }

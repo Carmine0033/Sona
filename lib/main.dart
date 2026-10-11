@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:media_overlay/l10n/app_localizations.dart';
@@ -15,65 +16,71 @@ Future<Process> openFramelessVinylWindow() async {
   return await Process.start(Platform.resolvedExecutable, ['--mini']);
 }
 
-Future<void> main(List<String> args) async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main(List<String> args) {
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    try {
+      await SettingsService.init();
+    } catch (e, st) {
+      debugPrint('Settings init fallita: $e\n$st');
+      // continua con i default invece di morire
+    }
+    await windowManager.ensureInitialized();
 
-  await SettingsService.init();
-  await windowManager.ensureInitialized();
+    final isMini = args.contains('--mini');
 
-  final isMini = args.contains('--mini');
+    if (isMini) {
+      const options = WindowOptions(
+        size: Size(440, 580),
+        minimumSize: Size(280, 360),
+        center: true,
+        backgroundColor: Colors.transparent,
+        skipTaskbar: false,
+        titleBarStyle: TitleBarStyle.hidden,
+        title: 'Sona Vinyl Card',
+      );
 
-  if (isMini) {
-    const options = WindowOptions(
-      size: Size(440, 580),
-      minimumSize: Size(280, 360),
-      center: true,
-      backgroundColor: Colors.transparent,
-      skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.hidden,
-      title: 'Sona Vinyl Card',
-    );
+      await windowManager.waitUntilReadyToShow(options, () async {
+        await windowManager.setAsFrameless();
+        await windowManager.setResizable(true);
+        await windowManager.setBackgroundColor(Colors.transparent);
+        await windowManager.setAlwaysOnTop(true);
+        await windowManager.show();
+        await windowManager.focus();
+      });
 
-    await windowManager.waitUntilReadyToShow(options, () async {
-      await windowManager.setAsFrameless();
-      await windowManager.setResizable(true);
-      await windowManager.setBackgroundColor(Colors.transparent);
-      await windowManager.setAlwaysOnTop(true);
-      await windowManager.show();
-      await windowManager.focus();
-    });
+      runApp(
+        ProviderScope(
+          observers: [SettingsObserver()],
+          child: const MiniFramelessApp(),
+        ),
+      );
+    } else {
+      const options = WindowOptions(
+        size: Size(1280, 780),
+        minimumSize: Size(920, 580),
+        center: true,
+        backgroundColor: Colors.transparent,
+        skipTaskbar: false,
+        titleBarStyle: TitleBarStyle.normal,
+        title: 'Sona',
+      );
 
-    runApp(
-      ProviderScope(
-        observers: [SettingsObserver()],
-        child: const MiniFramelessApp(),
-      ),
-    );
-  } else {
-    const options = WindowOptions(
-      size: Size(1280, 780),
-      minimumSize: Size(920, 580),
-      center: true,
-      backgroundColor: Colors.transparent,
-      skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.normal,
-      title: 'Sona',
-    );
+      await windowManager.waitUntilReadyToShow(options, () async {
+        await windowManager
+            .setAlwaysOnTop(SettingsService.getBool('alwaysOnTop', true));
+        await windowManager.show();
+        await windowManager.focus();
+      });
 
-    await windowManager.waitUntilReadyToShow(options, () async {
-      await windowManager
-          .setAlwaysOnTop(SettingsService.getBool('alwaysOnTop', true));
-      await windowManager.show();
-      await windowManager.focus();
-    });
-
-    runApp(
-      ProviderScope(
-        observers: [SettingsObserver()],
-        child: const SonaApp(),
-      ),
-    );
-  }
+      runApp(
+        ProviderScope(
+          observers: [SettingsObserver()],
+          child: const SonaApp(),
+        ),
+      );
+    }
+  }, (e, st) => debugPrint('Errore non gestito: $e\n$st'));
 }
 
 class SonaApp extends ConsumerWidget {

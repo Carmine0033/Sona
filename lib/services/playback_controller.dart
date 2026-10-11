@@ -8,4 +8,6 @@ abstract class PlaybackController {
   Future<void> previous();
 
   Future<bool> seek(Duration position);
+  Future<bool> setPlayerVolume(double level);
+  Future<bool> setVolume(double level);
 }

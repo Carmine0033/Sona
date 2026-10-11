@@ -152,4 +152,39 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get updateFailed => 'Aggiornamento non riuscito';
+
+  @override
+  String get appearance => 'Aspetto';
+
+  @override
+  String get background => 'Sfondo';
+
+  @override
+  String get audio => 'Audio';
+
+  @override
+  String get window => 'Finestra';
+
+  @override
+  String get about => 'Info';
+
+  @override
+  String get systemVolume => 'Volume di sistema';
+
+  @override
+  String get systemVolumeSubtitle => 'Regola il volume di riproduzione';
+
+  @override
+  String get checkForUpdates => 'Verifica aggiornamenti';
+
+  @override
+  String get upToDate => 'Sei alla versione più recente';
+
+  @override
+  String get checkingUpdates => 'Verifica in corso...';
+
+  @override
+  String updateAvailable(Object version) {
+    return 'Aggiornamento disponibile: v$version';
+  }
 }

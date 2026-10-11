@@ -57,5 +57,21 @@
   },
   "update": "Aggiorna",
   "downloadingUpdate": "Download aggiornamento in corso…",
-  "updateFailed": "Aggiornamento non riuscito"
+  "updateFailed": "Aggiornamento non riuscito",
+  "appearance": "Aspetto",
+  "background": "Sfondo",
+  "audio": "Audio",
+  "window": "Finestra",
+  "about": "Info",
+  "systemVolume": "Volume di sistema",
+  "systemVolumeSubtitle": "Regola il volume di riproduzione",
+  "checkForUpdates": "Verifica aggiornamenti",
+  "upToDate": "Sei alla versione più recente",
+  "checkingUpdates": "Verifica in corso...",
+  "updateAvailable": "Aggiornamento disponibile: v{version}",
+  "@updateAvailable": {
+    "placeholders": {
+      "version": {}
+    }
+  }
 }
