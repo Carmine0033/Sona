@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-14T15:40:04Z",
+  "title": "Design System: Sona",
+  "extensions": {
+    "colorMeta": {
+      "reiatsu-violet": { "role": "primary", "displayName": "Reiatsu Violet", "canonical": "#9D4EDD", "tonalRamp": ["#1f0a33", "#33124f", "#4a1b72", "#642496", "#7f33bb", "#9d4edd", "#c18ff0", "#ecdafd"] },
+      "abyss": { "role": "neutral", "displayName": "Abyss", "canonical": "#08060D", "tonalRamp": ["#08060d", "#121019", "#1e1b26", "#2c2836", "#3e3949", "#5a5466", "#8a8496", "#cdc8d6"] },
+      "obsidian-glass": { "role": "neutral", "displayName": "Obsidian Glass", "canonical": "#181226", "tonalRamp": ["#0c0914", "#181226", "#241b38", "#32264c", "#433463", "#5d4c80", "#8d7fae", "#d2cae5"] },
+      "obsidian-deep": { "role": "neutral", "displayName": "Obsidian Deep", "canonical": "#0F0B18", "tonalRamp": ["#0f0b18", "#1a1427", "#261e38", "#352a4c", "#473962", "#62527f", "#9183ad", "#d4cde4"] },
+      "dusk-container": { "role": "neutral", "displayName": "Dusk Container", "canonical": "#211E27", "tonalRamp": ["#100e13", "#211e27", "#2f2b37", "#3f3a49", "#524c5e", "#6e677c", "#9d97a9", "#dcd8e3"] },
+      "veil-outline": { "role": "neutral", "displayName": "Veil Outline", "canonical": "#4D4353", "tonalRamp": ["#1d1820", "#2e2833", "#3e3644", "#4d4353", "#655a6c", "#827787", "#aea4b2", "#e2dce5"] },
+      "moonlit-text": { "role": "neutral", "displayName": "Moonlit Text", "canonical": "#E7E0EC", "tonalRamp": ["#2a2530", "#433c4b", "#5f5768", "#7d7587", "#9c94a6", "#bcb4c5", "#d6cfdd", "#e7e0ec"] },
+      "lilac-mist": { "role": "neutral", "displayName": "Lilac Mist", "canonical": "#D0C2D5", "tonalRamp": ["#2a2230", "#433849", "#5d5064", "#796b80", "#96889d", "#b4a6ba", "#d0c2d5", "#ede5f0"] },
+      "pure-white": { "role": "neutral", "displayName": "Pure White", "canonical": "#FFFFFF", "tonalRamp": ["#262626", "#404040", "#5c5c5c", "#7a7a7a", "#999999", "#b8b8b8", "#dbdbdb", "#ffffff"] },
+      "amethyst-whisper": { "role": "neutral", "displayName": "Amethyst Whisper", "canonical": "#E0AAFF", "tonalRamp": ["#2b1640", "#43215f", "#5e2f82", "#7b3fa6", "#9a55c9", "#bb79e8", "#e0aaff", "#f5e6ff"] },
+      "text-secondary": { "role": "neutral", "displayName": "White 70", "canonical": "rgba(255, 255, 255, 0.70)" },
+      "text-tertiary": { "role": "neutral", "displayName": "White 60", "canonical": "rgba(255, 255, 255, 0.60)" },
+      "coral-error": { "role": "error", "displayName": "Coral Error", "canonical": "#FFB4AB", "tonalRamp": ["#410002", "#690005", "#93000a", "#ba1a1a", "#de3730", "#ff5449", "#ffb4ab", "#ffdad6"] }
+    },
+    "typographyMeta": {
+      "lyric-active": { "displayName": "Lyric Active", "purpose": "The line being sung; largest text in the app, with a soft accent glow." },
+      "lyric": { "displayName": "Lyric", "purpose": "Upcoming (62% white) and already-sung (38% white) lyric lines." },
+      "headline": { "displayName": "Headline", "purpose": "Track title in the player card, marquee when it overflows." },
+      "title": { "displayName": "Title", "purpose": "Modal titles, empty-state headings." },
+      "body": { "displayName": "Body", "purpose": "Settings row labels, list track titles." },
+      "body-sm": { "displayName": "Body Small", "purpose": "Navigation, inputs, hints." },
+      "caption": { "displayName": "Caption", "purpose": "Times, durations, metadata; always tabular figures." },
+      "wordmark": { "displayName": "Wordmark", "purpose": "The uppercase SONA mark in sidebar and card header." }
+    },
+    "shadows": [
+      { "name": "card-halo", "value": "0 4px 36px 2px rgba(157, 78, 221, 0.14), 0 8px 28px 4px rgba(0, 0, 0, 0.45)", "purpose": "Player card only: the signature accent halo plus a dark drop." },
+      { "name": "hero-glow", "value": "0 3px 16px 1px rgba(157, 78, 221, 0.45)", "purpose": "White hero Play button only." },
+      { "name": "modal-drop", "value": "0 8px 40px 4px rgba(0, 0, 0, 0.65)", "purpose": "Settings modal and dialogs; neutral, no accent." },
+      { "name": "lyric-glow", "value": "0 0 18px rgba(157, 78, 221, 0.5)", "purpose": "Text-shadow on the active lyric line." }
+    ],
+    "motion": [
+      { "name": "state-fast", "value": "150ms ease", "purpose": "Chip and settings-nav selection changes." },
+      { "name": "state", "value": "160ms ease", "purpose": "Sidebar nav active state." },
+      { "name": "lyric-shift", "value": "300ms cubic-bezier(0.215, 0.61, 0.355, 1)", "purpose": "Active lyric line growth and highlight (easeOutCubic)." },
+      { "name": "lyric-scroll", "value": "400ms cubic-bezier(0.215, 0.61, 0.355, 1)", "purpose": "Auto-scroll to the active lyric." }
+    ],
+    "breakpoints": [
+      { "name": "player-stacked", "value": "780px", "purpose": "Content width below which card and lyrics stack vertically." },
+      { "name": "window-min", "value": "920px x 580px", "purpose": "Main window minimum size." },
+      { "name": "mini-min", "value": "280px x 360px", "purpose": "Detached mini player minimum size." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Player Card",
+      "kind": "card",
+      "refersTo": "player-card",
+      "description": "The glass vinyl: translucent obsidian tinted by the accent, the only surface with the accent halo.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-head\"><span class=\"ds-dot\"></span><span class=\"ds-mark\">SONA</span></div><div class=\"ds-disc\"><div class=\"ds-label\"></div></div><div class=\"ds-title\">Map of the Problematique</div><div class=\"ds-artist\">Muse</div></div>",
+      "css": ".ds-card { width: 300px; padding: 20px 24px; border-radius: 24px; background: color-mix(in srgb, #9D4EDD 10%, rgba(24, 18, 38, 0.45)); border: 1.5px solid rgba(157, 78, 221, 0.28); box-shadow: 0 4px 36px 2px rgba(157, 78, 221, 0.14), 0 8px 28px 4px rgba(0, 0, 0, 0.45); font-family: 'Segoe UI', system-ui, sans-serif; text-align: center; } .ds-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; } .ds-dot { width: 8px; height: 8px; border-radius: 50%; background: #9D4EDD; box-shadow: 0 0 6px rgba(157, 78, 221, 0.6); } .ds-mark { color: rgba(255, 255, 255, 0.7); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; } .ds-disc { width: 140px; height: 140px; margin: 0 auto 18px; border-radius: 50%; background: repeating-radial-gradient(circle, #151515 0 2px, #1d1d1d 2px 4px); display: grid; place-items: center; } .ds-label { width: 48px; height: 48px; border-radius: 50%; background: #9D4EDD; } .ds-title { color: #fff; font-size: 20px; font-weight: 700; letter-spacing: -0.4px; } .ds-artist { color: #E0AAFF; font-size: 14px; margin-top: 4px; }"
+    },
+    {
+      "name": "Hero Play Button",
+      "kind": "button",
+      "refersTo": "button-play-hero",
+      "description": "The one high-contrast object: white circle, black glyph, accent glow.",
+      "html": "<button class=\"ds-play\" aria-label=\"Pause\"><svg width=\"30\" height=\"30\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><rect x=\"6\" y=\"5\" width=\"4\" height=\"14\" rx=\"1\"/><rect x=\"14\" y=\"5\" width=\"4\" height=\"14\" rx=\"1\"/></svg></button>",
+      "css": ".ds-play { width: 52px; height: 52px; border-radius: 50%; border: 1px solid #fff; background: #fff; color: #000; display: grid; place-items: center; cursor: pointer; box-shadow: 0 3px 16px 1px rgba(157, 78, 221, 0.45); transition: background 0.15s; } .ds-play:hover { background: #ebebeb; } .ds-play:active { background: #e0e0e0; } .ds-play:focus-visible { outline: 2px solid #9D4EDD; outline-offset: 3px; }"
+    },
+    {
+      "name": "Transport Button",
+      "kind": "button",
+      "refersTo": "button-transport",
+      "description": "Previous / next: a quiet glass circle beside the hero Play.",
+      "html": "<button class=\"ds-transport\" aria-label=\"Next\"><svg width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M6 6l8.5 6L6 18z\"/><rect x=\"16\" y=\"6\" width=\"2.5\" height=\"12\" rx=\"1\"/></svg></button>",
+      "css": ".ds-transport { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.18); background: rgba(255, 255, 255, 0.10); color: #fff; display: grid; place-items: center; cursor: pointer; transition: background 0.15s; } .ds-transport:hover { background: rgba(255, 255, 255, 0.18); } .ds-transport:active { background: rgba(255, 255, 255, 0.22); } .ds-transport:focus-visible { outline: 2px solid #9D4EDD; outline-offset: 2px; }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Quiet items at 60% white; the active one takes an accent tint.",
+      "html": "<nav class=\"ds-nav\"><div class=\"ds-nav-mark\">SONA</div><a class=\"ds-nav-item ds-active\" href=\"#\">Riproduttore</a><a class=\"ds-nav-item\" href=\"#\">Playlist</a><a class=\"ds-nav-item\" href=\"#\">Opzioni</a></nav>",
+      "css": ".ds-nav { width: 144px; display: flex; flex-direction: column; gap: 4px; padding: 16px 8px; background: #08060D; font-family: 'Segoe UI', system-ui, sans-serif; } .ds-nav-mark { color: #9D4EDD; font-size: 13px; font-weight: 700; letter-spacing: 2px; padding: 0 12px 14px; } .ds-nav-item { display: block; padding: 10px 12px; border-radius: 10px; color: rgba(255, 255, 255, 0.6); font-size: 13px; text-decoration: none; transition: background 0.16s, color 0.16s; } .ds-nav-item:hover { background: rgba(255, 255, 255, 0.05); } .ds-nav-item:focus-visible { outline: 2px solid #9D4EDD; outline-offset: -2px; } .ds-nav-item.ds-active { background: rgba(157, 78, 221, 0.18); color: #fff; font-weight: 600; }"
+    },
+    {
+      "name": "Option Chip",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Single-choice settings options (disc style, seek bar style).",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip ds-selected\">Vinile</button><button class=\"ds-chip\">Copertina</button></div>",
+      "css": ".ds-chips { display: flex; gap: 8px; font-family: 'Segoe UI', system-ui, sans-serif; } .ds-chip { padding: 7px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.24); background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.6); font-size: 12px; cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; } .ds-chip:hover { background: rgba(255, 255, 255, 0.09); } .ds-chip:focus-visible { outline: 2px solid #9D4EDD; outline-offset: 2px; } .ds-chip.ds-selected { background: rgba(157, 78, 221, 0.25); border-color: #9D4EDD; color: #fff; font-weight: 600; }"
+    },
+    {
+      "name": "Link Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Dark glass field with hairline border; the accent appears only on focus.",
+      "html": "<label class=\"ds-field\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1\"/><path d=\"M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1\"/></svg><input placeholder=\"Incolla il link di una playlist…\"></label>",
+      "css": ".ds-field { display: flex; align-items: center; gap: 10px; width: 360px; padding: 10px 12px; border-radius: 12px; background: rgba(24, 18, 38, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); color: #D0C2D5; transition: border-color 0.15s; } .ds-field:focus-within { border-color: rgba(157, 78, 221, 0.8); } .ds-field input { flex: 1; background: none; border: none; outline: none; color: #E7E0EC; font: 13px 'Segoe UI', system-ui, sans-serif; caret-color: #9D4EDD; } .ds-field input::placeholder { color: #D0C2D5; } .ds-field input::selection { background: rgba(157, 78, 221, 0.35); }"
+    },
+    {
+      "name": "Synced Lyric Lines",
+      "kind": "custom",
+      "refersTo": "lyric",
+      "description": "Sung, active and upcoming lines; clicking a line seeks to it.",
+      "html": "<div class=\"ds-lyrics\"><p class=\"ds-line ds-past\">Since I met you</p><p class=\"ds-line ds-now\">When will this loneliness be over?</p><p class=\"ds-line\">Loneliness be over</p></div>",
+      "css": ".ds-lyrics { width: 420px; font-family: 'Segoe UI', system-ui, sans-serif; } .ds-line { margin: 0 0 8px; padding: 12px 16px; border-radius: 14px; color: rgba(255, 255, 255, 0.62); font-size: 18px; font-weight: 500; line-height: 1.35; letter-spacing: -0.2px; cursor: pointer; transition: background 0.3s, color 0.3s, font-size 0.3s; } .ds-line:hover { background: rgba(255, 255, 255, 0.05); } .ds-line.ds-past { color: rgba(255, 255, 255, 0.38); } .ds-line.ds-now { background: rgba(255, 255, 255, 0.08); color: #fff; font-size: 23px; font-weight: 700; text-shadow: 0 0 18px rgba(157, 78, 221, 0.5); }"
+    },
+    {
+      "name": "Tooltip",
+      "kind": "custom",
+      "refersTo": "tooltip",
+      "description": "Every icon-only control explains itself after a 400ms hover.",
+      "html": "<span class=\"ds-tip\">Riproduci</span>",
+      "css": ".ds-tip { display: inline-block; padding: 6px 10px; border-radius: 6px; background: #211E27; border: 1px solid #4D4353; color: #E7E0EC; font: 12px 'Segoe UI', system-ui, sans-serif; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Glass Vinyl",
+    "overview": "Sona is a physical object behind a pane of tinted glass. The record (a spinning vinyl, or the bare album cover) sits at the center of a translucent card. The glass takes its tint from the user's accent color, and the room around it is lit by the track itself: the album artwork, blurred until only its colors remain, fills the window behind everything.\n\nThe interface is discreet and refined. Controls are thin-edged, low in contrast and quiet until touched. Color appears only where the user's attention belongs: the active state, the playing progress, the current lyric line. The music is the subject and the chrome steps back. A single glow, the accent halo around the player card, is the one moment of spectacle.\n\nEverything is the user's. The accent hue is a user setting, so the system is written in roles and alpha steps of \"the accent\", never in fixed hues. Reiatsu Violet is only the default.",
+    "keyCharacteristics": [
+      "Dark, near-black canvas lit from behind by blurred album art.",
+      "Translucent obsidian glass surfaces tinted by the accent at low alpha (6–10%).",
+      "Softly rounded geometry everywhere; circles for the record and transport buttons.",
+      "Text hierarchy built from a ladder of white opacities, not from extra hues.",
+      "One accent halo, reserved for the player card."
+    ],
+    "rules": [
+      { "name": "The User's Accent Rule", "body": "Never hard-code a hue for an interactive or decorative element. Derive it from the theme primary with an alpha step: 0.06 (tint), 0.12–0.18 (hover/active fill), 0.25–0.35 (selected fill, borders) or 0.5+ (focus, emphasis).", "section": "colors" },
+      { "name": "The White Ladder Rule", "body": "Text hierarchy on dark surfaces is pure white for primary, 70% for labels and 60% for secondary and meta. Anything below 60% is for icons, disabled states and already-sung lyric lines, never for copy someone has to read.", "section": "colors" },
+      { "name": "The Album Is the Light Rule", "body": "In glass mode the backdrop is the current artwork blurred at sigma 65 under a 65% Abyss veil. Never replace it with a gradient or a stock texture. Opaque mode is flat Abyss.", "section": "colors" },
+      { "name": "The Fixed Digits Rule", "body": "Every time, duration and counter uses tabular figures, so ticking values never jitter.", "section": "typography" },
+      { "name": "The Single Halo Rule", "body": "The accent halo belongs to the player card and the hero Play button, nowhere else. Modals, dialogs and bars lift with neutral dark shadows only.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do derive every accent use from `colorScheme.primary` with the alpha steps of The User's Accent Rule.",
+      "Do keep text on the White Ladder: 100%, 70% or 60%.",
+      "Do use tabular figures for every time and count.",
+      "Do give every icon-only control a tooltip and a visible hover state.",
+      "Do keep every window state (empty, loading, error, detached) movable, closable and readable over arbitrary desktop content."
+    ],
+    "donts": [
+      "Don't put the accent halo on anything except the player card and the hero Play button.",
+      "Don't hard-code surface colors in dialogs or modals (such as `#1A0B2E`). Use the theme's dialog and surface tokens.",
+      "Don't use readable copy below 60% white opacity.",
+      "Don't replace the blurred artwork backdrop with gradients or decorative textures.",
+      "Don't duplicate the same control in two places on one screen."
+    ]
+  }
+}

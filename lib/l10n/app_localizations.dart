@@ -110,6 +110,12 @@ abstract class AppLocalizations {
   /// **'Player'**
   String get player;
 
+  /// No description provided for @playlist.
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist'**
+  String get playlist;
+
   /// No description provided for @nothingPlaying.
   ///
   /// In en, this message translates to:
@@ -433,6 +439,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Update available: v{version}'**
   String updateAvailable(Object version);
+
+  /// No description provided for @updateCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t check for updates. Check your connection and try again.'**
+  String get updateCheckFailed;
+
+  /// No description provided for @nothingPlayingHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Start playing music in Spotify, YouTube or any app that shows up in the Windows media controls.'**
+  String get nothingPlayingHint;
+
+  /// No description provided for @previousTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previousTrack;
+
+  /// No description provided for @nextTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextTrack;
+
+  /// No description provided for @play.
+  ///
+  /// In en, this message translates to:
+  /// **'Play'**
+  String get play;
+
+  /// No description provided for @pause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get pause;
+
+  /// No description provided for @mute.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute'**
+  String get mute;
+
+  /// No description provided for @unmute.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmute'**
+  String get unmute;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @invalidHex.
+  ///
+  /// In en, this message translates to:
+  /// **'Use #RRGGBB or #AARRGGBB'**
+  String get invalidHex;
+
+  /// No description provided for @playlistLinkHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a playlist link…'**
+  String get playlistLinkHint;
+
+  /// No description provided for @pasteAndLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste and load'**
+  String get pasteAndLoad;
+
+  /// No description provided for @removePlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove playlist'**
+  String get removePlaylist;
+
+  /// No description provided for @playlistEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the link of a public playlist'**
+  String get playlistEmptyTitle;
+
+  /// No description provided for @playlistEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Spotify · YouTube Music · Apple Music · Deezer'**
+  String get playlistEmptySubtitle;
+
+  /// No description provided for @trackCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 track} other{{count} tracks}}'**
+  String trackCount(int count);
+
+  /// No description provided for @playlistTruncated.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial list: the service returned only some of the tracks.'**
+  String get playlistTruncated;
+
+  /// No description provided for @openTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in {service}'**
+  String openTrack(Object service);
+
+  /// No description provided for @playlistErrorUnexpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected error: {error}'**
+  String playlistErrorUnexpected(Object error);
+
+  /// No description provided for @playlistErrorInvalidLink.
+  ///
+  /// In en, this message translates to:
+  /// **'The pasted text isn\'t a valid link.'**
+  String get playlistErrorInvalidLink;
+
+  /// No description provided for @playlistErrorAutoMix.
+  ///
+  /// In en, this message translates to:
+  /// **'YouTube auto-mixes aren\'t real playlists: save it as a playlist and try again.'**
+  String get playlistErrorAutoMix;
+
+  /// No description provided for @playlistErrorUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported link. Use a Spotify, YouTube Music, Apple Music or Deezer playlist.'**
+  String get playlistErrorUnsupported;
+
+  /// No description provided for @playlistErrorNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist not found, or it\'s private.'**
+  String get playlistErrorNotFound;
+
+  /// No description provided for @playlistErrorForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'This playlist is private: make it public and try again.'**
+  String get playlistErrorForbidden;
+
+  /// No description provided for @playlistErrorRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many requests or quota exhausted: try again later.'**
+  String get playlistErrorRateLimited;
+
+  /// No description provided for @playlistErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t connect. Check your network and firewall.'**
+  String get playlistErrorNetwork;
+
+  /// No description provided for @playlistErrorParse.
+  ///
+  /// In en, this message translates to:
+  /// **'The service changed its format: Sona needs an update.'**
+  String get playlistErrorParse;
+
+  /// No description provided for @playlistErrorMissingKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading from {service} isn\'t configured (missing API key).'**
+  String playlistErrorMissingKey(Object service);
+
+  /// No description provided for @thisService.
+  ///
+  /// In en, this message translates to:
+  /// **'this service'**
+  String get thisService;
 }
 
 class _AppLocalizationsDelegate

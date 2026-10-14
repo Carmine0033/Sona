@@ -1,6 +1,7 @@
 {
   "options": "Opzioni",
   "player": "Riproduttore",
+  "playlist": "Playlist",
   "nothingPlaying": "Nessun brano in riproduzione",
   "error": "Errore: {error}",
   "@error": {
@@ -73,5 +74,56 @@
     "placeholders": {
       "version": {}
     }
-  }
+  },
+  "updateCheckFailed": "Impossibile verificare gli aggiornamenti. Controlla la connessione e riprova.",
+
+  "nothingPlayingHint": "Avvia la musica in Spotify, YouTube o in qualsiasi app che compare nei controlli multimediali di Windows.",
+  "previousTrack": "Precedente",
+  "nextTrack": "Successivo",
+  "play": "Riproduci",
+  "pause": "Pausa",
+  "mute": "Disattiva audio",
+  "unmute": "Riattiva audio",
+  "close": "Chiudi",
+  "invalidHex": "Usa #RRGGBB o #AARRGGBB",
+
+  "playlistLinkHint": "Incolla il link di una playlist…",
+  "pasteAndLoad": "Incolla e carica",
+  "removePlaylist": "Rimuovi playlist",
+  "playlistEmptyTitle": "Incolla il link di una playlist pubblica",
+  "playlistEmptySubtitle": "Spotify · YouTube Music · Apple Music · Deezer",
+  "trackCount": "{count, plural, =1{1 brano} other{{count} brani}}",
+  "@trackCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "playlistTruncated": "Elenco parziale: il servizio ha restituito solo una parte dei brani.",
+  "openTrack": "Apri in {service}",
+  "@openTrack": {
+    "placeholders": {
+      "service": {}
+    }
+  },
+  "playlistErrorUnexpected": "Errore imprevisto: {error}",
+  "@playlistErrorUnexpected": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "playlistErrorInvalidLink": "Il testo incollato non è un link valido.",
+  "playlistErrorAutoMix": "I mix automatici di YouTube non sono playlist vere: salvalo come playlist e riprova.",
+  "playlistErrorUnsupported": "Link non supportato. Usa una playlist di Spotify, YouTube Music, Apple Music o Deezer.",
+  "playlistErrorNotFound": "Playlist non trovata, oppure è privata.",
+  "playlistErrorForbidden": "Questa playlist è privata: rendila pubblica e riprova.",
+  "playlistErrorRateLimited": "Troppe richieste o quota esaurita: riprova più tardi.",
+  "playlistErrorNetwork": "Connessione non riuscita. Controlla rete e firewall.",
+  "playlistErrorParse": "Il servizio ha cambiato formato: serve un aggiornamento di Sona.",
+  "playlistErrorMissingKey": "Lettura da {service} non configurata (chiave API mancante).",
+  "@playlistErrorMissingKey": {
+    "placeholders": {
+      "service": {}
+    }
+  },
+  "thisService": "questo servizio"
 }

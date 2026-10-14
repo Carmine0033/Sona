@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'dart:ui'; // ImageFilter.blur
+
 import 'package:flutter/material.dart';
 import 'package:media_overlay/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_overlay/models/now_playing.dart';
 import 'package:media_overlay/services/settings_service.dart';
+
 import '../core/theme.dart';
 import '../main.dart';
 import '../providers/app_providers.dart';
@@ -18,7 +20,9 @@ class PlayerScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     //preferences
     ref.listen(
-        alwaysOnTopProvider, (_, n) => SettingsService.setBool("alwaysOnTop", n));
+      alwaysOnTopProvider,
+      (_, n) => SettingsService.setBool("alwaysOnTop", n),
+    );
 
     final accent = Theme.of(context).colorScheme.primary;
     final nowPlaying = ref.watch(nowPlayingProvider);
@@ -27,26 +31,67 @@ class PlayerScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: ThemeColors.canvasAbyss,
       body: nowPlaying.when(
-        loading: () => Center(
-          child: CircularProgressIndicator(color: accent),
-        ),
+        loading: () => Center(child: CircularProgressIndicator(color: accent)),
         error: (e, _) => Center(
           child: Text(
             l10n.error(e.toString()),
             style: const TextStyle(color: ThemeColors.onSurface),
           ),
         ),
-        data: (info) => info == null
-            ? Center(
-                child: Text(
-                  l10n.nothingPlaying,
-                  style: const TextStyle(
-                    color: ThemeColors.onSurfaceVariant,
-                    fontSize: 16,
-                  ),
+        data: (info) =>
+            info == null ? const NothingPlaying() : _PlayerView(info: info),
+      ),
+    );
+  }
+}
+
+/// Stato vuoto condiviso da finestra principale e mini player:
+/// dice cosa manca e come rimediare.
+class NothingPlaying extends StatelessWidget {
+  final Widget? action;
+  const NothingPlaying({super.key, this.action});
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 360),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.album_outlined,
+                size: 56,
+                color: accent.withValues(alpha: 0.55),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                l10n.nothingPlaying,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: ThemeColors.luminescencePure,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
-              )
-            : _PlayerView(info: info),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.nothingPlayingHint,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: ThemeColors.onSurfaceVariant,
+                  fontSize: 13,
+                  height: 1.45,
+                ),
+              ),
+              if (action != null) ...[const SizedBox(height: 20), action!],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -88,20 +133,19 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
       }
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final isOpaque = ref.watch(opaqueBackgroundProvider);
-    final seekStyle = ref.watch(seekBarStyleProvider);
-    final discStyle = ref.watch(discStyleProvider);
     final detached = ref.watch(detachedProvider);
     final l10n = AppLocalizations.of(context)!;
 
     final art = widget.info.artwork;
     final hasArt = art != null && art.isNotEmpty;
 
-    final leftWidget =
-        detached ? _buildDetachedPlaceholder(l10n) : _buildPlayerCard();
+    final leftWidget = detached
+        ? _buildDetachedPlaceholder(l10n)
+        : _buildPlayerCard();
 
     return Stack(
       fit: StackFit.expand,
@@ -122,58 +166,22 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
 
         // 2. Velo scuro trasparente in stile Glassmorphism
         if (!isOpaque)
-          Container(
-            color: ThemeColors.canvasAbyss.withValues(alpha: 0.65),
-          ),
+          Container(color: ThemeColors.canvasAbyss.withValues(alpha: 0.65)),
 
-        // 3. Header in alto a destra con controlli utili
+        // 3. Header in alto a destra: solo ciò che riguarda la finestra.
+        //    Stile barra e stile disco stanno sulla card, che li porta con sé
+        //    anche quando viene staccata.
         Positioned(
           top: 14,
           right: 20,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _HeaderIconButton(
-                icon: seekStyle == SeekBarStyle.wave
-                    ? Icons.waves
-                    : Icons.linear_scale,
-                tooltip: seekStyle == SeekBarStyle.wave
-                    ? l10n.seekbarStyleWave
-                    : l10n.seekbarStyleLine,
-                onTap: () {
-                  ref.read(seekBarStyleProvider.notifier).state =
-                      seekStyle == SeekBarStyle.wave
-                          ? SeekBarStyle.line
-                          : SeekBarStyle.wave;
-                },
-              ),
-              const SizedBox(width: 8),
-              _HeaderIconButton(
-                icon: isOpaque ? Icons.dark_mode : Icons.blur_on,
-                tooltip: isOpaque
-                    ? l10n.transparentBackground
-                    : l10n.opaqueBackground,
-                onTap: () {
-                  ref.read(opaqueBackgroundProvider.notifier).state = !isOpaque;
-                },
-              ),
-              const SizedBox(width: 8),
-              _HeaderIconButton(
-                icon: discStyle == DiscStyle.vinyl
-                    ? Icons.album
-                    : Icons.disc_full,
-                tooltip: discStyle == DiscStyle.vinyl
-                    ? l10n.discStyleVinyl
-                    : l10n.discStyleAlbum,
-                active: discStyle == DiscStyle.vinyl,
-                onTap: () {
-                  ref.read(discStyleProvider.notifier).state =
-                      discStyle == DiscStyle.vinyl
-                          ? DiscStyle.fullAlbum
-                          : DiscStyle.vinyl;
-                },
-              ),
-            ],
+          child: _HeaderIconButton(
+            icon: isOpaque ? Icons.blur_on : Icons.dark_mode_outlined,
+            tooltip: isOpaque
+                ? l10n.transparentBackground
+                : l10n.opaqueBackground,
+            onTap: () {
+              ref.read(opaqueBackgroundProvider.notifier).state = !isOpaque;
+            },
           ),
         ),
 
@@ -191,11 +199,13 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                       // Sinistra: Card del Player
                       Padding(
                         padding: const EdgeInsets.only(
-                            left: 32, right: 16, bottom: 24, top: 12),
+                          left: 32,
+                          right: 16,
+                          bottom: 24,
+                          top: 12,
+                        ),
                         child: Center(
-                          child: SingleChildScrollView(
-                            child: leftWidget,
-                          ),
+                          child: SingleChildScrollView(child: leftWidget),
                         ),
                       ),
                       // Destra: Sezione dei Lyrics sincronizzati
@@ -211,15 +221,14 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                   // Layout compatto/verticale per schermi stretti
                   return SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 16),
+                      horizontal: 20,
+                      vertical: 16,
+                    ),
                     child: Column(
                       children: [
                         leftWidget,
                         const SizedBox(height: 24),
-                        const SizedBox(
-                          height: 420,
-                          child: FullLyricsView(),
-                        ),
+                        const SizedBox(height: 420, child: FullLyricsView()),
                       ],
                     ),
                   );
@@ -243,10 +252,7 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
           ThemeColors.surfaceElevated.withValues(alpha: 0.35),
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: accent.withValues(alpha: 0.20),
-          width: 1.5,
-        ),
+        border: Border.all(color: accent.withValues(alpha: 0.20), width: 1.5),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -302,43 +308,30 @@ class _HeaderIconButton extends StatelessWidget {
   final IconData icon;
   final String tooltip;
   final VoidCallback onTap;
-  final bool active;
 
   const _HeaderIconButton({
     required this.icon,
     required this.tooltip,
     required this.onTap,
-    this.active = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final accent = Theme.of(context).colorScheme.primary;
     return Tooltip(
       message: tooltip,
       child: Material(
-        color: Colors.transparent,
-        child: InkWell(
+        color: Colors.black.withValues(alpha: 0.25),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
           onTap: onTap,
-          child: Container(
+          hoverColor: Colors.white.withValues(alpha: 0.08),
+          child: Padding(
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: active
-                  ? accent.withValues(alpha: 0.25)
-                  : Colors.black.withValues(alpha: 0.25),
-              border: Border.all(
-                color: active
-                    ? accent.withValues(alpha: 0.4)
-                    : Colors.white.withValues(alpha: 0.1),
-              ),
-            ),
-            child: Icon(
-              icon,
-              size: 18,
-              color: active ? accent : Colors.white70,
-            ),
+            child: Icon(icon, size: 18, color: Colors.white70),
           ),
         ),
       ),

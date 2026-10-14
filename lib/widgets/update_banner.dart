@@ -30,7 +30,6 @@ class UpdateBanner extends ConsumerWidget {
       context: context,
       barrierDismissible: false,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A0B2E),
         title: Text(
           l10n.downloadingUpdate,
           style: const TextStyle(color: Colors.white, fontSize: 15),

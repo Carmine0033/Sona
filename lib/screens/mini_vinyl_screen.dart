@@ -1,10 +1,13 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:window_manager/window_manager.dart';
+
 import '../core/theme.dart';
 import '../providers/app_providers.dart';
 import '../widgets/vinyl_card.dart';
+import 'player_screen.dart' show NothingPlaying;
 
 import 'package:media_overlay/l10n/app_localizations.dart';
 
@@ -17,53 +20,81 @@ class MiniVinylScreen extends ConsumerWidget {
     final nowPlaying = ref.watch(nowPlayingProvider);
     final l10n = AppLocalizations.of(context)!;
 
+    // La finestra è senza bordi: ogni stato deve restare trascinabile,
+    // ridimensionabile e chiudibile, non solo quello con un brano attivo.
+    final content = nowPlaying.when(
+      loading: () => Center(child: CircularProgressIndicator(color: accent)),
+      error: (e, _) => _MiniPanel(
+        child: Text(
+          l10n.error(e.toString()),
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: ThemeColors.onSurface),
+        ),
+      ),
+      data: (info) {
+        if (info == null) {
+          return _MiniPanel(
+            child: NothingPlaying(
+              action: OutlinedButton.icon(
+                icon: const Icon(Icons.push_pin, size: 16),
+                label: Text(l10n.reattachCard),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: accent,
+                  side: BorderSide(color: accent.withValues(alpha: 0.5)),
+                ),
+                onPressed: _close,
+              ),
+            ),
+          );
+        }
+        return FittedBox(
+          fit: BoxFit.scaleDown,
+          child: VinylCard(
+            info: info,
+            isDetached: true,
+            onToggleDetach: _close,
+          ),
+        );
+      },
+    );
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: SafeArea(
-        child: nowPlaying.when(
-          loading: () => Center(
-            child: CircularProgressIndicator(color: accent),
-          ),
-          error: (e, _) => Center(
-            child: Text(
-              l10n.error(e.toString()),
-              style: const TextStyle(color: ThemeColors.onSurface),
-            ),
-          ),
-          data: (info) {
-            if (info == null) {
-              return Center(
-                child: Text(
-                  l10n.nothingPlaying,
-                  style: const TextStyle(
-                    color: ThemeColors.onSurfaceVariant,
-                    fontSize: 14,
-                  ),
-                ),
-              );
-            }
-
-            return WindowResizeFrame(
-              borderThickness: 8.0,
-              child: DragToMoveArea(
-                child: Center(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: VinylCard(
-                      info: info,
-                      isDetached: true,
-                      onToggleDetach: () async {
-                        await windowManager.destroy();
-                        exit(0);
-                      },
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
+        child: WindowResizeFrame(
+          borderThickness: 8.0,
+          child: DragToMoveArea(child: Center(child: content)),
         ),
       ),
+    );
+  }
+
+  static Future<void> _close() async {
+    await windowManager.destroy();
+    exit(0);
+  }
+}
+
+/// Fondo leggibile per gli stati senza card, sopra una finestra trasparente.
+class _MiniPanel extends StatelessWidget {
+  final Widget child;
+  const _MiniPanel({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = Theme.of(context).colorScheme.primary;
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 400),
+      decoration: BoxDecoration(
+        color: Color.alphaBlend(
+          accent.withValues(alpha: 0.08),
+          ThemeColors.surfaceElevated.withValues(alpha: 0.92),
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: accent.withValues(alpha: 0.28), width: 1.5),
+      ),
+      padding: const EdgeInsets.all(8),
+      child: child,
     );
   }
 }
@@ -186,10 +217,7 @@ class _ResizeBorder extends StatelessWidget {
   final MouseCursor cursor;
   final ResizeEdge edge;
 
-  const _ResizeBorder({
-    required this.cursor,
-    required this.edge,
-  });
+  const _ResizeBorder({required this.cursor, required this.edge});
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import '../core/theme.dart';
 import '../models/now_playing.dart';
 import '../services/playback_controller.dart';
 import '../services/smtc_channel.dart';
@@ -38,7 +39,10 @@ final customMediaPathProvider = StateProvider<String?>(
     name: 'customMedia');
 
 final accentColorProvider= StateProvider<Color>(
-  (ref) => Color(SettingsService.getInt('accent', 0xFF8B5CF6)),
+  // Il valore salvato dall'utente ha sempre la precedenza; Reiatsu Violet
+  // (DESIGN.md) vale solo finché non ne sceglie uno.
+  (ref) => Color(
+      SettingsService.getInt('accent', ThemeColors.primary.toARGB32())),
   name: 'accent'
 );
 
@@ -67,7 +71,7 @@ final appVersionProvider = FutureProvider<String>((ref) async {
   return info.version;
 });
 
-enum AppSection { player, options }
+enum AppSection { player, playlist, options }
 enum SeekBarStyle { line, wave }
 enum DiscStyle { vinyl, fullAlbum }
 

@@ -16,6 +16,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get player => 'Player';
 
   @override
+  String get playlist => 'Playlist';
+
+  @override
   String get nothingPlaying => 'No track playing';
 
   @override
@@ -186,4 +189,115 @@ class AppLocalizationsEn extends AppLocalizations {
   String updateAvailable(Object version) {
     return 'Update available: v$version';
   }
+
+  @override
+  String get updateCheckFailed =>
+      'Couldn\'t check for updates. Check your connection and try again.';
+
+  @override
+  String get nothingPlayingHint =>
+      'Start playing music in Spotify, YouTube or any app that shows up in the Windows media controls.';
+
+  @override
+  String get previousTrack => 'Previous';
+
+  @override
+  String get nextTrack => 'Next';
+
+  @override
+  String get play => 'Play';
+
+  @override
+  String get pause => 'Pause';
+
+  @override
+  String get mute => 'Mute';
+
+  @override
+  String get unmute => 'Unmute';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get invalidHex => 'Use #RRGGBB or #AARRGGBB';
+
+  @override
+  String get playlistLinkHint => 'Paste a playlist link…';
+
+  @override
+  String get pasteAndLoad => 'Paste and load';
+
+  @override
+  String get removePlaylist => 'Remove playlist';
+
+  @override
+  String get playlistEmptyTitle => 'Paste the link of a public playlist';
+
+  @override
+  String get playlistEmptySubtitle =>
+      'Spotify · YouTube Music · Apple Music · Deezer';
+
+  @override
+  String trackCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tracks',
+      one: '1 track',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get playlistTruncated =>
+      'Partial list: the service returned only some of the tracks.';
+
+  @override
+  String openTrack(Object service) {
+    return 'Open in $service';
+  }
+
+  @override
+  String playlistErrorUnexpected(Object error) {
+    return 'Unexpected error: $error';
+  }
+
+  @override
+  String get playlistErrorInvalidLink => 'The pasted text isn\'t a valid link.';
+
+  @override
+  String get playlistErrorAutoMix =>
+      'YouTube auto-mixes aren\'t real playlists: save it as a playlist and try again.';
+
+  @override
+  String get playlistErrorUnsupported =>
+      'Unsupported link. Use a Spotify, YouTube Music, Apple Music or Deezer playlist.';
+
+  @override
+  String get playlistErrorNotFound => 'Playlist not found, or it\'s private.';
+
+  @override
+  String get playlistErrorForbidden =>
+      'This playlist is private: make it public and try again.';
+
+  @override
+  String get playlistErrorRateLimited =>
+      'Too many requests or quota exhausted: try again later.';
+
+  @override
+  String get playlistErrorNetwork =>
+      'Couldn\'t connect. Check your network and firewall.';
+
+  @override
+  String get playlistErrorParse =>
+      'The service changed its format: Sona needs an update.';
+
+  @override
+  String playlistErrorMissingKey(Object service) {
+    return 'Reading from $service isn\'t configured (missing API key).';
+  }
+
+  @override
+  String get thisService => 'this service';
 }

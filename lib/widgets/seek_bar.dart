@@ -1,7 +1,10 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../core/theme.dart';
 import '../models/now_playing.dart';
 import '../providers/app_providers.dart';
 
@@ -28,6 +31,10 @@ class _SeekBarState extends ConsumerState<SeekBar>
   @override
   void initState() {
     super.initState();
+    // SMTC invia eventi solo quando qualcosa cambia: senza questa lettura,
+    // tornando sul player la barra resterebbe a 0:00 fino al prossimo evento.
+    final current = ref.read(nowPlayingProvider).asData?.value;
+    if (current != null) _sync(current);
     _ticker = createTicker((_) {
       // ridisegna mentre suona: fa avanzare sia la posizione sia l'onda
       if (_playing && !_dragging) setState(() {});
@@ -60,6 +67,7 @@ class _SeekBarState extends ConsumerState<SeekBar>
   Future<void> _commitSeek(double fraction) async {
     final target = _duration * fraction;
     final ok = await ref.read(playbackControllerProvider).seek(target);
+    if (!mounted) return;
     setState(() {
       _dragging = false;
       if (ok) {
@@ -67,12 +75,6 @@ class _SeekBarState extends ConsumerState<SeekBar>
         _anchor = DateTime.now();
       }
     });
-  }
-
-  String _fmt(Duration d) {
-    final m = d.inMinutes.remainder(60).toString();
-    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$m:$s';
   }
 
   @override
@@ -92,22 +94,28 @@ class _SeekBarState extends ConsumerState<SeekBar>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        style == SeekBarStyle.wave ? _buildWave(fraction) : _buildLine(fraction),
+        style == SeekBarStyle.wave
+            ? _buildWave(fraction)
+            : _buildLine(fraction),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(_fmt(pos),
-                  style: const TextStyle(color: Colors.white70, fontSize: 11)),
-              Text(_fmt(_duration),
-                  style: const TextStyle(color: Colors.white70, fontSize: 11)),
+              Text(formatDuration(pos), style: _timeStyle),
+              Text(formatDuration(_duration), style: _timeStyle),
             ],
           ),
         ),
       ],
     );
   }
+
+  static const _timeStyle = TextStyle(
+    color: Colors.white70,
+    fontSize: 11,
+    fontFeatures: tabularFigures,
+  );
 
   Widget _buildLine(double fraction) {
     final accent = Theme.of(context).colorScheme.primary;
@@ -133,41 +141,49 @@ class _SeekBarState extends ConsumerState<SeekBar>
     final accent = Theme.of(context).colorScheme.primary;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
-      child: LayoutBuilder(builder: (context, c) {
-        final width = c.maxWidth;
-        final phase = DateTime.now().millisecondsSinceEpoch / 1000.0 * 3.0;
-        final amplitude = _playing ? 4.0 : 1.0; // ampiezza bilanciata per la card
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final width = c.maxWidth;
+          final phase = DateTime.now().millisecondsSinceEpoch / 1000.0 * 3.0;
+          final amplitude = _playing
+              ? 4.0
+              : 1.0; // ampiezza bilanciata per la card
 
-        void setFromX(double dx) =>
-            setState(() => _dragFraction = (dx / width).clamp(0.0, 1.0));
+          void setFromX(double dx) =>
+              setState(() => _dragFraction = (dx / width).clamp(0.0, 1.0));
 
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onHorizontalDragStart: (_) => setState(() => _dragging = true),
-          onHorizontalDragUpdate: (d) => setFromX(d.localPosition.dx),
-          onHorizontalDragEnd: (_) => _commitSeek(_dragFraction),
-          onTapDown: (d) {
-            setState(() => _dragging = true);
-            setFromX(d.localPosition.dx);
-          },
-          onTapUp: (_) => _commitSeek(_dragFraction),
-          child: SizedBox(
-            height: 22,
-            width: double.infinity,
-            child: RepaintBoundary(
-              child: CustomPaint(
-                painter: _WavePainter(
-                  progress: _dragging ? _dragFraction : fraction,
-                  phase: phase,
-                  amplitude: amplitude,
-                  played: accent,
-                  remaining: Colors.white24,
+          return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onHorizontalDragStart: (_) => setState(() => _dragging = true),
+              onHorizontalDragUpdate: (d) => setFromX(d.localPosition.dx),
+              onHorizontalDragEnd: (_) => _commitSeek(_dragFraction),
+              onTapDown: (d) {
+                setState(() => _dragging = true);
+                setFromX(d.localPosition.dx);
+              },
+              onTapUp: (_) => _commitSeek(_dragFraction),
+              onTapCancel: () => setState(() => _dragging = false),
+              child: SizedBox(
+                height: 22,
+                width: double.infinity,
+                child: RepaintBoundary(
+                  child: CustomPaint(
+                    painter: _WavePainter(
+                      progress: _dragging ? _dragFraction : fraction,
+                      phase: phase,
+                      amplitude: amplitude,
+                      played: accent,
+                      remaining: Colors.white24,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      }),
+          );
+        },
+      ),
     );
   }
 }

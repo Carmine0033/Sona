@@ -1,6 +1,7 @@
 {
   "options": "Options",
   "player": "Player",
+  "playlist": "Playlist",
   "nothingPlaying": "No track playing",
   "error": "Error: {error}",
   "@error": {
@@ -73,5 +74,56 @@
     "placeholders": {
       "version": {}
     }
-  }
+  },
+  "updateCheckFailed": "Couldn't check for updates. Check your connection and try again.",
+
+  "nothingPlayingHint": "Start playing music in Spotify, YouTube or any app that shows up in the Windows media controls.",
+  "previousTrack": "Previous",
+  "nextTrack": "Next",
+  "play": "Play",
+  "pause": "Pause",
+  "mute": "Mute",
+  "unmute": "Unmute",
+  "close": "Close",
+  "invalidHex": "Use #RRGGBB or #AARRGGBB",
+
+  "playlistLinkHint": "Paste a playlist link…",
+  "pasteAndLoad": "Paste and load",
+  "removePlaylist": "Remove playlist",
+  "playlistEmptyTitle": "Paste the link of a public playlist",
+  "playlistEmptySubtitle": "Spotify · YouTube Music · Apple Music · Deezer",
+  "trackCount": "{count, plural, =1{1 track} other{{count} tracks}}",
+  "@trackCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "playlistTruncated": "Partial list: the service returned only some of the tracks.",
+  "openTrack": "Open in {service}",
+  "@openTrack": {
+    "placeholders": {
+      "service": {}
+    }
+  },
+  "playlistErrorUnexpected": "Unexpected error: {error}",
+  "@playlistErrorUnexpected": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "playlistErrorInvalidLink": "The pasted text isn't a valid link.",
+  "playlistErrorAutoMix": "YouTube auto-mixes aren't real playlists: save it as a playlist and try again.",
+  "playlistErrorUnsupported": "Unsupported link. Use a Spotify, YouTube Music, Apple Music or Deezer playlist.",
+  "playlistErrorNotFound": "Playlist not found, or it's private.",
+  "playlistErrorForbidden": "This playlist is private: make it public and try again.",
+  "playlistErrorRateLimited": "Too many requests or quota exhausted: try again later.",
+  "playlistErrorNetwork": "Couldn't connect. Check your network and firewall.",
+  "playlistErrorParse": "The service changed its format: Sona needs an update.",
+  "playlistErrorMissingKey": "Reading from {service} isn't configured (missing API key).",
+  "@playlistErrorMissingKey": {
+    "placeholders": {
+      "service": {}
+    }
+  },
+  "thisService": "this service"
 }

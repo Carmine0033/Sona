@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,12 +8,22 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:media_overlay/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
+
 import '../core/theme.dart';
 import '../providers/app_providers.dart';
 import '../services/settings_service.dart';
 import '../services/smtc_channel.dart';
 import '../services/update_service.dart';
 import 'accent_picker.dart';
+
+/// Colonna etichette comune a tutte le righe delle impostazioni,
+/// così i controlli partono tutti dalla stessa x.
+const settingsLabelWidth = 168.0;
+const settingsLabelStyle = TextStyle(
+  color: Colors.white70,
+  fontSize: 14,
+  fontWeight: FontWeight.w500,
+);
 
 class SettingsOverlay extends ConsumerWidget {
   const SettingsOverlay({super.key});
@@ -38,9 +49,7 @@ class SettingsOverlay extends ConsumerWidget {
                   ref.read(settingsOpenProvider.notifier).state = false,
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                child: Container(
-                  color: Colors.black.withValues(alpha: 0.55),
-                ),
+                child: Container(color: Colors.black.withValues(alpha: 0.55)),
               ),
             ),
           ),
@@ -72,16 +81,10 @@ class SettingsCard extends ConsumerWidget {
             accent.withValues(alpha: 0.08),
             ThemeColors.surfaceElevated,
           ),
-          border: Border.all(
-            color: accent.withValues(alpha: 0.3),
-            width: 1.2,
-          ),
+          border: Border.all(color: accent.withValues(alpha: 0.3), width: 1.2),
+          // Ombra neutra: l'alone d'accento è riservato alla card del player
+          // (The Single Halo Rule, DESIGN.md).
           boxShadow: [
-            BoxShadow(
-              color: accent.withValues(alpha: 0.16),
-              blurRadius: 36,
-              spreadRadius: 1,
-            ),
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.65),
               blurRadius: 40,
@@ -140,36 +143,36 @@ class SettingsCard extends ConsumerWidget {
                     label: l10n.appearance,
                     active: section == SettingsSection.appearance,
                     accent: accent,
-                    onTap: () => ref
-                        .read(settingsSectionProvider.notifier)
-                        .state = SettingsSection.appearance,
+                    onTap: () =>
+                        ref.read(settingsSectionProvider.notifier).state =
+                            SettingsSection.appearance,
                   ),
                   _NavItem(
                     icon: Icons.wallpaper_rounded,
                     label: l10n.background,
                     active: section == SettingsSection.background,
                     accent: accent,
-                    onTap: () => ref
-                        .read(settingsSectionProvider.notifier)
-                        .state = SettingsSection.background,
+                    onTap: () =>
+                        ref.read(settingsSectionProvider.notifier).state =
+                            SettingsSection.background,
                   ),
                   _NavItem(
                     icon: Icons.volume_up_outlined,
                     label: l10n.audio,
                     active: section == SettingsSection.audio,
                     accent: accent,
-                    onTap: () => ref
-                        .read(settingsSectionProvider.notifier)
-                        .state = SettingsSection.audio,
+                    onTap: () =>
+                        ref.read(settingsSectionProvider.notifier).state =
+                            SettingsSection.audio,
                   ),
                   _NavItem(
                     icon: Icons.open_in_full_rounded,
                     label: l10n.window,
                     active: section == SettingsSection.window,
                     accent: accent,
-                    onTap: () => ref
-                        .read(settingsSectionProvider.notifier)
-                        .state = SettingsSection.window,
+                    onTap: () =>
+                        ref.read(settingsSectionProvider.notifier).state =
+                            SettingsSection.window,
                   ),
                   const Spacer(),
                   _NavItem(
@@ -177,9 +180,9 @@ class SettingsCard extends ConsumerWidget {
                     label: l10n.about,
                     active: section == SettingsSection.about,
                     accent: accent,
-                    onTap: () => ref
-                        .read(settingsSectionProvider.notifier)
-                        .state = SettingsSection.about,
+                    onTap: () =>
+                        ref.read(settingsSectionProvider.notifier).state =
+                            SettingsSection.about,
                   ),
                 ],
               ),
@@ -203,12 +206,13 @@ class SettingsCard extends ConsumerWidget {
                         ),
                         const Spacer(),
                         IconButton(
+                          tooltip: l10n.close,
                           icon: const Icon(Icons.close_rounded, size: 20),
                           color: Colors.white60,
                           splashRadius: 18,
-                          onPressed: () => ref
-                              .read(settingsOpenProvider.notifier)
-                              .state = false,
+                          onPressed: () =>
+                              ref.read(settingsOpenProvider.notifier).state =
+                                  false,
                         ),
                       ],
                     ),
@@ -230,12 +234,12 @@ class SettingsCard extends ConsumerWidget {
   }
 
   String _title(SettingsSection s, AppLocalizations l10n) => switch (s) {
-        SettingsSection.appearance => l10n.appearance,
-        SettingsSection.background => l10n.background,
-        SettingsSection.audio => l10n.audio,
-        SettingsSection.window => l10n.window,
-        SettingsSection.about => l10n.about,
-      };
+    SettingsSection.appearance => l10n.appearance,
+    SettingsSection.background => l10n.background,
+    SettingsSection.audio => l10n.audio,
+    SettingsSection.window => l10n.window,
+    SettingsSection.about => l10n.about,
+  };
 
   Widget _content(
     SettingsSection s,
@@ -243,83 +247,75 @@ class SettingsCard extends ConsumerWidget {
     BuildContext ctx,
     AppLocalizations l10n,
     Color accent,
-  ) =>
-      switch (s) {
-        SettingsSection.appearance => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const AccentPickerRow(),
-              const SizedBox(height: 20),
-              _chipRow(
-                label: l10n.discStyle,
-                accent: accent,
-                chips: [
-                  _Chip(
-                    label: l10n.vinyl,
-                    selected: ref.watch(discStyleProvider) == DiscStyle.vinyl,
-                    accent: accent,
-                    onTap: () => ref
-                        .read(discStyleProvider.notifier)
-                        .state = DiscStyle.vinyl,
-                  ),
-                  _Chip(
-                    label: l10n.album,
-                    selected:
-                        ref.watch(discStyleProvider) == DiscStyle.fullAlbum,
-                    accent: accent,
-                    onTap: () => ref
-                        .read(discStyleProvider.notifier)
-                        .state = DiscStyle.fullAlbum,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _chipRow(
-                label: l10n.progressBarStyle,
-                accent: accent,
-                chips: [
-                  _Chip(
-                    label: l10n.line,
-                    selected:
-                        ref.watch(seekBarStyleProvider) == SeekBarStyle.line,
-                    accent: accent,
-                    onTap: () => ref
-                        .read(seekBarStyleProvider.notifier)
-                        .state = SeekBarStyle.line,
-                  ),
-                  _Chip(
-                    label: l10n.wave,
-                    selected:
-                        ref.watch(seekBarStyleProvider) == SeekBarStyle.wave,
-                    accent: accent,
-                    onTap: () => ref
-                        .read(seekBarStyleProvider.notifier)
-                        .state = SeekBarStyle.wave,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _discImageRow(ref, l10n, accent),
-            ],
-          ),
-        SettingsSection.background => _switchRow(
-            ref: ref,
-            title: l10n.opaqueBackground,
-            sub: l10n.opaqueBackgroundSubtitle,
-            provider: opaqueBackgroundProvider,
-            accent: accent,
-          ),
-        SettingsSection.audio => const _VolumeRow(),
-        SettingsSection.window => _switchRow(
-            ref: ref,
-            title: l10n.alwaysOnTop,
-            sub: l10n.alwaysOnTopSubtitle,
-            provider: alwaysOnTopProvider,
-            accent: accent,
-            onChanged: (v) => windowManager.setAlwaysOnTop(v),
-          ),
-        SettingsSection.about => const _AboutContent(),
-      };
+  ) => switch (s) {
+    SettingsSection.appearance => Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const AccentPickerRow(),
+        const SizedBox(height: 20),
+        _chipRow(
+          label: l10n.discStyle,
+          accent: accent,
+          chips: [
+            _Chip(
+              label: l10n.vinyl,
+              selected: ref.watch(discStyleProvider) == DiscStyle.vinyl,
+              accent: accent,
+              onTap: () =>
+                  ref.read(discStyleProvider.notifier).state = DiscStyle.vinyl,
+            ),
+            _Chip(
+              label: l10n.album,
+              selected: ref.watch(discStyleProvider) == DiscStyle.fullAlbum,
+              accent: accent,
+              onTap: () => ref.read(discStyleProvider.notifier).state =
+                  DiscStyle.fullAlbum,
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        _chipRow(
+          label: l10n.progressBarStyle,
+          accent: accent,
+          chips: [
+            _Chip(
+              label: l10n.line,
+              selected: ref.watch(seekBarStyleProvider) == SeekBarStyle.line,
+              accent: accent,
+              onTap: () => ref.read(seekBarStyleProvider.notifier).state =
+                  SeekBarStyle.line,
+            ),
+            _Chip(
+              label: l10n.wave,
+              selected: ref.watch(seekBarStyleProvider) == SeekBarStyle.wave,
+              accent: accent,
+              onTap: () => ref.read(seekBarStyleProvider.notifier).state =
+                  SeekBarStyle.wave,
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+        _discImageRow(ref, l10n, accent),
+      ],
+    ),
+    SettingsSection.background => _switchRow(
+      ref: ref,
+      title: l10n.opaqueBackground,
+      sub: l10n.opaqueBackgroundSubtitle,
+      provider: opaqueBackgroundProvider,
+      accent: accent,
+    ),
+    SettingsSection.audio => const _VolumeRow(),
+    SettingsSection.window => _switchRow(
+      ref: ref,
+      title: l10n.alwaysOnTop,
+      sub: l10n.alwaysOnTopSubtitle,
+      provider: alwaysOnTopProvider,
+      accent: accent,
+      onChanged: (v) => windowManager.setAlwaysOnTop(v),
+    ),
+    SettingsSection.about => const _AboutContent(),
+  };
 
   Widget _chipRow({
     required String label,
@@ -330,20 +326,10 @@ class SettingsCard extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SizedBox(
-          width: 140,
-          child: Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          width: settingsLabelWidth,
+          child: Text(label, style: settingsLabelStyle),
         ),
-        Wrap(
-          spacing: 8,
-          children: chips,
-        ),
+        Wrap(spacing: 8, children: chips),
       ],
     );
   }
@@ -374,10 +360,7 @@ class SettingsCard extends ConsumerWidget {
               const SizedBox(height: 3),
               Text(
                 sub,
-                style: const TextStyle(
-                  color: Colors.white38,
-                  fontSize: 12,
-                ),
+                style: const TextStyle(color: Colors.white60, fontSize: 12),
               ),
             ],
           ),
@@ -397,26 +380,15 @@ class SettingsCard extends ConsumerWidget {
     );
   }
 
-  Widget _discImageRow(
-    WidgetRef ref,
-    AppLocalizations l10n,
-    Color accent,
-  ) {
+  Widget _discImageRow(WidgetRef ref, AppLocalizations l10n, Color accent) {
     final customMedia = ref.watch(customMediaPathProvider);
     final hasCustom = customMedia != null;
 
     return Row(
       children: [
         SizedBox(
-          width: 140,
-          child: Text(
-            l10n.discImage,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          width: settingsLabelWidth,
+          child: Text(l10n.discImage, style: settingsLabelStyle),
         ),
         TextButton.icon(
           icon: Icon(Icons.image_outlined, size: 16, color: accent),
@@ -507,7 +479,9 @@ class _NavItem extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
             color: active ? accent.withValues(alpha: 0.20) : Colors.transparent,
             border: Border.all(
-              color: active ? accent.withValues(alpha: 0.35) : Colors.transparent,
+              color: active
+                  ? accent.withValues(alpha: 0.35)
+                  : Colors.transparent,
               width: 1,
             ),
           ),
@@ -656,10 +630,7 @@ class _VolumeRowState extends ConsumerState<_VolumeRow> {
                 const SizedBox(height: 3),
                 Text(
                   l10n.systemVolumeSubtitle,
-                  style: const TextStyle(
-                    color: Colors.white38,
-                    fontSize: 12,
-                  ),
+                  style: const TextStyle(color: Colors.white60, fontSize: 12),
                 ),
               ],
             ),
@@ -688,7 +659,7 @@ class _VolumeRowState extends ConsumerState<_VolumeRow> {
               icon: Icon(icon, size: 20),
               color: isMuted ? Colors.white38 : accent,
               onPressed: _toggleMute,
-              tooltip: isMuted ? 'Unmute' : 'Mute',
+              tooltip: isMuted ? l10n.unmute : l10n.mute,
             ),
             Expanded(
               child: SliderTheme(
@@ -751,7 +722,7 @@ class _AboutContentState extends ConsumerState<_AboutContent> {
     } catch (_) {
       if (mounted) {
         setState(() {
-          _statusMessage = l10n.error('Failed to check');
+          _statusMessage = l10n.updateCheckFailed;
         });
       }
     } finally {
@@ -764,7 +735,7 @@ class _AboutContentState extends ConsumerState<_AboutContent> {
   @override
   Widget build(BuildContext context) {
     final accent = ref.watch(accentColorProvider);
-    final appVersion = ref.watch(appVersionProvider).asData?.value ?? '0.1.3';
+    final appVersion = ref.watch(appVersionProvider).asData?.value;
     final l10n = AppLocalizations.of(context)!;
 
     return Column(
@@ -796,11 +767,8 @@ class _AboutContentState extends ConsumerState<_AboutContent> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'v$appVersion',
-                  style: const TextStyle(
-                    color: Colors.white54,
-                    fontSize: 13,
-                  ),
+                  appVersion == null ? ' ' : 'v$appVersion',
+                  style: const TextStyle(color: Colors.white54, fontSize: 13),
                 ),
               ],
             ),

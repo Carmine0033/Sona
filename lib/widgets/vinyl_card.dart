@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:media_overlay/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../core/theme.dart';
 import '../models/now_playing.dart';
 import '../providers/app_providers.dart';
@@ -27,6 +28,7 @@ class VinylCard extends ConsumerStatefulWidget {
 
 class _VinylCardState extends ConsumerState<VinylCard> {
   double _volume = 0.8;
+  double _lastAudible = 0.8;
 
   @override
   void initState() {
@@ -34,6 +36,12 @@ class _VinylCardState extends ConsumerState<VinylCard> {
     SmtcChannel.getVolume().then((v) {
       if (v >= 0 && mounted) setState(() => _volume = v.clamp(0.0, 1.0));
     });
+  }
+
+  void _setVolume(double v) {
+    if (_volume > 0.01) _lastAudible = _volume;
+    setState(() => _volume = v);
+    ref.read(playbackControllerProvider).setPlayerVolume(v);
   }
 
   @override
@@ -53,10 +61,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
           ThemeColors.surfaceElevated.withValues(alpha: 0.45),
         ),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: accent.withValues(alpha: 0.28),
-          width: 1.5,
-        ),
+        border: Border.all(color: accent.withValues(alpha: 0.28), width: 1.5),
         boxShadow: [
           BoxShadow(
             color: accent.withValues(alpha: 0.14),
@@ -117,8 +122,10 @@ class _VinylCardState extends ConsumerState<VinylCard> {
                         : l10n.seekbarStyleLine,
                     child: IconButton(
                       padding: const EdgeInsets.all(4),
-                      constraints:
-                          const BoxConstraints(minWidth: 32, minHeight: 32),
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
                       icon: Icon(
                         seekStyle == SeekBarStyle.wave
                             ? Icons.waves
@@ -127,10 +134,11 @@ class _VinylCardState extends ConsumerState<VinylCard> {
                         color: accent,
                       ),
                       onPressed: () {
-                        ref.read(seekBarStyleProvider.notifier).state =
-                            seekStyle == SeekBarStyle.wave
-                                ? SeekBarStyle.line
-                                : SeekBarStyle.wave;
+                        ref
+                            .read(seekBarStyleProvider.notifier)
+                            .state = seekStyle == SeekBarStyle.wave
+                            ? SeekBarStyle.line
+                            : SeekBarStyle.wave;
                       },
                     ),
                   ),
@@ -142,8 +150,10 @@ class _VinylCardState extends ConsumerState<VinylCard> {
                         : l10n.discStyleAlbum,
                     child: IconButton(
                       padding: const EdgeInsets.all(4),
-                      constraints:
-                          const BoxConstraints(minWidth: 32, minHeight: 32),
+                      constraints: const BoxConstraints(
+                        minWidth: 32,
+                        minHeight: 32,
+                      ),
                       icon: Icon(
                         discStyle == DiscStyle.vinyl
                             ? Icons.album
@@ -152,10 +162,11 @@ class _VinylCardState extends ConsumerState<VinylCard> {
                         color: accent,
                       ),
                       onPressed: () {
-                        ref.read(discStyleProvider.notifier).state =
-                            discStyle == DiscStyle.vinyl
-                                ? DiscStyle.fullAlbum
-                                : DiscStyle.vinyl;
+                        ref
+                            .read(discStyleProvider.notifier)
+                            .state = discStyle == DiscStyle.vinyl
+                            ? DiscStyle.fullAlbum
+                            : DiscStyle.vinyl;
                       },
                     ),
                   ),
@@ -168,8 +179,10 @@ class _VinylCardState extends ConsumerState<VinylCard> {
                           : l10n.detachCard,
                       child: IconButton(
                         padding: const EdgeInsets.all(4),
-                        constraints:
-                            const BoxConstraints(minWidth: 32, minHeight: 32),
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
                         icon: Icon(
                           widget.isDetached
                               ? Icons.push_pin
@@ -234,6 +247,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
             children: [
               _CtrlButton(
                 icon: Icons.skip_previous_rounded,
+                tooltip: l10n.previousTrack,
                 onTap: controller.previous,
               ),
               const SizedBox(width: 20),
@@ -241,12 +255,14 @@ class _VinylCardState extends ConsumerState<VinylCard> {
                 icon: widget.info.isPlaying
                     ? Icons.pause_rounded
                     : Icons.play_arrow_rounded,
+                tooltip: widget.info.isPlaying ? l10n.pause : l10n.play,
                 hero: true,
                 onTap: controller.playPause,
               ),
               const SizedBox(width: 20),
               _CtrlButton(
                 icon: Icons.skip_next_rounded,
+                tooltip: l10n.nextTrack,
                 onTap: controller.next,
               ),
             ],
@@ -256,19 +272,31 @@ class _VinylCardState extends ConsumerState<VinylCard> {
           // Slider per il Volume / Barra di controllo bottom
           Row(
             children: [
-              Icon(
-                _volume == 0 ? Icons.volume_off : Icons.volume_down,
-                size: 16,
-                color: accent.withValues(alpha: 0.7),
+              IconButton(
+                tooltip: _volume < 0.01 ? l10n.unmute : l10n.mute,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                iconSize: 16,
+                color: accent.withValues(alpha: 0.8),
+                icon: Icon(
+                  _volume < 0.01 ? Icons.volume_off : Icons.volume_down,
+                ),
+                onPressed: () => _setVolume(
+                  _volume < 0.01
+                      ? (_lastAudible > 0.01 ? _lastAudible : 0.5)
+                      : 0,
+                ),
               ),
               Expanded(
                 child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     trackHeight: 3,
-                    thumbShape:
-                        const RoundSliderThumbShape(enabledThumbRadius: 4),
-                    overlayShape:
-                        const RoundSliderOverlayShape(overlayRadius: 8),
+                    thumbShape: const RoundSliderThumbShape(
+                      enabledThumbRadius: 4,
+                    ),
+                    overlayShape: const RoundSliderOverlayShape(
+                      overlayRadius: 8,
+                    ),
                     activeTrackColor: accent,
                     inactiveTrackColor: Colors.white.withValues(alpha: 0.2),
                     thumbColor: accent,
@@ -277,10 +305,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
                     value: _volume.clamp(0.0, 1.0),
                     min: 0.0,
                     max: 1.0,
-                    onChanged: (v) {
-                      setState(() => _volume = v);
-                      controller.setPlayerVolume(v);
-                    },
+                    onChanged: _setVolume,
                   ),
                 ),
               ),
@@ -299,10 +324,12 @@ class _VinylCardState extends ConsumerState<VinylCard> {
 
 class _CtrlButton extends StatelessWidget {
   final IconData icon;
+  final String tooltip;
   final VoidCallback onTap;
   final bool hero;
   const _CtrlButton({
     required this.icon,
+    required this.tooltip,
     required this.onTap,
     this.hero = false,
   });
@@ -312,37 +339,43 @@ class _CtrlButton extends StatelessWidget {
     final accent = Theme.of(context).colorScheme.primary;
     final size = hero ? 52.0 : 40.0;
     final iconSize = hero ? 30.0 : 22.0;
+    final fg = hero ? Colors.black : Colors.white;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: hero ? Colors.white : Colors.white.withValues(alpha: 0.10),
-            border: Border.all(
+    // Il colore sta sul Material, non su un Container figlio:
+    // così hover e pressione dell'InkWell restano visibili.
+    return Tooltip(
+      message: tooltip,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: hero
+              ? [
+                  BoxShadow(
+                    color: accent.withValues(alpha: 0.45),
+                    blurRadius: 16,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
+        ),
+        child: Material(
+          color: hero ? Colors.white : Colors.white.withValues(alpha: 0.10),
+          shape: CircleBorder(
+            side: BorderSide(
               color: hero ? Colors.white : Colors.white.withValues(alpha: 0.18),
-              width: 1,
             ),
-            boxShadow: hero
-                ? [
-                    BoxShadow(
-                      color: accent.withValues(alpha: 0.45),
-                      blurRadius: 16,
-                      spreadRadius: 1,
-                    )
-                  ]
-                : null,
           ),
-          child: Icon(
-            icon,
-            color: hero ? Colors.black : Colors.white,
-            size: iconSize,
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            hoverColor: fg.withValues(alpha: 0.08),
+            splashColor: fg.withValues(alpha: 0.12),
+            child: SizedBox(
+              width: size,
+              height: size,
+              child: Icon(icon, color: fg, size: iconSize),
+            ),
           ),
         ),
       ),

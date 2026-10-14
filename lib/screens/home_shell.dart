@@ -5,6 +5,7 @@ import '../providers/app_providers.dart';
 import '../widgets/sidebar.dart';
 import '../widgets/settings_card.dart';
 import 'player_screen.dart';
+import 'playlist_view.dart';
 import '../widgets/update_banner.dart';
 
 class HomeShell extends ConsumerWidget {
@@ -29,6 +30,7 @@ class HomeShell extends ConsumerWidget {
                     Expanded(
                       child: switch (section) {
                         AppSection.player => const PlayerScreen(),
+                        AppSection.playlist => const PlaylistView(),
                         AppSection.options => const PlayerScreen(),
                       },
                     ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:media_overlay/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../providers/app_providers.dart';
 
 class Sidebar extends ConsumerWidget {
@@ -15,12 +16,12 @@ class Sidebar extends ConsumerWidget {
 
     return Container(
       width: 160,
-      padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+      padding: const EdgeInsets.fromLTRB(8, 16, 8, 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(8, 0, 8, 14),
+            padding: const EdgeInsets.fromLTRB(12, 0, 8, 18),
             child: Text(
               'SONA',
               style: TextStyle(
@@ -39,6 +40,17 @@ class Sidebar extends ConsumerWidget {
               ref.read(settingsOpenProvider.notifier).state = false;
               ref.read(selectedSectionProvider.notifier).state =
                   AppSection.player;
+            },
+          ),
+          const SizedBox(height: 4),
+          _NavItem(
+            icon: Icons.queue_music,
+            label: l10n.playlist,
+            active: !isSettingsOpen && sel == AppSection.playlist,
+            onTap: () {
+              ref.read(settingsOpenProvider.notifier).state = false;
+              ref.read(selectedSectionProvider.notifier).state =
+                  AppSection.playlist;
             },
           ),
           const SizedBox(height: 4),

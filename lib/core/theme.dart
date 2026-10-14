@@ -88,7 +88,58 @@ ThemeData buildTheme([Color? primaryAccent]) {
       errorContainer: ThemeColors.errorContainer,
       onErrorContainer: ThemeColors.onErrorContainer,
     ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: Color.alphaBlend(
+        primary.withValues(alpha: 0.08),
+        ThemeColors.surfaceElevated,
+      ),
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: primary.withValues(alpha: 0.3)),
+      ),
+    ),
+    tooltipTheme: TooltipThemeData(
+      waitDuration: const Duration(milliseconds: 400),
+      textStyle: const TextStyle(color: ThemeColors.onSurface, fontSize: 12),
+      decoration: BoxDecoration(
+        color: ThemeColors.surfaceContainer,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: ThemeColors.outlineVariant),
+      ),
+    ),
+    scrollbarTheme: ScrollbarThemeData(
+      thickness: const WidgetStatePropertyAll(4),
+      radius: const Radius.circular(2),
+      thumbColor: WidgetStateProperty.resolveWith(
+        (s) => Colors.white.withValues(
+          alpha:
+              s.contains(WidgetState.hovered) || s.contains(WidgetState.dragged)
+              ? 0.35
+              : 0.15,
+        ),
+      ),
+    ),
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: primary,
+      selectionColor: primary.withValues(alpha: 0.35),
+      selectionHandleColor: primary,
+    ),
+    snackBarTheme: const SnackBarThemeData(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: ThemeColors.surfaceContainer,
+      contentTextStyle: TextStyle(color: ThemeColors.onSurface, fontSize: 13),
+    ),
   );
 }
 
+/// Times and counters: fixed-width digits so ticking values don't jitter.
+const tabularFigures = [FontFeature.tabularFigures()];
 
+/// `m:ss`, or `h:mm:ss` from one hour up.
+String formatDuration(Duration d) {
+  final h = d.inHours;
+  final m = d.inMinutes.remainder(60);
+  final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+  return h > 0 ? '$h:${m.toString().padLeft(2, '0')}:$s' : '$m:$s';
+}

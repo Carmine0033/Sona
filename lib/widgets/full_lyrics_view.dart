@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:media_overlay/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../core/theme.dart';
 import '../models/lyrics.dart';
 import '../models/now_playing.dart';
@@ -28,11 +29,10 @@ class _FullLyricsViewState extends ConsumerState<FullLyricsView>
   @override
   void initState() {
     super.initState();
+    final current = ref.read(nowPlayingProvider).asData?.value;
+    if (current != null) _sync(current);
     _ticker = createTicker((_) {
-      if (_playing && mounted) {
-        setState(() {});
-        _autoScrollIfNeeded();
-      }
+      if (_playing && mounted) _autoScrollIfNeeded();
     })..start();
   }
 
@@ -70,7 +70,8 @@ class _FullLyricsViewState extends ConsumerState<FullLyricsView>
 
     final idx = _activeIndex(lyrics, _pos);
     if (idx != _lastActiveIndex) {
-      _lastActiveIndex = idx;
+      // Ricostruisce solo quando cambia il verso attivo, non a ogni frame.
+      setState(() => _lastActiveIndex = idx);
       if (DateTime.now().difference(_lastUserInteraction).inSeconds > 4) {
         _scrollToIndex(idx);
       }
@@ -81,7 +82,8 @@ class _FullLyricsViewState extends ConsumerState<FullLyricsView>
     if (!_scrollController.hasClients || index < 0) return;
     const itemEstimate = 56.0;
     final viewportHeight = _scrollController.position.viewportDimension;
-    final targetOffset = (index * itemEstimate) - (viewportHeight / 2) + (itemEstimate / 2);
+    final targetOffset =
+        (index * itemEstimate) - (viewportHeight / 2) + (itemEstimate / 2);
     final clampedOffset = targetOffset.clamp(
       0.0,
       _scrollController.position.maxScrollExtent,
@@ -147,53 +149,65 @@ class _FullLyricsViewState extends ConsumerState<FullLyricsView>
             blendMode: BlendMode.dstIn,
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.symmetric(vertical: 140, horizontal: 24),
+              padding: const EdgeInsets.symmetric(
+                vertical: 140,
+                horizontal: 24,
+              ),
               itemCount: lines.length,
               itemBuilder: (context, index) {
                 final line = lines[index];
                 final isActive = index == activeIdx;
                 final isPassed = index < activeIdx;
 
-                return GestureDetector(
-                  onTap: () {
-                    ref.read(playbackControllerProvider).seek(line.time);
-                    _lastUserInteraction = DateTime.now();
-                    _scrollToIndex(index);
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOutCubic,
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 12,
-                      horizontal: 16,
-                    ),
-                    margin: const EdgeInsets.only(bottom: 8),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: isActive
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : Colors.transparent,
-                    ),
-                    child: Text(
-                      line.text.isEmpty ? '♪' : line.text,
-                      style: TextStyle(
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
+                    hoverColor: Colors.white.withValues(alpha: 0.05),
+                    splashColor: Colors.white.withValues(alpha: 0.06),
+                    highlightColor: Colors.transparent,
+                    onTap: () {
+                      ref.read(playbackControllerProvider).seek(line.time);
+                      _lastUserInteraction = DateTime.now();
+                      _scrollToIndex(index);
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOutCubic,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
                         color: isActive
-                            ? Colors.white
-                            : (isPassed
-                                ? Colors.white.withValues(alpha: 0.38)
-                                : Colors.white.withValues(alpha: 0.62)),
-                        fontSize: isActive ? 23 : 18,
-                        fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                        height: 1.35,
-                        letterSpacing: -0.2,
-                        shadows: isActive
-                            ? [
-                                Shadow(
-                                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
-                                  blurRadius: 18,
-                                ),
-                              ]
-                            : null,
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : Colors.transparent,
+                      ),
+                      child: Text(
+                        line.text.isEmpty ? '♪' : line.text,
+                        style: TextStyle(
+                          color: isActive
+                              ? Colors.white
+                              : (isPassed
+                                    ? Colors.white.withValues(alpha: 0.38)
+                                    : Colors.white.withValues(alpha: 0.62)),
+                          fontSize: isActive ? 23 : 18,
+                          fontWeight: isActive
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                          height: 1.35,
+                          letterSpacing: -0.2,
+                          shadows: isActive
+                              ? [
+                                  Shadow(
+                                    color: Theme.of(context).colorScheme.primary
+                                        .withValues(alpha: 0.5),
+                                    blurRadius: 18,
+                                  ),
+                                ]
+                              : null,
+                        ),
                       ),
                     ),
                   ),
