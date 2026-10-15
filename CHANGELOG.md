@@ -1,4 +1,22 @@
-﻿---------------------------
+---------------------------
+Release Sona V0.1.5
+---------------------------
+
+### Added
+
+* \- Playlist import from public links (Spotify, YouTube Music, Apple Music, Deezer)
+* \- Built-in player with shuffle, repeat, volume and wave seek bar
+* \- Album artwork for every track in the playlist
+* \- Discord Rich Presence (opt-in in Settings)
+
+### Changed
+
+* Player and playlist error messages are now translated (IT/EN)
+
+### Fixed
+
+* Browser extension and local WebSocket server for playlists
+---------------------------
 Release Sona V0.1.4
 ---------------------------
 
@@ -58,6 +76,7 @@ Release Sona V0.1.2
 ### Fixed
 
 *
+
 
 
 
