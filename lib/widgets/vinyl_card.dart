@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme.dart';
 import '../models/now_playing.dart';
 import '../providers/app_providers.dart';
-import '../services/smtc_channel.dart';
+import '../services/playback_controller.dart';
 import 'marquee_text.dart';
 import 'seek_bar.dart';
 import 'spinning_disc.dart';
@@ -33,7 +33,13 @@ class _VinylCardState extends ConsumerState<VinylCard> {
   @override
   void initState() {
     super.initState();
-    SmtcChannel.getVolume().then((v) {
+    _readVolume(ref.read(playbackControllerProvider));
+  }
+
+  // The slider starts at the current source's volume: Spotify via SMTC
+  // or Sona's internal player.
+  void _readVolume(PlaybackController controller) {
+    controller.getVolume().then((v) {
       if (v >= 0 && mounted) setState(() => _volume = v.clamp(0.0, 1.0));
     });
   }
@@ -47,7 +53,9 @@ class _VinylCardState extends ConsumerState<VinylCard> {
   @override
   Widget build(BuildContext context) {
     final accent = Theme.of(context).colorScheme.primary;
-    final controller = ref.read(playbackControllerProvider);
+    // Source changed (playlist <-> system app): reread the volume.
+    ref.listen(playbackControllerProvider, (_, next) => _readVolume(next));
+    final controller = ref.watch(playbackControllerProvider);
     final seekStyle = ref.watch(seekBarStyleProvider);
     final discStyle = ref.watch(discStyleProvider);
     final l10n = AppLocalizations.of(context)!;
@@ -80,7 +88,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Top Header Bar con controlli (Stile SeekBar, Stile Disco, Detach)
+          // Header: seek bar style, disc style, detach
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -115,7 +123,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Pulsante per cambiare lo stile della barra di progresso (Wave / Line)
+                  // Seek bar style (wave / line)
                   Tooltip(
                     message: seekStyle == SeekBarStyle.wave
                         ? l10n.seekbarStyleWave
@@ -143,7 +151,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  // Pulsante per cambiare lo stile del disco (Vinyl / Album)
+                  // Disc style (vinyl / album)
                   Tooltip(
                     message: discStyle == DiscStyle.vinyl
                         ? l10n.discStyleVinyl
@@ -171,7 +179,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  // Pulsante per Staccare / Riagganciare la Card
+                  // Detach / reattach the card
                   if (widget.onToggleDetach != null)
                     Tooltip(
                       message: widget.isDetached
@@ -199,7 +207,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
           ),
           const SizedBox(height: 12),
 
-          // Disco rotante con copertina
+          // Spinning disc with artwork
           SpinningDisc(
             albumArt: widget.info.artwork,
             spinning: widget.info.isPlaying,
@@ -207,7 +215,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
           ),
           const SizedBox(height: 22),
 
-          // Titolo brano
+          // Title
           SizedBox(
             height: 28,
             width: double.infinity,
@@ -223,7 +231,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
           ),
           const SizedBox(height: 4),
 
-          // Artista
+          // Artist
           Text(
             widget.info.artist.isEmpty ? '—' : widget.info.artist,
             maxLines: 1,
@@ -237,11 +245,11 @@ class _VinylCardState extends ConsumerState<VinylCard> {
           ),
           const SizedBox(height: 22),
 
-          // Barra di progresso / seek bar
+          // Seek bar
           const SeekBar(),
           const SizedBox(height: 18),
 
-          // Pulsanti di controllo riproduzione (Prev, Play/Pause, Next)
+          // Playback controls
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -269,7 +277,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
           ),
           const SizedBox(height: 16),
 
-          // Slider per il Volume / Barra di controllo bottom
+          // Volume
           Row(
             children: [
               IconButton(
@@ -341,8 +349,8 @@ class _CtrlButton extends StatelessWidget {
     final iconSize = hero ? 30.0 : 22.0;
     final fg = hero ? Colors.black : Colors.white;
 
-    // Il colore sta sul Material, non su un Container figlio:
-    // così hover e pressione dell'InkWell restano visibili.
+    // Color goes on the Material, not a child Container,
+    // so InkWell hover and splash stay visible.
     return Tooltip(
       message: tooltip,
       child: DecoratedBox(

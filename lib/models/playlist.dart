@@ -25,7 +25,7 @@ class PlaylistTrack {
   final Duration? duration;
   final String? artworkUrl;
 
-  ///Link 
+  /// Link that opens the track in its app.
   final String? openUrl;
 }
 

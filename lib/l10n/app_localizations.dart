@@ -296,6 +296,30 @@ abstract class AppLocalizations {
   /// **'Keep window above other applications'**
   String get alwaysOnTopSubtitle;
 
+  /// No description provided for @discordPresence.
+  ///
+  /// In en, this message translates to:
+  /// **'Discord status'**
+  String get discordPresence;
+
+  /// No description provided for @discordPresenceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the track you are listening to on Discord'**
+  String get discordPresenceSubtitle;
+
+  /// No description provided for @discordPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Paused'**
+  String get discordPaused;
+
+  /// No description provided for @discordDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Sona'**
+  String get discordDownload;
+
   /// No description provided for @source.
   ///
   /// In en, this message translates to:
@@ -613,6 +637,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'this service'**
   String get thisService;
+
+  /// No description provided for @findingAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding audio…'**
+  String get findingAudio;
+
+  /// No description provided for @stopPlayback.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get stopPlayback;
+
+  /// No description provided for @shuffle.
+  ///
+  /// In en, this message translates to:
+  /// **'Shuffle'**
+  String get shuffle;
+
+  /// No description provided for @repeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat'**
+  String get repeat;
+
+  /// No description provided for @repeatOne.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat track'**
+  String get repeatOne;
+
+  /// No description provided for @audioErrorBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'YouTube is blocking playback. Update Sona or try again later.'**
+  String get audioErrorBlocked;
+
+  /// No description provided for @audioErrorNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching audio found for this track.'**
+  String get audioErrorNoMatch;
+
+  /// No description provided for @audioErrorUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio isn\'t available for this track.'**
+  String get audioErrorUnavailable;
+
+  /// No description provided for @audioErrorNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t connect. Check your network and try again.'**
+  String get audioErrorNetwork;
+
+  /// No description provided for @audioErrorPlayback.
+  ///
+  /// In en, this message translates to:
+  /// **'Playback stopped because of an error.'**
+  String get audioErrorPlayback;
 }
 
 class _AppLocalizationsDelegate

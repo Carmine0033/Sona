@@ -6,7 +6,7 @@ import 'package:media_overlay/services/settings_service.dart';
 
 final playlistLinkServiceProvider = Provider<PlaylistLinkService>((ref) {
   final service = PlaylistLinkService(
-    // Iniettata a compile-time con --dart-define-from-file (vedi sotto).
+    // Injected at compile time via --dart-define-from-file (see below).
     youtubeApiKey: const String.fromEnvironment('YT_API_KEY'),
   );
   ref.onDispose(service.dispose);

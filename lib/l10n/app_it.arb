@@ -39,6 +39,10 @@
   "general": "Generale",
   "alwaysOnTop": "Sempre in primo piano",
   "alwaysOnTopSubtitle": "Mantieni la finestra sopra le altre applicazioni",
+  "discordPresence": "Stato su Discord",
+  "discordPresenceSubtitle": "Mostra su Discord il brano che stai ascoltando",
+  "discordPaused": "In pausa",
+  "discordDownload": "Scarica Sona",
   "source": "Codice Sorgente",
   "releases": "Rilasci",
   "transparentBackground": "Sfondo trasparente",
@@ -125,5 +129,16 @@
       "service": {}
     }
   },
-  "thisService": "questo servizio"
+  "thisService": "questo servizio",
+
+  "findingAudio": "Ricerca dell'audio…",
+  "stopPlayback": "Interrompi",
+  "shuffle": "Riproduzione casuale",
+  "repeat": "Ripeti",
+  "repeatOne": "Ripeti brano",
+  "audioErrorBlocked": "YouTube sta bloccando la riproduzione. Aggiorna Sona o riprova più tardi.",
+  "audioErrorNoMatch": "Nessun audio compatibile trovato per questo brano.",
+  "audioErrorUnavailable": "Audio non disponibile per questo brano.",
+  "audioErrorNetwork": "Connessione non riuscita. Controlla la rete e riprova.",
+  "audioErrorPlayback": "Riproduzione interrotta da un errore."
 }

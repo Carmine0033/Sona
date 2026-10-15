@@ -102,7 +102,7 @@ class _AccentPickerRowState extends ConsumerState<AccentPickerRow> {
             child: Text(l10n.accentColor, style: settingsLabelStyle),
           ),
         ),
-        // swatch cliccabile -> apre ruota + opacità
+        // clickable swatch -> opens wheel + opacity
         Tooltip(
           message: l10n.accentColor,
           child: Material(
@@ -120,7 +120,7 @@ class _AccentPickerRowState extends ConsumerState<AccentPickerRow> {
           ),
         ),
         const SizedBox(width: 10),
-        // campo hex
+        // hex field
         SizedBox(
           width: 132,
           child: TextField(

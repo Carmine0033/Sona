@@ -6,7 +6,8 @@
 
 
 namespace smtc_bridge {
-    void Register(flutter::FlutterEngine* engine);
+    // ignore_self: true in the main window (see smtc_bridge.cpp).
+    void Register(flutter::FlutterEngine* engine, bool ignore_self);
     void CleanUp();
 }
 

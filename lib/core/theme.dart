@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// A class that defines the Sona HUD theme palette based on DESIGN.md.
+/// Sona HUD theme palette (see DESIGN.md).
 abstract final class ThemeColors {
   // Canvas & Surfaces
   static const background = Color(0xFF15121A);
@@ -27,7 +27,7 @@ abstract final class ThemeColors {
   static const outlineVariant = Color(0xFF4D4353);
   static const surfaceStroke = Color(0x1FC77DFF); // rgba(199, 125, 255, 0.12)
 
-  // Reiatsu & Primary (Spiritual Purple & Amethyst)
+  // Primary (purple / amethyst)
   static const primary = Color(0xFF9D4EDD);
   static const primaryLight = Color(0xFFE0B6FF);
   static const onPrimary = Color(0xFF4C007D);

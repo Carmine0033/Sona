@@ -66,7 +66,7 @@ class UpdateService {
       await sink.close();
 
 
-      // lancio ritardato: l'app esce, POI l'installer parte a file liberi
+      // delayed launch: the app exits, THEN the installer runs on unlocked files
       await Process.start(
         'cmd',
         [
@@ -88,7 +88,7 @@ class UpdateService {
         mode: ProcessStartMode.detached,
       );
       await windowManager.destroy();
-      exit(0); // a questo punto l'installer è ancora in attesa (timeout + mutex)
+      exit(0); // the installer is still waiting (timeout + mutex)
     } finally {
       client.close();
     }

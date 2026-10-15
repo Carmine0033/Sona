@@ -115,6 +115,19 @@ class AppLocalizationsIt extends AppLocalizations {
       'Mantieni la finestra sopra le altre applicazioni';
 
   @override
+  String get discordPresence => 'Stato su Discord';
+
+  @override
+  String get discordPresenceSubtitle =>
+      'Mostra su Discord il brano che stai ascoltando';
+
+  @override
+  String get discordPaused => 'In pausa';
+
+  @override
+  String get discordDownload => 'Scarica Sona';
+
+  @override
   String get source => 'Codice Sorgente';
 
   @override
@@ -302,4 +315,37 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get thisService => 'questo servizio';
+
+  @override
+  String get findingAudio => 'Ricerca dell\'audio…';
+
+  @override
+  String get stopPlayback => 'Interrompi';
+
+  @override
+  String get shuffle => 'Riproduzione casuale';
+
+  @override
+  String get repeat => 'Ripeti';
+
+  @override
+  String get repeatOne => 'Ripeti brano';
+
+  @override
+  String get audioErrorBlocked =>
+      'YouTube sta bloccando la riproduzione. Aggiorna Sona o riprova più tardi.';
+
+  @override
+  String get audioErrorNoMatch =>
+      'Nessun audio compatibile trovato per questo brano.';
+
+  @override
+  String get audioErrorUnavailable => 'Audio non disponibile per questo brano.';
+
+  @override
+  String get audioErrorNetwork =>
+      'Connessione non riuscita. Controlla la rete e riprova.';
+
+  @override
+  String get audioErrorPlayback => 'Riproduzione interrotta da un errore.';
 }

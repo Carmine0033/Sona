@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:media_overlay/models/playlist.dart';
 import 'package:media_overlay/services/playlist/playlist_core.dart';
 
-/// Lettura NON ufficiale della pagina pubblica music.apple.com.
-/// L'alternativa ufficiale (Apple Music API) richiede l'Apple Developer Program.
+/// UNOFFICIAL scraping of the public music.apple.com page.
+/// The official Apple Music API requires the Apple Developer Program.
 class AppleMusicResolver implements PlaylistResolver {
   AppleMusicResolver(this._http);
   final PlaylistHttp _http;
 
-  // pl.u-xxxx (playlist utente condivise) o pl.xxxx (editoriali)
+  // pl.u-xxxx (shared user playlists) or pl.xxxx (editorial)
   static final _id = RegExp(r'/playlist/(?:[^/]+/)?(pl\.[\w-]+)');
   static final _serverData = RegExp(
     r'<script[^>]*id="serialized-server-data"[^>]*>(.*?)</script>',
@@ -22,14 +22,14 @@ class AppleMusicResolver implements PlaylistResolver {
   @override
   String? matchId(Uri uri) {
     if (uri.host != 'music.apple.com') return null;
-    // /library/playlist/p.xxx = libreria privata: non raggiungibile senza login
+    // /library/playlist/p.xxx = private library, unreachable without login
     if (uri.path.contains('/library/')) return null;
     return _id.firstMatch(uri.path)?.group(1);
   }
 
   @override
   Future<PlaylistData> fetch(String id, Uri original) async {
-    // Il path originale contiene lo storefront (it/us/...) corretto.
+    // The original path holds the right storefront (it/us/...).
     final html = await _http.getText(Uri.https('music.apple.com', original.path));
 
     final raw = _serverData.firstMatch(html)?.group(1);
@@ -46,7 +46,7 @@ class AppleMusicResolver implements PlaylistResolver {
       throw const PlaylistException(PlaylistErrorKind.parse, 'Apple Music: JSON non valido');
     }
 
-    // Un brano è una mappa con titolo, artista e durata: la "forma" basta a riconoscerlo.
+    // A track is a map with title, artist and duration: its shape is enough.
     final tracks = <PlaylistTrack>[
       for (final m in walkMaps(json, _looksLikeTrack))
         PlaylistTrack(
@@ -69,7 +69,7 @@ class AppleMusicResolver implements PlaylistResolver {
       source: source,
       id: id,
       title: rawTitle
-          .replaceAll('\u200e', '') // Apple antepone un carattere invisibile LRM
+          .replaceAll('\u200e', '') // Apple prepends an invisible LRM character
           .replaceFirst(RegExp(r'\s*(?:[-–|]|on|su)\s*Apple\s*Music$', caseSensitive: false), '')
           .trim(),
       coverUrl: metaContent(html, 'og:image'),
@@ -83,7 +83,7 @@ class AppleMusicResolver implements PlaylistResolver {
       m['artistName'] is String &&
       (m['duration'] is num || m['durationInMillis'] is num);
 
-  /// Gli URL Apple sono template: .../{w}x{h}bb.{f}
+  /// Apple URLs are templates: .../{w}x{h}bb.{f}
   static String? _artwork(Object? art) {
     final url = walkMaps(art, (m) => m['url'] is String)
         .map((m) => m['url'] as String)

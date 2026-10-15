@@ -70,7 +70,7 @@ class _FullLyricsViewState extends ConsumerState<FullLyricsView>
 
     final idx = _activeIndex(lyrics, _pos);
     if (idx != _lastActiveIndex) {
-      // Ricostruisce solo quando cambia il verso attivo, non a ogni frame.
+      // Rebuild only when the active line changes, not every frame.
       setState(() => _lastActiveIndex = idx);
       if (DateTime.now().difference(_lastUserInteraction).inSeconds > 4) {
         _scrollToIndex(idx);

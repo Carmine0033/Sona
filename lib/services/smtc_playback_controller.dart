@@ -20,4 +20,7 @@ class SmtcPlaybackController implements PlaybackController {
 
   @override
   Future<bool> setVolume(double level) => SmtcChannel.setVolume(level);
+
+  @override
+  Future<double> getVolume() => SmtcChannel.getVolume();
 }

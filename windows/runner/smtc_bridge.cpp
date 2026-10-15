@@ -7,6 +7,7 @@
 
 #include <windows.h>
 #include <winrt/Windows.Foundation.h>
+#include <winrt/Windows.Foundation.Collections.h>
 #include <winrt/Windows.Media.Control.h>
 #include <winrt/Windows.Storage.Streams.h>
 
@@ -83,12 +84,55 @@ std::vector<uint8_t> ReadThumbnail(IRandomAccessStreamReference const& ref) {
   return bytes;
 }
 
+// The main window ignores Sona's own SMTC session (playlist playback):
+// the internal player already shows it, and when it stops the system
+// app must take over. The detached mini player is another process and
+// must see it.
+bool g_ignore_self = false;
+
+bool IsSelf(GlobalSystemMediaTransportControlsSession const& session) {
+  static const std::wstring self = [] {
+    wchar_t path[MAX_PATH] = L"";
+    GetModuleFileNameW(nullptr, path, MAX_PATH);
+    std::wstring p(path);
+    size_t slash = p.find_last_of(L"\\/");
+    return slash == std::wstring::npos ? p : p.substr(slash + 1);
+  }();
+  try {
+    std::wstring id(session.SourceAppUserModelId());
+    if (id.size() < self.size()) return false;
+    return _wcsicmp(id.c_str() + (id.size() - self.size()), self.c_str()) == 0;
+  } catch (...) {
+    return false;
+  }
+}
+
+GlobalSystemMediaTransportControlsSession PickSession(
+    GlobalSystemMediaTransportControlsSessionManager const& manager) {
+  if (!manager) return nullptr;
+  auto current = manager.GetCurrentSession();
+  if (!g_ignore_self || !current || !IsSelf(current)) return current;
+  GlobalSystemMediaTransportControlsSession fallback{nullptr};
+  for (auto const& s : manager.GetSessions()) {
+    if (IsSelf(s)) continue;
+    try {
+      if (s.GetPlaybackInfo().PlaybackStatus() ==
+          GlobalSystemMediaTransportControlsSessionPlaybackStatus::Playing) {
+        return s;
+      }
+    } catch (...) {
+    }
+    if (!fallback) fallback = s;
+  }
+  return fallback;
+}
+
 bool RunCommand(const std::string& cmd, int64_t positionMs) {
   try {
     auto manager =
         GlobalSystemMediaTransportControlsSessionManager::RequestAsync().get();
     if (!manager) return false;
-    auto session = manager.GetCurrentSession();
+    auto session = PickSession(manager);
     if (!session) return false;
 
     if (cmd == "playPause") {
@@ -127,10 +171,21 @@ EncodableValue BuildPayload(GlobalSystemMediaTransportControlsSession const& ses
     auto artist = winrt::to_string(props.Artist());
     auto album = winrt::to_string(props.AlbumTitle());
 
-    int64_t posMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-                        timeline.Position()).count();
     int64_t durMs = std::chrono::duration_cast<std::chrono::milliseconds>(
                         timeline.EndTime() - timeline.StartTime()).count();
+    // Position is a snapshot from the app's last update: while playing, add
+    // the time elapsed since then so a late-opened player isn't behind.
+    auto position = timeline.Position();
+    if (playing) {
+      auto elapsed = winrt::clock::now() - timeline.LastUpdatedTime();
+      if (elapsed > winrt::Windows::Foundation::TimeSpan::zero() &&
+          elapsed < std::chrono::hours(6)) {
+        position += elapsed;
+      }
+    }
+    int64_t posMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        position).count();
+    if (durMs > 0 && posMs > durMs) posMs = durMs;
 
     std::string id = title + "|" + artist + "|" + album;
     std::vector<uint8_t> thumb;
@@ -233,9 +288,7 @@ void OnSessionChanged() {
     std::lock_guard<std::recursive_mutex> lk(g_state->m);
     DetachSession_nolock_state(g_state);
     try {
-      auto s = g_state->manager
-                   ? g_state->manager.GetCurrentSession()
-                   : GlobalSystemMediaTransportControlsSession{nullptr};
+      auto s = PickSession(g_state->manager);
       g_state->session = s;
       if (s && g_running.load()) {
         g_state->tokMedia = s.MediaPropertiesChanged(
@@ -397,14 +450,14 @@ EncodableValue ReadCurrentOnce() {
     auto manager =
         GlobalSystemMediaTransportControlsSessionManager::RequestAsync().get();
     if (!manager) return EncodableValue();
-    return BuildPayload(manager.GetCurrentSession());
+    return BuildPayload(PickSession(manager));
   } catch (...) {
     return EncodableValue();
   }
 }
 
 
-//check for music player
+// Check for a music player
 bool IsProcessNamed(DWORD pid, const wchar_t* name) {
   if (pid == 0) return false;
   HANDLE h= OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
@@ -478,7 +531,7 @@ bool SetSpotifyVolume(float level) {
   });
 }
 
-// Ritorna il volume [0..1], oppure -1 se Spotify non ha una sessione audio.
+// Returns the volume [0..1], or -1 if Spotify has no audio session.
 float GetSpotifyVolume() {
   float out = -1.0f;
   WithSpotifyVolume([&out](ISimpleAudioVolume* vol) {
@@ -504,7 +557,8 @@ std::string PickMediaFile() {
 }  // namespace
 
 namespace smtc_bridge {
-void Register(flutter::FlutterEngine* engine) {
+void Register(flutter::FlutterEngine* engine, bool ignore_self) {
+  g_ignore_self = ignore_self;
   EnsureMessageWindow();
 
   g_method_channel = std::make_unique<flutter::MethodChannel<EncodableValue>>(

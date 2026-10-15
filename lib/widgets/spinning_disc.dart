@@ -22,7 +22,7 @@ class SpinningDisc extends ConsumerStatefulWidget {
 
 class _SpinningDiscState extends ConsumerState<SpinningDisc>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _rotation; // giro del disco
+  late final AnimationController _rotation; // disc rotation
 
   @override
   void initState() {
@@ -86,7 +86,7 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
         : _fallback();
   }
 
-  //Vynil + Album
+  // Vinyl + album
   Widget _buildVinyl(BuildContext context) {
     final accent = Theme.of(context).colorScheme.primary;
     final s = widget.size;
@@ -142,7 +142,7 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
     );
   }
 
-  //Full album
+  // Full album
   Widget _buildFullAlbum(BuildContext context) {
     final accent = Theme.of(context).colorScheme.primary;
     final s = widget.size;
@@ -169,7 +169,7 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
           alignment: Alignment.center,
           children: [
             ClipOval(child: SizedBox(width: s, height: s, child: _art())),
-            // forellino centrale per mantenere il "feel" da disco
+            // small center hole to keep the record feel
             Container(
               width: s * 0.05,
               height: s * 0.05,
@@ -187,7 +187,7 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
   }
 }
 
-// Vinile: base nera + scanalature
+// Vinyl: black base + grooves
 class _VinylPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {

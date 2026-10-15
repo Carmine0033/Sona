@@ -39,6 +39,10 @@
   "general": "General",
   "alwaysOnTop": "Always on top",
   "alwaysOnTopSubtitle": "Keep window above other applications",
+  "discordPresence": "Discord status",
+  "discordPresenceSubtitle": "Show the track you are listening to on Discord",
+  "discordPaused": "Paused",
+  "discordDownload": "Get Sona",
   "source": "Source",
   "releases": "Releases",
   "transparentBackground": "Transparent background",
@@ -125,5 +129,16 @@
       "service": {}
     }
   },
-  "thisService": "this service"
+  "thisService": "this service",
+
+  "findingAudio": "Finding audio…",
+  "stopPlayback": "Stop",
+  "shuffle": "Shuffle",
+  "repeat": "Repeat",
+  "repeatOne": "Repeat track",
+  "audioErrorBlocked": "YouTube is blocking playback. Update Sona or try again later.",
+  "audioErrorNoMatch": "No matching audio found for this track.",
+  "audioErrorUnavailable": "Audio isn't available for this track.",
+  "audioErrorNetwork": "Couldn't connect. Check your network and try again.",
+  "audioErrorPlayback": "Playback stopped because of an error."
 }

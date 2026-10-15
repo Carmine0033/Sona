@@ -23,7 +23,7 @@ class MarqueeText extends StatelessWidget {
         textDirection: TextDirection.ltr,
       )..layout();
 
-      // Se il testo entra, viene centrato.
+      // If the text fits, center it.
       if (tp.width <= constraints.maxWidth) {
         return Align(
           alignment: alignment,

@@ -17,6 +17,9 @@ final class SettingsObserver extends ProviderObserver {
       case 'alwaysOnTop':
         SettingsService.setBool('alwaysOnTop', newValue as bool);
         break;
+      case 'discordPresence':
+        SettingsService.setBool('discordPresence', newValue as bool);
+        break;
       case 'seekStyle':
         SettingsService.setInt('seekStyle', (newValue as SeekBarStyle).index);
         break;

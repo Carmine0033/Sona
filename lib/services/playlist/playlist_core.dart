@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:media_overlay/models/playlist.dart';
 
 
-//Errors
+// Errors
 enum PlaylistErrorKind {
   invalidLink,    
   unsupportedLink, 
@@ -33,7 +33,7 @@ final class PlaylistException implements Exception {
 abstract interface class PlaylistResolver {
    MusicSource get source;
 
-  ///Playlist ID
+  /// Playlist ID
   String? matchId(Uri uri);
 
   Future<PlaylistData> fetch(String id, Uri original);
@@ -73,7 +73,7 @@ class PlaylistHttp {
       final decoded = jsonDecode(text);
       if (decoded is Map<String, dynamic>) return decoded;
     } on FormatException {
-      // gestito sotto
+      // handled below
     }
     throw const PlaylistException(PlaylistErrorKind.parse, 'JSON non valido');
   }

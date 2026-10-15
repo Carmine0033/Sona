@@ -15,7 +15,7 @@ class SmtcChannel {
       });
   
 
-  //commands
+  // Commands
   static Future<bool> playPause() async =>
       await _method.invokeMethod<bool>('playPause') ?? false;
 

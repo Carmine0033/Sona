@@ -6,7 +6,7 @@ class YouTubeResolver implements PlaylistResolver {
   final PlaylistHttp _http;
   final String _apiKey;
 
-  // 20 pagine × 50 = 1000 brani ≈ 21 unità di quota per caricamento.
+  // 20 pages × 50 = 1000 tracks ≈ 21 quota units per load.
   static const _maxPages = 20;
   static const _hosts = {'youtube.com', 'www.youtube.com', 'm.youtube.com', 'music.youtube.com'};
 
@@ -18,7 +18,7 @@ class YouTubeResolver implements PlaylistResolver {
     if (!_hosts.contains(uri.host)) return null;
     final list = uri.queryParameters['list'];
     if (list != null && list.isNotEmpty) return list;
-    // music.youtube.com/browse/VLPLxxxx → l'id reale è dopo "VL"
+    // music.youtube.com/browse/VLPLxxxx: the real ID follows "VL"
     final seg = uri.pathSegments;
     if (seg.length == 2 && seg[0] == 'browse' && seg[1].startsWith('VL')) {
       return seg[1].substring(2);
@@ -36,7 +36,7 @@ class YouTubeResolver implements PlaylistResolver {
     try {
       final meta = await _http.getJson(_api('playlists', {'part': 'snippet', 'id': id}));
       final items = meta['items'] as List? ?? const [];
-      // Una playlist privata NON dà 403: risulta semplicemente vuota.
+      // A private playlist doesn't 403: it just comes back empty.
       if (items.isEmpty) throw const PlaylistException(PlaylistErrorKind.notFound);
       final snip = (items.first as Map)['snippet'] as Map? ?? const {};
 
@@ -53,11 +53,11 @@ class YouTubeResolver implements PlaylistResolver {
         for (final it in (page['items'] as List? ?? const []).whereType<Map>()) {
           final s = it['snippet'] as Map? ?? const {};
           final owner = s['videoOwnerChannelTitle'] as String?;
-          if (owner == null) continue; // video eliminato o privato
+          if (owner == null) continue; // deleted or private video
           final videoId = (s['resourceId'] as Map?)?['videoId'] as String?;
           tracks.add(PlaylistTrack(
             title: s['title'] as String? ?? '',
-            // I canali auto-generati di YT Music si chiamano "Artista - Topic"
+            // Auto-generated YT Music channels are named "Artist - Topic"
             artist: owner.replaceFirst(RegExp(r' - Topic$'), ''),
             artworkUrl: _thumb(s['thumbnails']),
             openUrl: videoId == null

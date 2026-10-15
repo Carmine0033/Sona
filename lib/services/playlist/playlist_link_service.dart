@@ -15,7 +15,7 @@ class PlaylistLinkService {
       YouTubeResolver(_http, youtubeApiKey),
       AppleMusicResolver(_http),
       DeezerResolver(_http),
-      // Nuovo servizio = una classe + una riga qui.
+      // New service = one class + one line here.
     ];
   }
 

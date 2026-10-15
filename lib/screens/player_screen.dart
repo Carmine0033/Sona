@@ -18,7 +18,7 @@ class PlayerScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    //preferences
+    // Preferences
     ref.listen(
       alwaysOnTopProvider,
       (_, n) => SettingsService.setBool("alwaysOnTop", n),
@@ -45,8 +45,8 @@ class PlayerScreen extends ConsumerWidget {
   }
 }
 
-/// Stato vuoto condiviso da finestra principale e mini player:
-/// dice cosa manca e come rimediare.
+/// Empty state shared by the main window and the mini player:
+/// what's missing and how to fix it.
 class NothingPlaying extends StatelessWidget {
   final Widget? action;
   const NothingPlaying({super.key, this.action});
@@ -150,7 +150,7 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // 1. Sfondo a tutta area: album sfocato se disponibile ed opzione disattivata
+        // 1. Full-bleed background: blurred artwork if available
         if (hasArt && !isOpaque)
           ImageFiltered(
             imageFilter: ImageFilter.blur(sigmaX: 65, sigmaY: 65),
@@ -164,13 +164,12 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
         else
           Container(color: ThemeColors.canvasAbyss),
 
-        // 2. Velo scuro trasparente in stile Glassmorphism
+        // 2. Dark glass overlay
         if (!isOpaque)
           Container(color: ThemeColors.canvasAbyss.withValues(alpha: 0.65)),
 
-        // 3. Header in alto a destra: solo ciò che riguarda la finestra.
-        //    Stile barra e stile disco stanno sulla card, che li porta con sé
-        //    anche quando viene staccata.
+        // 3. Top-right header: window controls only. Bar and disc style
+        //    live on the card, so they follow it when detached.
         Positioned(
           top: 14,
           right: 20,
@@ -185,7 +184,7 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
           ),
         ),
 
-        // 4. Layout Principale: Card del Player a sinistra + Sezione Lyrics a destra
+        // 4. Main layout: player card left, lyrics right
         SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(top: 48.0),
@@ -196,7 +195,7 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                 if (isWide) {
                   return Row(
                     children: [
-                      // Sinistra: Card del Player
+                      // Left: player card
                       Padding(
                         padding: const EdgeInsets.only(
                           left: 32,
@@ -208,7 +207,7 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                           child: SingleChildScrollView(child: leftWidget),
                         ),
                       ),
-                      // Destra: Sezione dei Lyrics sincronizzati
+                      // Right: synced lyrics
                       const Expanded(
                         child: Padding(
                           padding: EdgeInsets.only(right: 24, bottom: 12),
@@ -218,7 +217,7 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                     ],
                   );
                 } else {
-                  // Layout compatto/verticale per schermi stretti
+                  // Compact vertical layout for narrow windows
                   return SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,

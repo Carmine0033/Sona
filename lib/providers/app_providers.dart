@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -6,13 +8,16 @@ import '../models/now_playing.dart';
 import '../services/playback_controller.dart';
 import '../services/smtc_channel.dart';
 import '../services/smtc_playback_controller.dart';
+import '../services/sona_playback_controller.dart';
+import '../services/artwork_service.dart';
+import '../models/sona_player_view_model.dart';
 import '../models/lyrics.dart';
 import '../services/lyrics_service.dart';
 import '../services/update_service.dart';
 import '../services/settings_service.dart';
 import 'package:flutter/material.dart';
 
-//preferences
+// Preferences
 
 final opaqueBackgroundProvider =
     StateProvider<bool>((ref) => SettingsService.getBool('opaque', false),
@@ -39,8 +44,7 @@ final customMediaPathProvider = StateProvider<String?>(
     name: 'customMedia');
 
 final accentColorProvider= StateProvider<Color>(
-  // Il valore salvato dall'utente ha sempre la precedenza; Reiatsu Violet
-  // (DESIGN.md) vale solo finché non ne sceglie uno.
+  // The user's saved value wins; Reiatsu Violet is only the default.
   (ref) => Color(
       SettingsService.getInt('accent', ThemeColors.primary.toARGB32())),
   name: 'accent'
@@ -49,19 +53,87 @@ final accentColorProvider= StateProvider<Color>(
 final detachedProvider = StateProvider<bool>((ref) => false, name: 'detached');
 
 
+// Two sources, one interface: the internal player while a playlist
+// plays, otherwise the system app seen through SMTC.
+
 final playbackControllerProvider= Provider<PlaybackController>((ref) {
-  return SmtcPlaybackController();
+  final internal = ref.watch(sonaNowPlayingProvider.select((n) => n != null));
+  return internal
+      ? SonaPlaybackController(ref.read(sonaPlayerProvider.notifier))
+      : SmtcPlaybackController();
 });
 
-final nowPlayingProvider= StreamProvider<NowPlaying?>((ref) {
+final nowPlayingProvider = Provider<AsyncValue<NowPlaying?>>((ref) {
+  final internal = ref.watch(sonaNowPlayingProvider);
+  if (internal != null) return AsyncData(internal);
+  return ref.watch(smtcNowPlayingProvider);
+});
+
+final smtcNowPlayingProvider= StreamProvider<NowPlaying?>((ref) {
   return SmtcChannel.updates.map((map) {
     if (map == null) return null;
     return NowPlaying.fromMap(map);
   });
 });
 
+/// Internal player track in SMTC format; null when stopped.
+///
+/// Like SMTC, position is a snapshot that screens advance themselves,
+/// so this rebuilds only on real changes (track, play/pause, duration,
+/// artwork, seek), not on every tick.
+final sonaNowPlayingProvider = Provider<NowPlaying?>((ref) {
+  final s = ref.watch(sonaPlayerProvider);
+  final t = s.track;
+  if (s.phase == PlayerPhase.idle || t == null) return null;
 
-//check for updates
+  final player = ref.read(sonaPlayerProvider.notifier).player;
+  ref.watch(sonaDurationProvider);
+  ref.watch(_sonaPositionJumpProvider);
+  final art = ref.watch(sonaArtworkBytesProvider).asData?.value;
+
+  final duration = player.state.duration > Duration.zero
+      ? player.state.duration
+      : (t.duration ?? Duration.zero);
+  return NowPlaying(
+    title: t.title,
+    artist: t.artist,
+    album: t.album ?? '',
+    isPlaying: s.phase == PlayerPhase.playing,
+    // while resolving, the position still belongs to the previous track
+    position: s.phase == PlayerPhase.resolving
+        ? Duration.zero
+        : player.state.position,
+    duration: duration,
+    artwork: art,
+  );
+});
+
+/// Emits only on position jumps (seek, rewind, resume).
+final _sonaPositionJumpProvider = StreamProvider<Duration>((ref) {
+  final player = ref.watch(sonaPlayerProvider.notifier).player;
+  Duration? last;
+  DateTime? lastAt;
+  return player.stream.position.where((p) {
+    final now = DateTime.now();
+    final expected = last == null ? null : last! + now.difference(lastAt!);
+    last = p;
+    lastAt = now;
+    return expected == null ||
+        (p - expected).abs() > const Duration(milliseconds: 1500);
+  });
+});
+
+/// Internal track artwork as bytes, like SMTC artwork.
+final sonaArtworkBytesProvider = FutureProvider<Uint8List?>((ref) async {
+  final t = ref.watch(sonaPlayerProvider.select((s) => s.track));
+  if (t == null) return null;
+  final url = await ref.watch(trackArtworkProvider(t).future);
+  if (url == null) return null;
+  return ref.read(artworkServiceProvider).fetchBytes(url);
+});
+
+
+// Update check
 final updateProvider = FutureProvider<UpdateInfo?>((ref) async {
   return UpdateService.check();
 });
@@ -108,3 +180,9 @@ final lyricsProvider = FutureProvider<List<LyricLine>>((ref) async {
   if (t == null) return [];
   return LyricsService.fetchSynced(t.artist, t.title, t.album, t.durationSec);
 });
+
+// Discord
+final discordEnabledProvider = StateProvider<bool>(
+  (ref) => SettingsService.getBool('discordPresence', false),
+  name: 'discordPresence',
+);

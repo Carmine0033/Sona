@@ -16,8 +16,8 @@ import '../services/smtc_channel.dart';
 import '../services/update_service.dart';
 import 'accent_picker.dart';
 
-/// Colonna etichette comune a tutte le righe delle impostazioni,
-/// così i controlli partono tutti dalla stessa x.
+/// Shared label column for all settings rows,
+/// so every control starts at the same x.
 const settingsLabelWidth = 168.0;
 const settingsLabelStyle = TextStyle(
   color: Colors.white70,
@@ -82,7 +82,7 @@ class SettingsCard extends ConsumerWidget {
             ThemeColors.surfaceElevated,
           ),
           border: Border.all(color: accent.withValues(alpha: 0.3), width: 1.2),
-          // Ombra neutra: l'alone d'accento è riservato alla card del player
+          // Neutral shadow: the accent halo is reserved for the player card
           // (The Single Halo Rule, DESIGN.md).
           boxShadow: [
             BoxShadow(
@@ -306,13 +306,26 @@ class SettingsCard extends ConsumerWidget {
       accent: accent,
     ),
     SettingsSection.audio => const _VolumeRow(),
-    SettingsSection.window => _switchRow(
-      ref: ref,
-      title: l10n.alwaysOnTop,
-      sub: l10n.alwaysOnTopSubtitle,
-      provider: alwaysOnTopProvider,
-      accent: accent,
-      onChanged: (v) => windowManager.setAlwaysOnTop(v),
+    SettingsSection.window => Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _switchRow(
+          ref: ref,
+          title: l10n.alwaysOnTop,
+          sub: l10n.alwaysOnTopSubtitle,
+          provider: alwaysOnTopProvider,
+          accent: accent,
+          onChanged: (v) => windowManager.setAlwaysOnTop(v),
+        ),
+        const SizedBox(height: 20),
+        _switchRow(
+          ref: ref,
+          title: l10n.discordPresence,
+          sub: l10n.discordPresenceSubtitle,
+          provider: discordEnabledProvider,
+          accent: accent,
+        ),
+      ],
     ),
     SettingsSection.about => const _AboutContent(),
   };

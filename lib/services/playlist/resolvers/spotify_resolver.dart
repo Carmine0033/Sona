@@ -8,7 +8,7 @@ class SpotifyResolver implements PlaylistResolver {
   SpotifyResolver(this._http);
   final PlaylistHttp _http;
 
-  // Gli id Spotify sono base62 di 22 caratteri.
+  // Spotify IDs are 22-char base62.
   static final _id = RegExp(r'playlist[/:]([A-Za-z0-9]{22})');
   static final _nextData = RegExp(
     r'<script[^>]*id="__NEXT_DATA__"[^>]*>(.*?)</script>',
@@ -23,7 +23,7 @@ class SpotifyResolver implements PlaylistResolver {
     final ok = uri.scheme == 'spotify' ||
         uri.host == 'open.spotify.com' ||
         uri.host == 'play.spotify.com';
-    // toString copre sia /intl-it/playlist/ID sia spotify:playlist:ID
+    // toString covers both /intl-it/playlist/ID and spotify:playlist:ID
     return ok ? _id.firstMatch(uri.toString())?.group(1) : null;
   }
 
@@ -57,7 +57,7 @@ class SpotifyResolver implements PlaylistResolver {
             duration: t['duration'] is num
                 ? Duration(milliseconds: (t['duration'] as num).toInt())
                 : null,
-            openUrl: _str(t['uri']), // spotify:track:... → apre l'app desktop
+            openUrl: _str(t['uri']), // spotify:track:... opens the desktop app
           ),
     ];
 

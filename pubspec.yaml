@@ -1,4 +1,4 @@
-﻿name: media_overlay
+name: media_overlay
 description: "A new Flutter project."
 publish_to: 'none'
 version: 0.1.4+6
@@ -21,12 +21,13 @@ dependencies:
   url_launcher: ^6.3.3
   win32: ^6.4.0
   window_manager: ^0.5.2
-
+  media_kit: ^1.2.6
+  media_kit_libs_windows_audio: ^1.0.9
+  youtube_explode_dart: ^3.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-
 flutter:
   uses-material-design: true
   generate: true

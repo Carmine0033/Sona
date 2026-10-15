@@ -39,7 +39,7 @@ class SettingsService {
   static Future<void> setString(String k, String v) async { _data[k] = v; _save(); }
   static Future<void> remove(String k) async { _data.remove(k); _save(); }
 
-  // cartella dove copiare il media custom
+  // folder the custom media is copied to
   static Directory mediaDir() {
     final dir = Directory('${_baseDir.path}\\media');
     if (!dir.existsSync()) dir.createSync(recursive: true);

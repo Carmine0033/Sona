@@ -31,12 +31,12 @@ class _SeekBarState extends ConsumerState<SeekBar>
   @override
   void initState() {
     super.initState();
-    // SMTC invia eventi solo quando qualcosa cambia: senza questa lettura,
-    // tornando sul player la barra resterebbe a 0:00 fino al prossimo evento.
+    // SMTC only sends events on changes: without this read, returning to
+    // the player would show 0:00 until the next event.
     final current = ref.read(nowPlayingProvider).asData?.value;
     if (current != null) _sync(current);
     _ticker = createTicker((_) {
-      // ridisegna mentre suona: fa avanzare sia la posizione sia l'onda
+      // repaint while playing: advances both position and wave
       if (_playing && !_dragging) setState(() {});
     })..start();
   }
@@ -147,7 +147,7 @@ class _SeekBarState extends ConsumerState<SeekBar>
           final phase = DateTime.now().millisecondsSinceEpoch / 1000.0 * 3.0;
           final amplitude = _playing
               ? 4.0
-              : 1.0; // ampiezza bilanciata per la card
+              : 1.0; // balanced amplitude for the card
 
           void setFromX(double dx) =>
               setState(() => _dragFraction = (dx / width).clamp(0.0, 1.0));
@@ -206,7 +206,7 @@ class _WavePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final midY = size.height / 2;
-    const waves = 7.0; // numero di "gobbe" sulla larghezza
+    const waves = 7.0; // number of humps across the width
     final k = (2 * math.pi * waves) / size.width;
     final progressX = (progress * size.width).clamp(0.0, size.width);
 

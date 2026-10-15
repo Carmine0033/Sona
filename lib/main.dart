@@ -10,7 +10,10 @@ import 'package:media_overlay/services/settings_observer.dart';
 import 'package:window_manager/window_manager.dart';
 import 'core/theme.dart';
 import 'providers/app_providers.dart';
+import 'services/discord_presence.dart';
+import 'services/media_session.dart';
 import 'services/settings_service.dart';
+import 'package:media_kit/media_kit.dart';
 
 Future<Process> openFramelessVinylWindow() async {
   return await Process.start(Platform.resolvedExecutable, ['--mini']);
@@ -19,11 +22,11 @@ Future<Process> openFramelessVinylWindow() async {
 void main(List<String> args) {
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    MediaKit.ensureInitialized();
     try {
       await SettingsService.init();
-    } catch (e, st) {
-      debugPrint('Settings init fallita: $e\n$st');
-      // continua con i default invece di morire
+    } catch (_) {
+      // fall back to defaults instead of crashing
     }
     await windowManager.ensureInitialized();
 
@@ -52,6 +55,8 @@ void main(List<String> args) {
       runApp(
         ProviderScope(
           observers: [SettingsObserver()],
+          // Separate process: the internal player lives in the main window.
+          overrides: [sonaNowPlayingProvider.overrideWithValue(null)],
           child: const MiniFramelessApp(),
         ),
       );
@@ -80,7 +85,7 @@ void main(List<String> args) {
         ),
       );
     }
-  }, (e, st) => debugPrint('Errore non gestito: $e\n$st'));
+  }, (_, _) {});
 }
 
 class SonaApp extends ConsumerWidget {
@@ -89,6 +94,10 @@ class SonaApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final accent = ref.watch(accentColorProvider);
+    // Publish playlist playback to Windows media controls.
+    ref.watch(sonaMediaSessionProvider);
+    // Discord "Listening to" status, if enabled.
+    ref.watch(discordPresenceProvider);
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: buildTheme(accent),

@@ -114,6 +114,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alwaysOnTopSubtitle => 'Keep window above other applications';
 
   @override
+  String get discordPresence => 'Discord status';
+
+  @override
+  String get discordPresenceSubtitle =>
+      'Show the track you are listening to on Discord';
+
+  @override
+  String get discordPaused => 'Paused';
+
+  @override
+  String get discordDownload => 'Get Sona';
+
+  @override
   String get source => 'Source';
 
   @override
@@ -300,4 +313,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get thisService => 'this service';
+
+  @override
+  String get findingAudio => 'Finding audio…';
+
+  @override
+  String get stopPlayback => 'Stop';
+
+  @override
+  String get shuffle => 'Shuffle';
+
+  @override
+  String get repeat => 'Repeat';
+
+  @override
+  String get repeatOne => 'Repeat track';
+
+  @override
+  String get audioErrorBlocked =>
+      'YouTube is blocking playback. Update Sona or try again later.';
+
+  @override
+  String get audioErrorNoMatch => 'No matching audio found for this track.';
+
+  @override
+  String get audioErrorUnavailable => 'Audio isn\'t available for this track.';
+
+  @override
+  String get audioErrorNetwork =>
+      'Couldn\'t connect. Check your network and try again.';
+
+  @override
+  String get audioErrorPlayback => 'Playback stopped because of an error.';
 }

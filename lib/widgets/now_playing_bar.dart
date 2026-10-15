@@ -192,8 +192,8 @@ class NowPlayingBar extends ConsumerWidget {
   }
 }
 
-/// SMTC notifica la posizione solo quando cambia qualcosa: tra un evento e
-/// l'altro la stima avanza da sola, come nella SeekBar del player.
+/// SMTC reports position only on changes; between events the estimate
+/// advances on its own, like the player's SeekBar.
 class _ElapsedLabel extends StatefulWidget {
   final NowPlaying info;
   const _ElapsedLabel({required this.info});

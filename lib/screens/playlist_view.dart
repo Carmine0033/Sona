@@ -5,11 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_overlay/core/theme.dart';
 import 'package:media_overlay/l10n/app_localizations.dart';
 import 'package:media_overlay/models/playlist.dart';
+import 'package:media_overlay/models/sona_player_view_model.dart';
 import 'package:media_overlay/providers/app_providers.dart';
-import 'package:media_overlay/services/external_link.dart';
+import 'package:media_overlay/services/artwork_service.dart';
 import 'package:media_overlay/services/playlist/playlist_core.dart';
 import 'package:media_overlay/viewmodels/playlist_view_model.dart';
 import 'package:media_overlay/widgets/now_playing_bar.dart';
+import 'package:media_overlay/widgets/sona_player_bar.dart';
 
 class PlaylistView extends ConsumerWidget {
   const PlaylistView({super.key});
@@ -17,6 +19,9 @@ class PlaylistView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(playlistViewModelProvider);
+    final internalActive =
+        ref.watch(sonaPlayerProvider.select((s) => s.phase)) !=
+        PlayerPhase.idle;
     final l10n = AppLocalizations.of(context)!;
 
     return Column(
@@ -38,7 +43,12 @@ class PlaylistView extends ConsumerWidget {
             ),
           },
         ),
-        const NowPlayingBar(),
+        // While Sona plays, its bar replaces the system player's:
+        // two bars with different controls would be confusing.
+        if (internalActive)
+          const SonaPlayerBar()
+        else
+          const NowPlayingBar(),
       ],
     );
   }
@@ -126,8 +136,7 @@ class _LinkBarState extends ConsumerState<_LinkBar> {
       child: TextField(
         controller: _ctrl,
         onSubmitted: _submit,
-        // readOnly invece di disabled: durante il caricamento il link resta
-        // leggibile e selezionabile invece di sbiadire.
+        // readOnly, not disabled: the link stays readable while loading.
         readOnly: loading,
         style: const TextStyle(fontSize: 13, color: ThemeColors.onSurface),
         decoration: InputDecoration(
@@ -173,6 +182,12 @@ class _PlaylistBody extends ConsumerWidget {
     final p = playlist;
     final accent = ref.watch(accentColorProvider);
     final l10n = AppLocalizations.of(context)!;
+    // select: rebuild only when the active track changes.
+    final playingIndex = ref.watch(
+      sonaPlayerProvider.select(
+        (s) => identical(s.playlist, p) ? s.index : -1,
+      ),
+    );
     const dim = TextStyle(fontSize: 12, color: Colors.white60);
 
     return ListView.builder(
@@ -243,97 +258,74 @@ class _PlaylistBody extends ConsumerWidget {
             ),
           );
         }
-        return _TrackTile(index: i, track: p.tracks[i - 1], source: p.source);
+        return _TrackTile(
+          index: i,
+          track: p.tracks[i - 1],
+          isPlaying: playingIndex == i - 1,
+          onPlay: () => ref.read(sonaPlayerProvider.notifier).playAt(p, i - 1),
+        );
       },
     );
   }
 }
 
-class _TrackTile extends StatelessWidget {
-  const _TrackTile({
-    required this.index,
-    required this.track,
-    required this.source,
-  });
+class _TrackTile extends ConsumerWidget {
+  const _TrackTile({required this.index, required this.track, required this.onPlay, this.isPlaying = false});
   final int index;
   final PlaylistTrack track;
-  final MusicSource source;
+  final VoidCallback onPlay;
+  final bool isPlaying;
 
-  static const _dim = TextStyle(
-    fontSize: 12,
-    color: Colors.white60,
-    fontFeatures: tabularFigures,
-  );
+  static const _dim = TextStyle(fontSize: 12, color: Colors.white60);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = track;
-    final l10n = AppLocalizations.of(context)!;
-    final tile = InkWell(
-      onTap: t.openUrl == null ? null : () => openExternal(t.openUrl!),
-      hoverColor: Colors.white.withValues(alpha: 0.04),
-      child: Padding(
+    final accent = ref.watch(accentColorProvider);
+    final cover = ref.watch(trackArtworkProvider(t)).asData?.value;
+
+    return InkWell(
+      onTap: onPlay,
+      child: Container(
+        color: isPlaying ? accent.withValues(alpha: 0.08) : null,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 28,
-              child: Text('$index', textAlign: TextAlign.right, style: _dim),
-            ),
-            const SizedBox(width: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: _NetImage(url: t.artworkUrl, size: 40),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              flex: 3,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    t.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    t.artist,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: _dim,
-                  ),
-                ],
-              ),
-            ),
-            if (t.album != null)
-              Expanded(
-                flex: 2,
-                child: Text(
-                  t.album!,
+        child: Row(children: [
+          SizedBox(
+            width: 28,
+            child: isPlaying
+                ? Icon(Icons.graphic_eq, size: 16, color: accent)
+                : Text('$index', textAlign: TextAlign.right, style: _dim),
+          ),
+          const SizedBox(width: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: _NetImage(url: cover, size: 40),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            flex: 3,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              // Artist on top, title below.
+              Text(t.artist,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: _dim,
-                ),
-              ),
-            if (t.duration != null) ...[
-              const SizedBox(width: 12),
-              Text(formatDuration(t.duration!), style: _dim),
-            ],
-          ],
-        ),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: isPlaying ? accent : null,
+                  )),
+              Text(t.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: _dim),
+            ]),
+          ),
+          if (t.album != null)
+            Expanded(flex: 2, child: Text(t.album!, maxLines: 1, overflow: TextOverflow.ellipsis, style: _dim)),
+          if (t.duration != null) Text(_fmt(t.duration!), style: _dim),
+        ]),
       ),
     );
-    if (t.openUrl == null) return tile;
-    return Tooltip(
-      message: l10n.openTrack(source.label),
-      waitDuration: const Duration(milliseconds: 800),
-      child: tile,
-    );
   }
+
+  static String _fmt(Duration d) => '${d.inMinutes}:${(d.inSeconds % 60).toString().padLeft(2, '0')}';
 }
 
 class _NetImage extends StatelessWidget {
@@ -355,8 +347,7 @@ class _NetImage extends StatelessWidget {
       width: size,
       height: size,
       fit: BoxFit.cover,
-      // Decodifica alla dimensione mostrata: con 500 copertine 640px in RAM
-      // a piena risoluzione la lista occuperebbe centinaia di MB.
+      // Decode at display size: 500 full-res covers would take hundreds of MB.
       cacheWidth: (size * MediaQuery.devicePixelRatioOf(context)).round(),
       errorBuilder: (_, _, _) => placeholder,
     );

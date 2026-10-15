@@ -1,4 +1,6 @@
 #include "flutter_window.h"
+#include "discord_rpc.h"
+#include "media_session.h"
 #include "smtc_bridge.h"
 #include <optional>
 
@@ -25,7 +27,15 @@ bool FlutterWindow::OnCreate() {
     return false;
   }
   RegisterPlugins(flutter_controller_->engine());
-  smtc_bridge::Register(flutter_controller_->engine());
+  // The detached mini player is a second process (--mini): it reads SMTC,
+  // including Sona's own session, but doesn't publish one.
+  const bool is_mini = wcsstr(GetCommandLineW(), L"--mini") != nullptr;
+  smtc_bridge::Register(flutter_controller_->engine(), /*ignore_self=*/!is_mini);
+  if (!is_mini) {
+    media_session::Register(flutter_controller_->engine(), GetHandle());
+    // Only the main window publishes the presence.
+    discord_rpc::Register(flutter_controller_->engine());
+  }
   SetChildContent(flutter_controller_->view()->GetNativeWindow());
 
   flutter_controller_->engine()->SetNextFrameCallback([&]() {
@@ -41,6 +51,8 @@ bool FlutterWindow::OnCreate() {
 }
 
 void FlutterWindow::OnDestroy() {
+  discord_rpc::Shutdown();
+  media_session::CleanUp();
   smtc_bridge::CleanUp();
 
   if (flutter_controller_) {

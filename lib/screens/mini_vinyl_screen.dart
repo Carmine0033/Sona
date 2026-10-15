@@ -20,8 +20,8 @@ class MiniVinylScreen extends ConsumerWidget {
     final nowPlaying = ref.watch(nowPlayingProvider);
     final l10n = AppLocalizations.of(context)!;
 
-    // La finestra è senza bordi: ogni stato deve restare trascinabile,
-    // ridimensionabile e chiudibile, non solo quello con un brano attivo.
+    // Frameless window: every state must stay draggable,
+    // resizable and closable.
     final content = nowPlaying.when(
       loading: () => Center(child: CircularProgressIndicator(color: accent)),
       error: (e, _) => _MiniPanel(
@@ -75,7 +75,7 @@ class MiniVinylScreen extends ConsumerWidget {
   }
 }
 
-/// Fondo leggibile per gli stati senza card, sopra una finestra trasparente.
+/// Readable backdrop for card-less states over a transparent window.
 class _MiniPanel extends StatelessWidget {
   final Widget child;
   const _MiniPanel({required this.child});
