@@ -697,6 +697,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Playback stopped because of an error.'**
   String get audioErrorPlayback;
+
+  /// No description provided for @libraryInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a Spotify, YouTube Music, Apple Music or Deezer playlist link…'**
+  String get libraryInputHint;
+
+  /// No description provided for @libraryPaste.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get libraryPaste;
+
+  /// No description provided for @libraryAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add playlist'**
+  String get libraryAdd;
+
+  /// No description provided for @libraryAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get libraryAll;
+
+  /// No description provided for @libraryFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get libraryFavorites;
+
+  /// No description provided for @libraryYourPlaylists.
+  ///
+  /// In en, this message translates to:
+  /// **'Your playlists'**
+  String get libraryYourPlaylists;
+
+  /// No description provided for @libraryAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 available} other{{count} available}}'**
+  String libraryAvailable(int count);
+
+  /// No description provided for @libraryTracks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 track} other{{count} tracks}}'**
+  String libraryTracks(int count);
+
+  /// No description provided for @librarySourcePlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'{source} playlist'**
+  String librarySourcePlaylist(String source);
+
+  /// No description provided for @libraryNowPlaying.
+  ///
+  /// In en, this message translates to:
+  /// **'Now playing'**
+  String get libraryNowPlaying;
+
+  /// No description provided for @libraryNowPlayingTicker.
+  ///
+  /// In en, this message translates to:
+  /// **'Now playing:'**
+  String get libraryNowPlayingTicker;
+
+  /// No description provided for @libraryPlayNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Play now'**
+  String get libraryPlayNow;
+
+  /// No description provided for @libraryPause.
+  ///
+  /// In en, this message translates to:
+  /// **'Pause'**
+  String get libraryPause;
+
+  /// No description provided for @librarySync.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync'**
+  String get librarySync;
+
+  /// No description provided for @librarySynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist updated'**
+  String get librarySynced;
+
+  /// No description provided for @libraryRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get libraryRemove;
+
+  /// No description provided for @libraryRemoveConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove \"{title}\" from your library?'**
+  String libraryRemoveConfirm(String title);
+
+  /// No description provided for @libraryCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get libraryCancel;
+
+  /// No description provided for @libraryBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Library'**
+  String get libraryBack;
+
+  /// No description provided for @libraryAddCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add playlist'**
+  String get libraryAddCardTitle;
+
+  /// No description provided for @libraryAddCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste a link to a public playlist'**
+  String get libraryAddCardBody;
+
+  /// No description provided for @libraryAddCardAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste link'**
+  String get libraryAddCardAction;
+
+  /// No description provided for @libraryUpdatedToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated today'**
+  String get libraryUpdatedToday;
+
+  /// No description provided for @libraryUpdatedYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated yesterday'**
+  String get libraryUpdatedYesterday;
+
+  /// No description provided for @libraryUpdatedDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{Updated 1 day ago} other{Updated {days} days ago}}'**
+  String libraryUpdatedDaysAgo(int days);
 }
 
 class _AppLocalizationsDelegate

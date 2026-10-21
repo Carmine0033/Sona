@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:media_kit/media_kit.dart';
@@ -92,6 +93,7 @@ class SonaPlayerViewModel extends Notifier<SonaPlayerState> {
   DateTime? _prefetchAt;
   List<int> _order = [];
   int _orderPos = 0;
+  bool _samePlaylist(PlaylistData? a, PlaylistData? b) => a != null && b != null && a.source == b.source && a.id == b.id;
 
   Player get player => _player!;
   static const _prefetchTtl = Duration(minutes: 30);
@@ -181,7 +183,7 @@ class SonaPlayerViewModel extends Notifier<SonaPlayerState> {
 
   Future<void> playAt(PlaylistData playlist, int index) async {
     if (index < 0 || index >= playlist.tracks.length) return;
-    final changed = !identical(state.playlist, playlist);
+    final changed = !_samePlaylist(state.playlist, playlist);
     state = state.copyWith(playlist: playlist, index: index);
     if (state.shuffle || changed) _rebuildOrder(index);
     await _play(playlist, index);
@@ -258,6 +260,13 @@ class SonaPlayerViewModel extends Notifier<SonaPlayerState> {
     }
   }
 
+  /// Turns shuffle on and starts [playlist] from a random track.
+  Future<void> shufflePlay(PlaylistData playlist) async {
+    if (playlist.tracks.isEmpty) return;
+    if (!state.shuffle) state = state.copyWith(shuffle: true);
+    await playAt(playlist, Random().nextInt(playlist.tracks.length));
+  }
+
   void toggleShuffle() {
     state = state.copyWith(shuffle: !state.shuffle, errorKind: state.errorKind);
     if (state.shuffle && state.index >= 0) _rebuildOrder(state.index);
@@ -298,7 +307,7 @@ class SonaPlayerViewModel extends Notifier<SonaPlayerState> {
   Future<ResolvedAudio?> _takePrefetch(PlaylistData playlist, int index) async {
     final ok =
         _prefetch != null &&
-        identical(_prefetchPlaylist, playlist) &&
+        _samePlaylist(_prefetchPlaylist, playlist) &&
         _prefetchIndex == index &&
         DateTime.now().difference(_prefetchAt!) < _prefetchTtl;
     final future = ok ? _prefetch : null;

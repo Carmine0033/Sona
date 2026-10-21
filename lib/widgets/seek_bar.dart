@@ -50,7 +50,7 @@ class _SeekBarState extends ConsumerState<SeekBar>
   void _sync(NowPlaying info) {
     _base = info.position;
     _duration = info.duration;
-    _anchor = DateTime.now();
+    _anchor = info.capturedAt;
     _playing = info.isPlaying;
     _speed = 1.0;
   }

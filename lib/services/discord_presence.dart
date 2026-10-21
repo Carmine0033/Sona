@@ -127,7 +127,8 @@ final discordPresenceProvider = Provider<void>((ref) {
       return;
     }
 
-    final now = DateTime.now().millisecondsSinceEpoch;
+    // Anchor on the snapshot time: a stale snapshot must not shift "start".
+    final now = n.capturedAt.millisecondsSinceEpoch;
     final start = now - n.position.inMilliseconds;
     // Duration matters: YouTube reports it after start, and without a new
     // push the time bar would be missing for the whole track.

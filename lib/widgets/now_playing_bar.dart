@@ -203,22 +203,14 @@ class _ElapsedLabel extends StatefulWidget {
 }
 
 class _ElapsedLabelState extends State<_ElapsedLabel> {
-  late DateTime _anchor;
   Timer? _timer;
 
   @override
   void initState() {
     super.initState();
-    _anchor = DateTime.now();
     _timer = Timer.periodic(const Duration(milliseconds: 500), (_) {
       if (widget.info.isPlaying) setState(() {});
     });
-  }
-
-  @override
-  void didUpdateWidget(_ElapsedLabel old) {
-    super.didUpdateWidget(old);
-    if (old.info != widget.info) _anchor = DateTime.now();
   }
 
   @override
@@ -230,10 +222,7 @@ class _ElapsedLabelState extends State<_ElapsedLabel> {
   @override
   Widget build(BuildContext context) {
     final i = widget.info;
-    var pos = i.isPlaying
-        ? i.position + DateTime.now().difference(_anchor)
-        : i.position;
-    if (pos > i.duration) pos = i.duration;
+    final pos = i.livePosition;
     return Text(
       '${formatDuration(pos)} / ${formatDuration(i.duration)}',
       style: const TextStyle(

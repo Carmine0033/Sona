@@ -348,4 +348,108 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get audioErrorPlayback => 'Riproduzione interrotta da un errore.';
+
+  @override
+  String get libraryInputHint =>
+      'Incolla il link di una playlist Spotify, YouTube Music, Apple Music o Deezer…';
+
+  @override
+  String get libraryPaste => 'Incolla';
+
+  @override
+  String get libraryAdd => 'Aggiungi playlist';
+
+  @override
+  String get libraryAll => 'Tutte';
+
+  @override
+  String get libraryFavorites => 'Preferite';
+
+  @override
+  String get libraryYourPlaylists => 'Le tue playlist';
+
+  @override
+  String libraryAvailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count disponibili',
+      one: '1 disponibile',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String libraryTracks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count brani',
+      one: '1 brano',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String librarySourcePlaylist(String source) {
+    return 'Playlist $source';
+  }
+
+  @override
+  String get libraryNowPlaying => 'In riproduzione';
+
+  @override
+  String get libraryNowPlayingTicker => 'Riproduzione in corso:';
+
+  @override
+  String get libraryPlayNow => 'Riproduci ora';
+
+  @override
+  String get libraryPause => 'Pausa';
+
+  @override
+  String get librarySync => 'Sincronizza';
+
+  @override
+  String get librarySynced => 'Playlist aggiornata';
+
+  @override
+  String get libraryRemove => 'Rimuovi';
+
+  @override
+  String libraryRemoveConfirm(String title) {
+    return 'Rimuovere \"$title\" dalla libreria?';
+  }
+
+  @override
+  String get libraryCancel => 'Annulla';
+
+  @override
+  String get libraryBack => 'Libreria';
+
+  @override
+  String get libraryAddCardTitle => 'Aggiungi playlist';
+
+  @override
+  String get libraryAddCardBody => 'Incolla il link di una playlist pubblica';
+
+  @override
+  String get libraryAddCardAction => 'Incolla link';
+
+  @override
+  String get libraryUpdatedToday => 'Aggiornata oggi';
+
+  @override
+  String get libraryUpdatedYesterday => 'Aggiornata ieri';
+
+  @override
+  String libraryUpdatedDaysAgo(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Aggiornata $days giorni fa',
+      one: 'Aggiornata 1 giorno fa',
+    );
+    return '$_temp0';
+  }
 }

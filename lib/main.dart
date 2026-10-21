@@ -14,9 +14,28 @@ import 'services/discord_presence.dart';
 import 'services/media_session.dart';
 import 'services/settings_service.dart';
 import 'package:media_kit/media_kit.dart';
+import 'dart:math' as math;
+import 'package:screen_retriever/screen_retriever.dart';
+
+const kPreferredSize = Size(1480, 920);
+const kMinSize = Size(1100, 720);
 
 Future<Process> openFramelessVinylWindow() async {
   return await Process.start(Platform.resolvedExecutable, ['--mini']);
+}
+
+/// Main window size: [kPreferredSize] capped to 90% of the work area.
+Future<Size> _initialWindowSize() async {
+  try {
+    final display = await screenRetriever.getPrimaryDisplay();
+    final area = display.visibleSize ?? display.size;
+    return Size(
+      math.min(kPreferredSize.width, area.width * 0.9),
+      math.min(kPreferredSize.height, area.height * 0.9),
+    );
+  } catch (_) {
+    return kPreferredSize;
+  }
 }
 
 void main(List<String> args) {
@@ -61,9 +80,14 @@ void main(List<String> args) {
         ),
       );
     } else {
-      const options = WindowOptions(
-        size: Size(1280, 780),
-        minimumSize: Size(920, 580),
+      // Large by default, but never past 90% of the primary screen.
+      final size = await _initialWindowSize();
+      final options = WindowOptions(
+        size: size,
+        minimumSize: Size(
+          math.min(kMinSize.width, size.width),
+          math.min(kMinSize.height, size.height),
+        ),
         center: true,
         backgroundColor: Colors.transparent,
         skipTaskbar: false,

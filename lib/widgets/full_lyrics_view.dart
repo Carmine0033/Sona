@@ -45,7 +45,7 @@ class _FullLyricsViewState extends ConsumerState<FullLyricsView>
 
   void _sync(NowPlaying i) {
     _base = i.position;
-    _anchor = DateTime.now();
+    _anchor = i.capturedAt;
     _playing = i.isPlaying;
   }
 

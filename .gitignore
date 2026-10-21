@@ -95,3 +95,5 @@ app.*.map.json
 sona.iss
 release.ps1
 installer/
+mock/
+test/

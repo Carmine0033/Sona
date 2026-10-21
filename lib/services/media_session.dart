@@ -23,7 +23,7 @@ class MediaSessionChannel {
     'artist': n.artist,
     'album': n.album,
     'isPlaying': n.isPlaying,
-    'positionMs': n.position.inMilliseconds,
+    'positionMs': n.livePosition.inMilliseconds,
     'durationMs': n.duration.inMilliseconds,
     'hasNext': hasNext,
     if (!identical(artwork, keepArtwork)) 'artwork': artwork as Uint8List?,

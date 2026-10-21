@@ -345,4 +345,108 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get audioErrorPlayback => 'Playback stopped because of an error.';
+
+  @override
+  String get libraryInputHint =>
+      'Paste a Spotify, YouTube Music, Apple Music or Deezer playlist link…';
+
+  @override
+  String get libraryPaste => 'Paste';
+
+  @override
+  String get libraryAdd => 'Add playlist';
+
+  @override
+  String get libraryAll => 'All';
+
+  @override
+  String get libraryFavorites => 'Favorites';
+
+  @override
+  String get libraryYourPlaylists => 'Your playlists';
+
+  @override
+  String libraryAvailable(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count available',
+      one: '1 available',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String libraryTracks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tracks',
+      one: '1 track',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String librarySourcePlaylist(String source) {
+    return '$source playlist';
+  }
+
+  @override
+  String get libraryNowPlaying => 'Now playing';
+
+  @override
+  String get libraryNowPlayingTicker => 'Now playing:';
+
+  @override
+  String get libraryPlayNow => 'Play now';
+
+  @override
+  String get libraryPause => 'Pause';
+
+  @override
+  String get librarySync => 'Sync';
+
+  @override
+  String get librarySynced => 'Playlist updated';
+
+  @override
+  String get libraryRemove => 'Remove';
+
+  @override
+  String libraryRemoveConfirm(String title) {
+    return 'Remove \"$title\" from your library?';
+  }
+
+  @override
+  String get libraryCancel => 'Cancel';
+
+  @override
+  String get libraryBack => 'Library';
+
+  @override
+  String get libraryAddCardTitle => 'Add playlist';
+
+  @override
+  String get libraryAddCardBody => 'Paste a link to a public playlist';
+
+  @override
+  String get libraryAddCardAction => 'Paste link';
+
+  @override
+  String get libraryUpdatedToday => 'Updated today';
+
+  @override
+  String get libraryUpdatedYesterday => 'Updated yesterday';
+
+  @override
+  String libraryUpdatedDaysAgo(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Updated $days days ago',
+      one: 'Updated 1 day ago',
+    );
+    return '$_temp0';
+  }
 }
