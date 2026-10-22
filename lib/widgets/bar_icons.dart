@@ -1,0 +1,85 @@
+import 'package:flutter/material.dart';
+import 'package:media_overlay/providers/app_providers.dart';
+
+class BarIconSet {
+  const BarIconSet._({
+    required this.shuffle,
+    required this.previous,
+    required this.play,
+    required this.pause,
+    required this.next,
+    required this.repeat,
+    required this.repeatOne,
+    required this.lyrics,
+    required this.volumeUp,
+    required this.volumeDown,
+    required this.volumeOff,
+  });
+
+  final IconData shuffle,
+      previous,
+      play,
+      pause,
+      next,
+      repeat,
+      repeatOne,
+      lyrics,
+      volumeUp,
+      volumeDown,
+      volumeOff;
+
+  static BarIconSet of(BarIconStyle s) => switch (s) {
+    BarIconStyle.filled => const BarIconSet._(
+      shuffle: Icons.shuffle,
+      previous: Icons.skip_previous,
+      play: Icons.play_arrow,
+      pause: Icons.pause,
+      next: Icons.skip_next,
+      repeat: Icons.repeat,
+      repeatOne: Icons.repeat_one,
+      lyrics: Icons.lyrics,
+      volumeUp: Icons.volume_up,
+      volumeDown: Icons.volume_down,
+      volumeOff: Icons.volume_off,
+    ),
+    BarIconStyle.outlined => const BarIconSet._(
+      shuffle: Icons.shuffle_outlined,
+      previous: Icons.skip_previous_outlined,
+      play: Icons.play_arrow_outlined,
+      pause: Icons.pause_outlined,
+      next: Icons.skip_next_outlined,
+      repeat: Icons.repeat_outlined,
+      repeatOne: Icons.repeat_one_outlined,
+      lyrics: Icons.lyrics_outlined,
+      volumeUp: Icons.volume_up_outlined,
+      volumeDown: Icons.volume_down_outlined,
+      volumeOff: Icons.volume_off_outlined,
+    ),
+    BarIconStyle.rounded => const BarIconSet._(
+      shuffle: Icons.shuffle_rounded,
+      previous: Icons.skip_previous_rounded,
+      play: Icons.play_arrow_rounded,
+      pause: Icons.pause_rounded,
+      next: Icons.skip_next_rounded,
+      repeat: Icons.repeat_rounded,
+      repeatOne: Icons.repeat_one_rounded,
+      lyrics: Icons.lyrics_rounded,
+      volumeUp: Icons.volume_up_rounded,
+      volumeDown: Icons.volume_down_rounded,
+      volumeOff: Icons.volume_off_rounded,
+    ),
+    BarIconStyle.sharp => const BarIconSet._(
+      shuffle: Icons.shuffle_sharp,
+      previous: Icons.skip_previous_sharp,
+      play: Icons.play_arrow_sharp,
+      pause: Icons.pause_sharp,
+      next: Icons.skip_next_sharp,
+      repeat: Icons.repeat_sharp,
+      repeatOne: Icons.repeat_one_sharp,
+      lyrics: Icons.lyrics_sharp,
+      volumeUp: Icons.volume_up_sharp,
+      volumeDown: Icons.volume_down_sharp,
+      volumeOff: Icons.volume_off_sharp,
+    ),
+  };
+}

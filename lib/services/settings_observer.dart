@@ -35,6 +35,21 @@ final class SettingsObserver extends ProviderObserver {
       case 'accent':
         SettingsService.setInt('accent', (newValue as Color).toARGB32());
         break;
+      case 'barBackground':
+        SettingsService.setInt('barBackground', (newValue as BarBackground).index);
+        break;
+      case 'barMedia':
+        final p = newValue as String?;
+        p == null
+            ? SettingsService.remove('barMedia')
+            : SettingsService.setString('barMedia', p);
+        break;
+      case 'barDim':
+        SettingsService.setInt('barDim', newValue as int);
+        break;
+      case 'barIconStyle':
+        SettingsService.setInt('barIconStyle', (newValue as BarIconStyle).index);
+        break;
     }
   }
 }

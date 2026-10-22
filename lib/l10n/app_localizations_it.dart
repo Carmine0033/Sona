@@ -452,4 +452,80 @@ class AppLocalizationsIt extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get settingsBarTitle => 'Barra di riproduzione';
+
+  @override
+  String get settingsBarBackground => 'Sfondo';
+
+  @override
+  String get barBgGlass => 'Trasparente';
+
+  @override
+  String get barBgAlbum => 'Copertina sfocata';
+
+  @override
+  String get barBgCustom => 'Immagine / GIF';
+
+  @override
+  String get settingsBarPick => 'Scegli immagine o GIF';
+
+  @override
+  String get settingsBarChange => 'Cambia';
+
+  @override
+  String get settingsBarDim => 'Oscuramento';
+
+  @override
+  String get settingsBarIcons => 'Stile icone';
+
+  @override
+  String get iconStyleFilled => 'Piene';
+
+  @override
+  String get iconStyleOutlined => 'Contorno';
+
+  @override
+  String get iconStyleRounded => 'Arrotondate';
+
+  @override
+  String get iconStyleSharp => 'Squadrate';
+
+  @override
+  String get settingsBarTooLarge => 'File troppo grande (massimo 15 MB)';
+
+  @override
+  String get settingsBarFailed => 'Impossibile caricare il file';
+
+  @override
+  String get searchTracksHint => 'Cerca un brano in tutte le playlist';
+
+  @override
+  String get searchInPlaylistHint => 'Cerca in questa playlist';
+
+  @override
+  String get searchOpen => 'Cerca (Ctrl+F)';
+
+  @override
+  String get searchClose => 'Chiudi ricerca';
+
+  @override
+  String searchResults(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count risultati',
+      one: '1 risultato',
+      zero: 'Nessun risultato',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchNoResults => 'Nessun brano trovato';
+
+  @override
+  String get searchTooMany =>
+      'Mostrati i primi 200 risultati: affina la ricerca';
 }

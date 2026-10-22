@@ -15,6 +15,7 @@ import '../services/settings_service.dart';
 import '../services/smtc_channel.dart';
 import '../services/update_service.dart';
 import 'accent_picker.dart';
+import 'player_bar_settings.dart';
 
 /// Shared label column for all settings rows,
 /// so every control starts at the same x.
@@ -157,6 +158,15 @@ class SettingsCard extends ConsumerWidget {
                             SettingsSection.background,
                   ),
                   _NavItem(
+                    icon: Icons.view_day_outlined,
+                    label: l10n.settingsBarTitle,
+                    active: section == SettingsSection.playerBar,
+                    accent: accent,
+                    onTap: () =>
+                        ref.read(settingsSectionProvider.notifier).state =
+                            SettingsSection.playerBar,
+                  ),
+                  _NavItem(
                     icon: Icons.volume_up_outlined,
                     label: l10n.audio,
                     active: section == SettingsSection.audio,
@@ -236,6 +246,7 @@ class SettingsCard extends ConsumerWidget {
   String _title(SettingsSection s, AppLocalizations l10n) => switch (s) {
     SettingsSection.appearance => l10n.appearance,
     SettingsSection.background => l10n.background,
+    SettingsSection.playerBar => l10n.settingsBarTitle,
     SettingsSection.audio => l10n.audio,
     SettingsSection.window => l10n.window,
     SettingsSection.about => l10n.about,
@@ -305,6 +316,7 @@ class SettingsCard extends ConsumerWidget {
       provider: opaqueBackgroundProvider,
       accent: accent,
     ),
+    SettingsSection.playerBar => const PlayerBarSettings(),
     SettingsSection.audio => const _VolumeRow(),
     SettingsSection.window => Column(
       mainAxisSize: MainAxisSize.min,

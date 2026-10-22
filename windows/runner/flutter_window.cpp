@@ -2,6 +2,7 @@
 #include "discord_rpc.h"
 #include "media_session.h"
 #include "smtc_bridge.h"
+#include "single_instance.h"
 #include <optional>
 
 #include "flutter/generated_plugin_registrant.h"
@@ -30,6 +31,7 @@ bool FlutterWindow::OnCreate() {
   // The detached mini player is a second process (--mini): it reads SMTC,
   // including Sona's own session, but doesn't publish one.
   const bool is_mini = wcsstr(GetCommandLineW(), L"--mini") != nullptr;
+  is_mini_ = is_mini;
   smtc_bridge::Register(flutter_controller_->engine(), /*ignore_self=*/!is_mini);
   if (!is_mini) {
     media_session::Register(flutter_controller_->engine(), GetHandle());
@@ -66,6 +68,13 @@ LRESULT
 FlutterWindow::MessageHandler(HWND hwnd, UINT const message,
                               WPARAM const wparam,
                               LPARAM const lparam) noexcept {
+  // Another Sona.exe was started: show this window instead. Only the main
+  // window reacts; the mini player is a separate process and stays put.
+  if (message == single_instance::ShowMessageId()) {
+    if (!is_mini_) single_instance::BringToFront(hwnd);
+    return 0;
+  }
+
   // Give Flutter, including plugins, an opportunity to handle window messages.
   if (flutter_controller_) {
     std::optional<LRESULT> result =

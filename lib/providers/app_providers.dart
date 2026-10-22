@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -146,11 +147,38 @@ final appVersionProvider = FutureProvider<String>((ref) async {
 enum AppSection { player, playlist, options }
 enum SeekBarStyle { line, wave }
 enum DiscStyle { vinyl, fullAlbum }
+enum BarBackground { glass, albumBlur, custom }
+enum BarIconStyle { filled, outlined, rounded, sharp }
+
+// Player bar customization (see widgets/player_bar_settings.dart).
+final barBackgroundProvider = StateProvider<BarBackground>(
+  (ref) => _enumAt(BarBackground.values, SettingsService.getInt('barBackground', 0)),
+  name: 'barBackground',
+);
+
+/// Custom bar image/GIF; null if unset or the file was deleted meanwhile.
+final barMediaPathProvider = StateProvider<String?>(
+  (ref) {
+    final p = SettingsService.getString('barMedia');
+    return (p != null && File(p).existsSync()) ? p : null;
+  },
+  name: 'barMedia',
+);
+
+final barDimProvider = StateProvider<int>(
+  (ref) => SettingsService.getInt('barDim', 55).clamp(0, 90),
+  name: 'barDim',
+);
+
+final barIconStyleProvider = StateProvider<BarIconStyle>(
+  (ref) => _enumAt(BarIconStyle.values, SettingsService.getInt('barIconStyle', 2)), // default: rounded
+  name: 'barIconStyle',
+);
 
 final selectedSectionProvider =StateProvider<AppSection>((ref) => AppSection.player);
 final settingsOpenProvider = StateProvider<bool>((ref) => false);
 
-enum SettingsSection { appearance, background, audio, window, about }
+enum SettingsSection { appearance, background, playerBar, audio, window, about }
 final settingsSectionProvider= StateProvider<SettingsSection>((ref) => SettingsSection.appearance);
 
 class TrackRef {

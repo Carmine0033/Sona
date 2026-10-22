@@ -4,17 +4,24 @@
 
 #include "flutter_window.h"
 #include "utils.h"
+#include "single_instance.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
+  // One Sona at a time: a second launch brings the running one to the front
+  // and exits. The detached mini player is the same exe started with --mini
+  // by the main window, so it must skip the check.
+  const bool is_mini = wcsstr(command_line, L"--mini") != nullptr;
+  if (!is_mini && !single_instance::Acquire()) {
+    single_instance::ActivateExisting();
+    return EXIT_SUCCESS;
+  }
+
   // Attach to console when present (e.g., 'flutter run') or create a
   // new console when running with a debugger.
   if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent()) {
     CreateAndAttachConsole();
   }
-
-  // Mutex for single-instance and Inno Setup installer coordination
-  ::CreateMutexW(nullptr, FALSE, L"SonaSingleInstanceMutex");
 
   // Initialize COM, so that it is available for use in the library and/or
   // plugins.

@@ -15,6 +15,7 @@ add_executable(${BINARY_NAME} WIN32
   "discord_rpc.cpp"
   "media_session.cpp"
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"
+  "single_instance.cpp"
   "Runner.rc"
   "runner.exe.manifest"
 )

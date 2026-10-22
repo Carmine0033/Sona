@@ -1,20 +1,93 @@
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:media_overlay/core/theme.dart' show formatDuration, tabularFigures;
 import 'package:media_overlay/l10n/app_localizations.dart';
+import 'package:media_overlay/models/playlist.dart';
 import 'package:media_overlay/models/sona_player_view_model.dart';
 import 'package:media_overlay/providers/app_providers.dart';
 import 'package:media_overlay/services/artwork_service.dart';
 import 'package:media_overlay/services/audio/track_audio_source.dart';
 import 'package:media_overlay/theme/sona_tokens.dart';
+import 'package:media_overlay/widgets/bar_icons.dart';
 
 /// Space scrollable content must leave at the bottom while the floating
 /// bar is visible: bar height plus its distance from the window edge.
 const kPlayerBarReserve = 112.0;
+
+/// Bar background chosen in settings: glass, blurred cover or a custom
+/// image/GIF, always under a dim layer so the controls stay readable.
+class _BarBackground extends ConsumerWidget {
+  const _BarBackground({required this.track});
+  final PlaylistTrack track;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final mode = ref.watch(barBackgroundProvider);
+    final media = ref.watch(barMediaPathProvider);
+    final dim = ref.watch(barDimProvider) / 100;
+    final cover = ref.watch(trackArtworkProvider(track)).asData?.value;
+
+    Widget withDim(Widget image) => Stack(fit: StackFit.expand, children: [
+      image,
+      ColoredBox(color: Colors.black.withValues(alpha: dim))
+    ]);
+
+    final Widget child= switch(mode) {
+        BarBackground.albumBlur when cover != null => withDim(
+          RepaintBoundary(
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 28, sigmaY: 28, tileMode: TileMode.mirror),
+              child: Transform.scale(
+                scale: 1.3,
+                child: Image.network(
+                  cover,
+                  fit: BoxFit.cover,
+                  cacheWidth: 160,
+                  gaplessPlayback: true,
+                ),
+              ),
+            ),
+          ),
+        ),
+        BarBackground.custom when media != null => withDim(
+          LayoutBuilder(
+            builder: (context, c) => Image.file(
+              File(media),
+              fit: BoxFit.cover,
+              gaplessPlayback: true,
+              // Decode at bar size: a big GIF at full resolution costs a lot of RAM.
+              cacheWidth: c.maxWidth.isFinite
+                  ? (c.maxWidth * MediaQuery.devicePixelRatioOf(context)).round()
+                  : null,
+              errorBuilder: (_, _, _) => _Glass(dim: dim),
+            ),
+          ),
+        ),
+        _ => _Glass(dim: dim),
+    };
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 600),
+      child: KeyedSubtree(key: ValueKey('$mode|$cover|$media'), child: child),
+    );
+  }
+}
+
+class _Glass extends StatelessWidget {
+  const _Glass({required this.dim});
+  final double dim;
+
+  @override
+  Widget build(BuildContext context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+        child: ColoredBox(color: SonaColors.surfaceLow.withValues(alpha: 0.15 + dim * 0.8)),
+      );
+}
 
 /// Floating glass player bar for the internal player (see mock/code.html):
 /// track on the left, controls and progress in the center, volume on the right.
@@ -27,6 +100,7 @@ class SonaPlayerBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(sonaPlayerProvider);
+    final icons = BarIconSet.of(ref.watch(barIconStyleProvider));
     final t = s.track;
     if (t == null) return const SizedBox.shrink();
 
@@ -84,22 +158,23 @@ class SonaPlayerBar extends ConsumerWidget {
 
     final controls = Row(mainAxisSize: MainAxisSize.min, children: [
       _IconBtn(
-        icon: Icons.shuffle,
+        icon: icons.shuffle,
         tooltip: l.shuffle,
         active: s.shuffle,
         accent: light,
         onTap: vm.toggleShuffle,
       ),
-      _IconBtn(icon: Icons.skip_previous_rounded, tooltip: l.previousTrack, accent: light, onTap: vm.previous),
+      _IconBtn(icon: icons.previous, tooltip: l.previousTrack, accent: light, onTap: vm.previous),
       _PlayButton(
         phase: s.phase,
+        icons: icons,
         tooltip: playing ? l.pause : l.play,
         accent: accent,
         onTap: onPlay,
       ),
-      _IconBtn(icon: Icons.skip_next_rounded, tooltip: l.nextTrack, accent: light, onTap: vm.next),
+      _IconBtn(icon: icons.next, tooltip: l.nextTrack, accent: light, onTap: vm.next),
       _IconBtn(
-        icon: s.loop == LoopMode.one ? Icons.repeat_one : Icons.repeat,
+        icon: s.loop == LoopMode.one ? icons.repeatOne : icons.repeat,
         tooltip: s.loop == LoopMode.one ? l.repeatOne : l.repeat,
         active: s.loop != LoopMode.off,
         accent: light,
@@ -125,14 +200,13 @@ class SonaPlayerBar extends ConsumerWidget {
       ),
       child: ClipRRect(
         borderRadius: _radius,
-        // The clip limits the blur to the bar: without it BackdropFilter
-        // would blur the whole window (and cost a lot of GPU).
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-          child: Container(
+        // The clip keeps the background (and the glass BackdropFilter) inside
+        // the bar: without it the blur would cover the whole window.
+        child: Stack(children: [
+          Positioned.fill(child: _BarBackground(track: t)),
+          Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: SonaColors.surfaceLow.withValues(alpha: 0.72),
               borderRadius: _radius,
               border: Border.all(color: SonaColors.specular),
             ),
@@ -142,9 +216,15 @@ class SonaPlayerBar extends ConsumerWidget {
                 return Row(children: [
                   Expanded(child: track(compact: true)),
                   const SizedBox(width: 8),
-                  _IconBtn(icon: Icons.skip_previous_rounded, tooltip: l.previousTrack, accent: light, onTap: vm.previous),
-                  _PlayButton(phase: s.phase, tooltip: playing ? l.pause : l.play, accent: accent, onTap: onPlay),
-                  _IconBtn(icon: Icons.skip_next_rounded, tooltip: l.nextTrack, accent: light, onTap: vm.next),
+                  _IconBtn(icon: icons.previous, tooltip: l.previousTrack, accent: light, onTap: vm.previous),
+                  _PlayButton(
+                    phase: s.phase,
+                    icons: icons,
+                    tooltip: playing ? l.pause : l.play,
+                    accent: accent,
+                    onTap: onPlay,
+                  ),
+                  _IconBtn(icon: icons.next, tooltip: l.nextTrack, accent: light, onTap: vm.next),
                   close,
                 ]);
               }
@@ -172,15 +252,15 @@ class SonaPlayerBar extends ConsumerWidget {
                   width: side,
                   child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                     if (onLyrics != null)
-                      _IconBtn(icon: Icons.lyrics_outlined, accent: light, onTap: onLyrics!),
-                    Flexible(child: _VolumeControl(accent: accent, light: light)),
+                      _IconBtn(icon: icons.lyrics, accent: light, onTap: onLyrics!),
+                    Flexible(child: _VolumeControl(accent: accent, light: light, icons: icons)),
                     close,
                   ]),
                 ),
               ]);
             }),
           ),
-        ),
+        ]),
       ),
     );
   }
@@ -222,11 +302,13 @@ class _IconBtn extends StatelessWidget {
 class _PlayButton extends StatelessWidget {
   const _PlayButton({
     required this.phase,
+    required this.icons,
     required this.tooltip,
     required this.accent,
     required this.onTap,
   });
   final PlayerPhase phase;
+  final BarIconSet icons;
   final String tooltip;
   final Color accent;
   final VoidCallback onTap;
@@ -260,10 +342,10 @@ class _PlayButton extends StatelessWidget {
                       )
                     : Icon(
                         phase == PlayerPhase.playing
-                            ? Icons.pause_rounded
+                            ? icons.pause
                             : phase == PlayerPhase.error
                             ? Icons.refresh_rounded
-                            : Icons.play_arrow_rounded,
+                            : icons.play,
                         color: onAccent,
                         size: 24,
                       ),
@@ -295,8 +377,9 @@ class _TimeLabel extends ConsumerWidget {
 }
 
 class _VolumeControl extends ConsumerWidget {
-  const _VolumeControl({required this.accent, required this.light});
+  const _VolumeControl({required this.accent, required this.light, required this.icons});
   final Color accent, light;
+  final BarIconSet icons;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -307,10 +390,10 @@ class _VolumeControl extends ConsumerWidget {
       children: [
         Icon(
           v == 0
-              ? Icons.volume_off
+              ? icons.volumeOff
               : v < 0.5
-              ? Icons.volume_down
-              : Icons.volume_up,
+              ? icons.volumeDown
+              : icons.volumeUp,
           size: 18,
           color: light,
         ),

@@ -11,21 +11,28 @@ import 'package:media_overlay/theme/sona_tokens.dart';
 import 'package:media_overlay/viewmodels/playlist_library_view_model.dart';
 import 'package:media_overlay/widgets/playlist_card.dart';
 import 'package:media_overlay/widgets/playlist_cover.dart';
-import 'package:media_overlay/widgets/sona_player_bar.dart' show kPlayerBarReserve;
+import 'package:media_overlay/widgets/sona_player_bar.dart'
+    show kPlayerBarReserve;
 import 'package:media_overlay/widgets/sona_ui.dart';
+
+import 'package:media_overlay/widgets/expandable_search.dart';
+import 'package:media_overlay/widgets/track_search_results.dart';
 
 class PlaylistLibraryPage extends ConsumerStatefulWidget {
   const PlaylistLibraryPage({super.key, required this.items});
   final List<SavedPlaylist> items;
 
   @override
-  ConsumerState<PlaylistLibraryPage> createState() => _PlaylistLibraryPageState();
+  ConsumerState<PlaylistLibraryPage> createState() =>
+      _PlaylistLibraryPageState();
 }
 
 class _PlaylistLibraryPageState extends ConsumerState<PlaylistLibraryPage> {
   final _input = TextEditingController();
   final _focus = FocusNode();
   final _scroll = ScrollController();
+  String _query = '';
+  final _searchKey = GlobalKey<ExpandableSearchState>();
   bool _busy = false;
   String? _error;
 
@@ -48,7 +55,11 @@ class _PlaylistLibraryPageState extends ConsumerState<PlaylistLibraryPage> {
       await ref.read(playlistLibraryProvider.notifier).add(link);
       _input.clear();
     } catch (e) {
-      if (mounted) setState(() => _error = playlistErrorText(AppLocalizations.of(context)!, e));
+      if (mounted) {
+        setState(
+          () => _error = playlistErrorText(AppLocalizations.of(context)!, e),
+        );
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -62,7 +73,11 @@ class _PlaylistLibraryPageState extends ConsumerState<PlaylistLibraryPage> {
   }
 
   void _focusInput() {
-    _scroll.animateTo(0, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+    _scroll.animateTo(
+      0,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
     _focus.requestFocus();
   }
 
@@ -86,67 +101,176 @@ class _PlaylistLibraryPageState extends ConsumerState<PlaylistLibraryPage> {
     final visible = items.where(filter.accepts).toList();
     final hero = _hero(items, ref.watch(sonaPlayerProvider));
 
-    return Stack(children: [
-      Positioned(top: -140, right: 120, child: _Glow(color: accent, size: 440)),
-      Positioned(top: 300, left: -140, child: _Glow(color: SonaColors.light(accent), size: 360)),
-      Positioned.fill(
-        child: CustomScrollView(controller: _scroll, slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
-            sliver: SliverList.list(children: [
-              _LinkInput(
-                controller: _input,
-                focus: _focus,
-                busy: _busy,
-                accent: accent,
-                onSubmit: _add,
-                onPaste: _paste,
-              ),
-              if (_error != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, left: 4),
-                  child: Text(_error!, style: SonaText.bodySm.copyWith(color: SonaColors.error)),
-                ),
-              const SizedBox(height: 20),
-              if (items.isNotEmpty) _FilterBar(items: items),
-              const SizedBox(height: 20),
-              if (hero != null) ...[_HeroCard(saved: hero), const SizedBox(height: 32)],
-              Row(children: [
-                Text(l.libraryYourPlaylists, style: SonaText.headlineMd),
-                const SizedBox(width: 10),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: SonaColors.surfaceHigh,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                  child: Text(l.libraryAvailable(visible.length).toUpperCase(),
-                      style: SonaText.labelSm.copyWith(
-                          color: SonaColors.light(accent), fontWeight: FontWeight.w600)),
-                ),
-              ]),
-              const SizedBox(height: 12),
-            ]),
+    final searching = _query.isNotEmpty;
+    // Search honors the active filter: with "Spotify" selected it only searches there.
+    final hits = searching ? searchTracks(visible, _query) : const <TrackHit>[];
+
+    // Ctrl+F works wherever the keyboard focus is (see SearchShortcut).
+    return SearchShortcut(
+      onTrigger: () => _searchKey.currentState?.open(),
+      child: Stack(
+        children: [
+          Positioned(
+            top: -140,
+            right: 120,
+            child: _Glow(color: accent, size: 440),
           ),
-          SliverPadding(
-            // Room for the floating player bar below the last row.
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 24 + kPlayerBarReserve),
-            sliver: SliverGrid.builder(
-              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 260,
-                mainAxisSpacing: 20,
-                crossAxisSpacing: 20,
-                childAspectRatio: 0.70,
-              ),
-              itemCount: visible.length + 1,
-              itemBuilder: (_, i) => i == visible.length
-                  ? AddPlaylistCard(onTap: _focusInput)
-                  : PlaylistCard(saved: visible[i]),
+          Positioned(
+            top: 300,
+            left: -140,
+            child: _Glow(color: SonaColors.light(accent), size: 360),
+          ),
+          Positioned.fill(
+            child: CustomScrollView(
+              controller: _scroll,
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+                  sliver: SliverList.list(
+                    children: [
+                      _LinkInput(
+                        controller: _input,
+                        focus: _focus,
+                        busy: _busy,
+                        accent: accent,
+                        onSubmit: _add,
+                        onPaste: _paste,
+                      ),
+                      if (_error != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8, left: 4),
+                          child: Text(
+                            _error!,
+                            style: SonaText.bodySm.copyWith(
+                              color: SonaColors.error,
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 20),
+
+                      // Filters and search on the same row
+                      if (items.isNotEmpty)
+                        Row(
+                          children: [
+                            Expanded(child: _FilterBar(items: items)),
+                            const SizedBox(width: 12),
+                            ExpandableSearch(
+                              key: _searchKey,
+                              accent: accent,
+                              hint: l.searchTracksHint,
+                              openTooltip: l.searchOpen,
+                              closeTooltip: l.searchClose,
+                              onChanged: (q) => setState(() => _query = q),
+                            ),
+                          ],
+                        ),
+                      const SizedBox(height: 20),
+
+                      if (searching) ...[
+                        Text(
+                          l.searchResults(hits.length),
+                          style: SonaText.headlineMd,
+                        ),
+                        if (hits.length == kMaxSearchHits)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: Text(
+                              l.searchTooMany,
+                              style: SonaText.bodySm,
+                            ),
+                          ),
+                        const SizedBox(height: 12),
+                        if (hits.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 40),
+                            child: Center(
+                              child: Text(
+                                l.searchNoResults,
+                                style: SonaText.bodyMd,
+                              ),
+                            ),
+                          ),
+                      ] else ...[
+                        if (hero != null) ...[
+                          _HeroCard(saved: hero),
+                          const SizedBox(height: 32),
+                        ],
+                        Row(
+                          children: [
+                            Text(
+                              l.libraryYourPlaylists,
+                              style: SonaText.headlineMd,
+                            ),
+                            const SizedBox(width: 10),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: SonaColors.surfaceHigh,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text(
+                                l
+                                    .libraryAvailable(visible.length)
+                                    .toUpperCase(),
+                                style: SonaText.labelSm.copyWith(
+                                  color: SonaColors.light(accent),
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                    ],
+                  ),
+                ),
+
+                if (searching)
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(
+                      20,
+                      0,
+                      20,
+                      24 + kPlayerBarReserve,
+                    ),
+                    sliver: SliverList.builder(
+                      itemCount: hits.length,
+                      itemBuilder: (_, i) =>
+                          TrackHitTile(hit: hits[i], query: _query),
+                    ),
+                  )
+                else
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(
+                      20,
+                      0,
+                      20,
+                      24 + kPlayerBarReserve,
+                    ),
+                    sliver: SliverGrid.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 260,
+                            mainAxisSpacing: 20,
+                            crossAxisSpacing: 20,
+                            childAspectRatio: 0.70,
+                          ),
+                      itemCount: visible.length + 1,
+                      itemBuilder: (_, i) => i == visible.length
+                          ? AddPlaylistCard(onTap: _focusInput)
+                          : PlaylistCard(saved: visible[i]),
+                    ),
+                  ),
+              ],
             ),
           ),
-        ]),
+        ],
       ),
-    ]);
+    );
   }
 }
 
@@ -157,17 +281,17 @@ class _Glow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => IgnorePointer(
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: RadialGradient(
-              colors: [color.withValues(alpha: 0.14), color.withValues(alpha: 0)],
-            ),
-          ),
+    child: Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(
+          colors: [color.withValues(alpha: 0.14), color.withValues(alpha: 0)],
         ),
-      );
+      ),
+    ),
+  );
 }
 
 class _LinkInput extends StatelessWidget {
@@ -193,75 +317,100 @@ class _LinkInput extends StatelessWidget {
     final light = SonaColors.light(accent);
     final mono = SonaText.labelLg.copyWith(fontWeight: FontWeight.w400);
 
-    return Row(children: [
-      Expanded(
-        child: ListenableBuilder(
-          listenable: focus,
-          builder: (context, child) => AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            height: 48,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: SonaColors.surfaceLow.withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: focus.hasFocus ? light : SonaColors.specular),
-              boxShadow: [
-                if (focus.hasFocus) BoxShadow(color: accent.withValues(alpha: 0.25), blurRadius: 20),
+    return Row(
+      children: [
+        Expanded(
+          child: ListenableBuilder(
+            listenable: focus,
+            builder: (context, child) => AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              height: 48,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: SonaColors.surfaceLow.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: focus.hasFocus ? light : SonaColors.specular,
+                ),
+                boxShadow: [
+                  if (focus.hasFocus)
+                    BoxShadow(
+                      color: accent.withValues(alpha: 0.25),
+                      blurRadius: 20,
+                    ),
+                ],
+              ),
+              child: child,
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.dataset_outlined, size: 20, color: light),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    focusNode: focus,
+                    enabled: !busy,
+                    onSubmitted: (_) => onSubmit(),
+                    style: mono.copyWith(color: SonaColors.text),
+                    cursorColor: accent,
+                    decoration: InputDecoration(
+                      isCollapsed: true,
+                      border: InputBorder.none,
+                      hintText: l.libraryInputHint,
+                      hintStyle: mono.copyWith(color: SonaColors.textMuted),
+                    ),
+                  ),
+                ),
+                Material(
+                  color: SonaColors.surfaceHigh,
+                  borderRadius: BorderRadius.circular(8),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: busy ? null : onPaste,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.content_paste, size: 16, color: light),
+                          const SizedBox(width: 6),
+                          Text(
+                            l.libraryPaste,
+                            style: SonaText.labelSm.copyWith(color: light),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                ValueListenableBuilder(
+                  valueListenable: controller,
+                  builder: (_, v, _) => v.text.isEmpty
+                      ? const SizedBox(width: 4)
+                      : IconButton(
+                          icon: const Icon(Icons.clear, size: 16),
+                          color: SonaColors.textMuted,
+                          onPressed: controller.clear,
+                        ),
+                ),
               ],
             ),
-            child: child,
           ),
-          child: Row(children: [
-            Icon(Icons.dataset_outlined, size: 20, color: light),
-            const SizedBox(width: 10),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                focusNode: focus,
-                enabled: !busy,
-                onSubmitted: (_) => onSubmit(),
-                style: mono.copyWith(color: SonaColors.text),
-                cursorColor: accent,
-                decoration: InputDecoration(
-                  isCollapsed: true,
-                  border: InputBorder.none,
-                  hintText: l.libraryInputHint,
-                  hintStyle: mono.copyWith(color: SonaColors.textMuted),
-                ),
-              ),
-            ),
-            Material(
-              color: SonaColors.surfaceHigh,
-              borderRadius: BorderRadius.circular(8),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: busy ? null : onPaste,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.content_paste, size: 16, color: light),
-                    const SizedBox(width: 6),
-                    Text(l.libraryPaste, style: SonaText.labelSm.copyWith(color: light)),
-                  ]),
-                ),
-              ),
-            ),
-            ValueListenableBuilder(
-              valueListenable: controller,
-              builder: (_, v, _) => v.text.isEmpty
-                  ? const SizedBox(width: 4)
-                  : IconButton(
-                      icon: const Icon(Icons.clear, size: 16),
-                      color: SonaColors.textMuted,
-                      onPressed: controller.clear,
-                    ),
-            ),
-          ]),
         ),
-      ),
-      const SizedBox(width: 12),
-      SonaPrimaryButton(icon: Icons.add, label: l.libraryAdd, accent: accent, busy: busy, onTap: onSubmit),
-    ]);
+        const SizedBox(width: 12),
+        SonaPrimaryButton(
+          icon: Icons.add,
+          label: l.libraryAdd,
+          accent: accent,
+          busy: busy,
+          onTap: onSubmit,
+        ),
+      ],
+    );
   }
 }
 
@@ -282,31 +431,37 @@ class _FilterBar extends ConsumerWidget {
     }
     final favs = items.where((p) => p.favorite).length;
 
-    return Wrap(spacing: 6, runSpacing: 6, children: [
-      _Chip(
-        label: '${l.libraryAll} (${items.length})',
-        active: filter.source == null && !filter.favoritesOnly,
-        accent: accent,
-        onTap: n.all,
-      ),
-      // Only services present in the library: no "Deezer (0)" chip.
-      for (final s in MusicSource.values)
-        if (counts[s] != null)
-          _Chip(
-            label: '${s.label} (${counts[s]})',
-            dot: true,
-            active: filter.source == s,
-            accent: accent,
-            onTap: () => n.source(s),
-          ),
-      _Chip(
-        label: favs > 0 ? '${l.libraryFavorites} ($favs)' : l.libraryFavorites,
-        icon: Icons.favorite_border,
-        active: filter.favoritesOnly,
-        accent: accent,
-        onTap: n.favorites,
-      ),
-    ]);
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        _Chip(
+          label: '${l.libraryAll} (${items.length})',
+          active: filter.source == null && !filter.favoritesOnly,
+          accent: accent,
+          onTap: n.all,
+        ),
+        // Only services present in the library: no "Deezer (0)" chip.
+        for (final s in MusicSource.values)
+          if (counts[s] != null)
+            _Chip(
+              label: '${s.label} (${counts[s]})',
+              dot: true,
+              active: filter.source == s,
+              accent: accent,
+              onTap: () => n.source(s),
+            ),
+        _Chip(
+          label: favs > 0
+              ? '${l.libraryFavorites} ($favs)'
+              : l.libraryFavorites,
+          icon: Icons.favorite_border,
+          active: filter.favoritesOnly,
+          accent: accent,
+          onTap: n.favorites,
+        ),
+      ],
+    );
   }
 }
 
@@ -334,7 +489,10 @@ class _Chip extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(999),
-        boxShadow: [if (active) BoxShadow(color: accent.withValues(alpha: 0.5), blurRadius: 12)],
+        boxShadow: [
+          if (active)
+            BoxShadow(color: accent.withValues(alpha: 0.5), blurRadius: 12),
+        ],
       ),
       child: Material(
         color: active ? accent : SonaColors.surfaceLow,
@@ -344,19 +502,32 @@ class _Chip extends StatelessWidget {
           onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              if (dot)
-                Container(
-                  width: 6,
-                  height: 6,
-                  margin: const EdgeInsets.only(right: 6),
-                  decoration: BoxDecoration(color: active ? Colors.white : light, shape: BoxShape.circle),
-                ),
-              if (icon != null) ...[Icon(icon, size: 14, color: active ? Colors.white : light), const SizedBox(width: 6)],
-              Text(label,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (dot)
+                  Container(
+                    width: 6,
+                    height: 6,
+                    margin: const EdgeInsets.only(right: 6),
+                    decoration: BoxDecoration(
+                      color: active ? Colors.white : light,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                if (icon != null) ...[
+                  Icon(icon, size: 14, color: active ? Colors.white : light),
+                  const SizedBox(width: 6),
+                ],
+                Text(
+                  label,
                   style: SonaText.labelSm.copyWith(
-                      color: fg, fontWeight: active ? FontWeight.w600 : FontWeight.w400)),
-            ]),
+                    color: fg,
+                    fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -381,82 +552,125 @@ class _HeroCard extends ConsumerWidget {
     final playing = active && s.phase == PlayerPhase.playing;
     final current = active ? s.track : null;
 
-    final info = Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-      Wrap(spacing: 10, crossAxisAlignment: WrapCrossAlignment.center, children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: 0.3),
-            borderRadius: BorderRadius.circular(999),
-            boxShadow: [BoxShadow(color: accent.withValues(alpha: 0.35), blurRadius: 8)],
-          ),
-          child: Text(l.librarySourcePlaylist(p.source.label).toUpperCase(),
-              style: SonaText.labelSm.copyWith(color: light, fontWeight: FontWeight.w700)),
-        ),
-        if (playing)
-          Row(mainAxisSize: MainAxisSize.min, children: [
-            _PulseDot(color: light),
-            const SizedBox(width: 6),
-            Text(l.libraryNowPlaying.toUpperCase(),
-                style: SonaText.labelSm.copyWith(color: light, fontWeight: FontWeight.w600)),
-          ]),
-      ]),
-      const SizedBox(height: 6),
-      Text(p.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: SonaText.headlineLg),
-      const SizedBox(height: 4),
-      Text(
-        [
-          if (p.owner != null) p.owner!,
-          l.libraryTracks(p.tracks.length),
-          if (saved.totalDuration > Duration.zero) formatTotal(saved.totalDuration),
-        ].join('  •  '),
-        style: SonaText.labelMd,
-      ),
-      if (current != null) ...[
-        const SizedBox(height: 10),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: SonaColors.canvas.withValues(alpha: 0.9),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(Icons.equalizer, size: 16, color: light),
-            const SizedBox(width: 8),
-            Text(l.libraryNowPlayingTicker, style: SonaText.labelSm),
-            const SizedBox(width: 6),
-            Flexible(
+    final info = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Wrap(
+          spacing: 10,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: accent.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(999),
+                boxShadow: [
+                  BoxShadow(
+                    color: accent.withValues(alpha: 0.35),
+                    blurRadius: 8,
+                  ),
+                ],
+              ),
               child: Text(
-                '${current.title} — ${current.artist}  (${s.index + 1}/${p.tracks.length})',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: SonaText.labelSm.copyWith(color: light, fontWeight: FontWeight.w600),
+                l.librarySourcePlaylist(p.source.label).toUpperCase(),
+                style: SonaText.labelSm.copyWith(
+                  color: light,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
-          ]),
+            if (playing)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _PulseDot(color: light),
+                  const SizedBox(width: 6),
+                  Text(
+                    l.libraryNowPlaying.toUpperCase(),
+                    style: SonaText.labelSm.copyWith(
+                      color: light,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
+        const SizedBox(height: 6),
+        Text(
+          p.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: SonaText.headlineLg,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          [
+            if (p.owner != null) p.owner!,
+            l.libraryTracks(p.tracks.length),
+            if (saved.totalDuration > Duration.zero)
+              formatTotal(saved.totalDuration),
+          ].join('  •  '),
+          style: SonaText.labelMd,
+        ),
+        if (current != null) ...[
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: SonaColors.canvas.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.equalizer, size: 16, color: light),
+                const SizedBox(width: 8),
+                Text(l.libraryNowPlayingTicker, style: SonaText.labelSm),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    '${current.title} — ${current.artist}  (${s.index + 1}/${p.tracks.length})',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: SonaText.labelSm.copyWith(
+                      color: light,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+
+    final actions = Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        SonaPrimaryButton(
+          icon: playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+          label: playing ? l.libraryPause : l.libraryPlayNow,
+          accent: accent,
+          large: true,
+          onTap: () => active ? vm.togglePlay() : vm.playAt(p, 0),
+        ),
+        SonaSecondaryButton(
+          icon: Icons.sync,
+          label: l.librarySync,
+          onTap: () => syncWithFeedback(context, ref, saved.key),
+        ),
+        SonaSecondaryButton(
+          icon: Icons.queue_music,
+          label: l.libraryTracks(p.tracks.length),
+          onTap: () =>
+              ref.read(openPlaylistKeyProvider.notifier).open(saved.key),
         ),
       ],
-    ]);
-
-    final actions = Wrap(spacing: 8, runSpacing: 8, children: [
-      SonaPrimaryButton(
-        icon: playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
-        label: playing ? l.libraryPause : l.libraryPlayNow,
-        accent: accent,
-        large: true,
-        onTap: () => active ? vm.togglePlay() : vm.playAt(p, 0),
-      ),
-      SonaSecondaryButton(
-        icon: Icons.sync,
-        label: l.librarySync,
-        onTap: () => syncWithFeedback(context, ref, saved.key),
-      ),
-      SonaSecondaryButton(
-        icon: Icons.queue_music,
-        label: l.libraryTracks(p.tracks.length),
-        onTap: () => ref.read(openPlaylistKeyProvider.notifier).open(saved.key),
-      ),
-    ]);
+    );
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -465,27 +679,50 @@ class _HeroCard extends ConsumerWidget {
         // Uniform border: Flutter doesn't allow borderRadius with a top-only border.
         border: Border.all(color: SonaColors.specular),
         gradient: const LinearGradient(
-          colors: [SonaColors.surfaceLow, SonaColors.surfaceMid, SonaColors.surfaceLow],
+          colors: [
+            SonaColors.surfaceLow,
+            SonaColors.surfaceMid,
+            SonaColors.surfaceLow,
+          ],
         ),
-        boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 24, offset: Offset(0, 8))],
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black54,
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ],
       ),
-      child: LayoutBuilder(builder: (context, c) {
-        final cover = PlaylistCollage(saved: saved, size: 144);
-        if (c.maxWidth < 760) {
-          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [cover, const SizedBox(width: 20), Expanded(child: info)]),
-            const SizedBox(height: 16),
-            actions,
-          ]);
-        }
-        return Row(children: [
-          cover,
-          const SizedBox(width: 20),
-          Expanded(child: info),
-          const SizedBox(width: 20),
-          actions,
-        ]);
-      }),
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final cover = PlaylistCollage(saved: saved, size: 144);
+          if (c.maxWidth < 760) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    cover,
+                    const SizedBox(width: 20),
+                    Expanded(child: info),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                actions,
+              ],
+            );
+          }
+          return Row(
+            children: [
+              cover,
+              const SizedBox(width: 20),
+              Expanded(child: info),
+              const SizedBox(width: 20),
+              actions,
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -497,9 +734,12 @@ class _PulseDot extends StatefulWidget {
   State<_PulseDot> createState() => _PulseDotState();
 }
 
-class _PulseDotState extends State<_PulseDot> with SingleTickerProviderStateMixin {
-  late final _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
-    ..repeat(reverse: true);
+class _PulseDotState extends State<_PulseDot>
+    with SingleTickerProviderStateMixin {
+  late final _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..repeat(reverse: true);
 
   @override
   void dispose() {
@@ -509,15 +749,15 @@ class _PulseDotState extends State<_PulseDot> with SingleTickerProviderStateMixi
 
   @override
   Widget build(BuildContext context) => FadeTransition(
-        opacity: Tween(begin: 0.35, end: 1.0).animate(_c),
-        child: Container(
-          width: 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: widget.color,
-            shape: BoxShape.circle,
-            boxShadow: [BoxShadow(color: widget.color, blurRadius: 6)],
-          ),
-        ),
-      );
+    opacity: Tween(begin: 0.35, end: 1.0).animate(_c),
+    child: Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: widget.color,
+        shape: BoxShape.circle,
+        boxShadow: [BoxShadow(color: widget.color, blurRadius: 6)],
+      ),
+    ),
+  );
 }

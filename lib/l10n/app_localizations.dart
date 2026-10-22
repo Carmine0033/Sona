@@ -847,6 +847,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{days, plural, =1{Updated 1 day ago} other{Updated {days} days ago}}'**
   String libraryUpdatedDaysAgo(int days);
+
+  /// No description provided for @settingsBarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Player bar'**
+  String get settingsBarTitle;
+
+  /// No description provided for @settingsBarBackground.
+  ///
+  /// In en, this message translates to:
+  /// **'Background'**
+  String get settingsBarBackground;
+
+  /// No description provided for @barBgGlass.
+  ///
+  /// In en, this message translates to:
+  /// **'Transparent'**
+  String get barBgGlass;
+
+  /// No description provided for @barBgAlbum.
+  ///
+  /// In en, this message translates to:
+  /// **'Blurred cover'**
+  String get barBgAlbum;
+
+  /// No description provided for @barBgCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Image / GIF'**
+  String get barBgCustom;
+
+  /// No description provided for @settingsBarPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose image or GIF'**
+  String get settingsBarPick;
+
+  /// No description provided for @settingsBarChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get settingsBarChange;
+
+  /// No description provided for @settingsBarDim.
+  ///
+  /// In en, this message translates to:
+  /// **'Dim'**
+  String get settingsBarDim;
+
+  /// No description provided for @settingsBarIcons.
+  ///
+  /// In en, this message translates to:
+  /// **'Icon style'**
+  String get settingsBarIcons;
+
+  /// No description provided for @iconStyleFilled.
+  ///
+  /// In en, this message translates to:
+  /// **'Filled'**
+  String get iconStyleFilled;
+
+  /// No description provided for @iconStyleOutlined.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlined'**
+  String get iconStyleOutlined;
+
+  /// No description provided for @iconStyleRounded.
+  ///
+  /// In en, this message translates to:
+  /// **'Rounded'**
+  String get iconStyleRounded;
+
+  /// No description provided for @iconStyleSharp.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharp'**
+  String get iconStyleSharp;
+
+  /// No description provided for @settingsBarTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'File too large (max 15 MB)'**
+  String get settingsBarTooLarge;
+
+  /// No description provided for @settingsBarFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the file'**
+  String get settingsBarFailed;
+
+  /// No description provided for @searchTracksHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search a track across all playlists'**
+  String get searchTracksHint;
+
+  /// No description provided for @searchInPlaylistHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search in this playlist'**
+  String get searchInPlaylistHint;
+
+  /// No description provided for @searchOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Search (Ctrl+F)'**
+  String get searchOpen;
+
+  /// No description provided for @searchClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close search'**
+  String get searchClose;
+
+  /// No description provided for @searchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No results} =1{1 result} other{{count} results}}'**
+  String searchResults(int count);
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No tracks found'**
+  String get searchNoResults;
+
+  /// No description provided for @searchTooMany.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing the first 200 results: refine your search'**
+  String get searchTooMany;
 }
 
 class _AppLocalizationsDelegate

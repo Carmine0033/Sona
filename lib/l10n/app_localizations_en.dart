@@ -449,4 +449,80 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get settingsBarTitle => 'Player bar';
+
+  @override
+  String get settingsBarBackground => 'Background';
+
+  @override
+  String get barBgGlass => 'Transparent';
+
+  @override
+  String get barBgAlbum => 'Blurred cover';
+
+  @override
+  String get barBgCustom => 'Image / GIF';
+
+  @override
+  String get settingsBarPick => 'Choose image or GIF';
+
+  @override
+  String get settingsBarChange => 'Change';
+
+  @override
+  String get settingsBarDim => 'Dim';
+
+  @override
+  String get settingsBarIcons => 'Icon style';
+
+  @override
+  String get iconStyleFilled => 'Filled';
+
+  @override
+  String get iconStyleOutlined => 'Outlined';
+
+  @override
+  String get iconStyleRounded => 'Rounded';
+
+  @override
+  String get iconStyleSharp => 'Sharp';
+
+  @override
+  String get settingsBarTooLarge => 'File too large (max 15 MB)';
+
+  @override
+  String get settingsBarFailed => 'Couldn\'t load the file';
+
+  @override
+  String get searchTracksHint => 'Search a track across all playlists';
+
+  @override
+  String get searchInPlaylistHint => 'Search in this playlist';
+
+  @override
+  String get searchOpen => 'Search (Ctrl+F)';
+
+  @override
+  String get searchClose => 'Close search';
+
+  @override
+  String searchResults(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count results',
+      one: '1 result',
+      zero: 'No results',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get searchNoResults => 'No tracks found';
+
+  @override
+  String get searchTooMany =>
+      'Showing the first 200 results: refine your search';
 }

@@ -1,4 +1,40 @@
 ---------------------------
+Release Sona V0.1.7
+---------------------------
+
+### Added
+
+* \- Search tracks across all your playlists (Ctrl+F) or inside a single playlist
+* \- Player bar customization: transparent, blurred album cover or custom image/GIF background
+* \- Dim slider for the player bar background
+* \- Icon style selection for the player bar (filled, outlined, rounded, sharp)
+
+### Changed
+
+* 
+
+### Fixed
+
+* Only one instance of Sona can run at a time; reopening it brings the existing window to the front (#N)
+---------------------------
+Release Sona V0.1.6
+---------------------------
+
+### Added
+
+* Playlist library: save multiple playlists, with favorites and source filters
+* Playlist detail page with sync and remove
+* Floating player bar with rounded corners
+
+### Changed
+
+* Redesigned Playlist page (new colors and typography)
+* Larger default window size
+
+### Fixed
+
+* Now-playing highlight and prefetch are kept after syncing a playlist
+---------------------------
 Release Sona V0.1.5
 ---------------------------
 
@@ -76,6 +112,8 @@ Release Sona V0.1.2
 ### Fixed
 
 *
+
+
 
 
 

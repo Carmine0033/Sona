@@ -1,4 +1,5 @@
 import 'package:media_overlay/models/playlist.dart';
+import 'package:media_overlay/utils/search.dart';
 
 /// A playlist in the user's library: its data plus how and when it was added.
 class SavedPlaylist {
@@ -15,6 +16,9 @@ class SavedPlaylist {
   final DateTime addedAt;
   final DateTime? syncedAt;
   final bool favorite;
+
+  late final List<String> titleKeys = [for (final t in data.tracks) normalizeSearch(t.title)];
+  late final List<String> artistKeys = [for (final t in data.tracks) normalizeSearch(t.artist)];
 
   /// Stable identity: pasting the same link twice doesn't create a duplicate.
   String get key => '${data.source.name}:${data.id}';
