@@ -21,7 +21,13 @@ const kPreferredSize = Size(1480, 920);
 const kMinSize = Size(1100, 720);
 
 Future<Process> openFramelessVinylWindow() async {
-  return await Process.start(Platform.resolvedExecutable, ['--mini']);
+  final proc = await Process.start(Platform.resolvedExecutable, ['--mini']);
+  // The mini player logs to pipes only we hold (the engine alone can write
+  // tens of KB per second). Unread, they fill up and its next log line
+  // blocks its UI thread: Windows then closes it as "not responding".
+  proc.stdout.drain<void>();
+  proc.stderr.drain<void>();
+  return proc;
 }
 
 /// Main window size: [kPreferredSize] capped to 90% of the work area.

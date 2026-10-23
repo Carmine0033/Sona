@@ -8,12 +8,16 @@ class SpinningDisc extends ConsumerStatefulWidget {
   final Uint8List? albumArt;
   final bool spinning;
   final double size;
+  /// Takes precedence over [albumArt]: DiscChangeAnimator passes the cover
+  /// to show right now, which during the exit is still the previous track's.
+  final ImageProvider? artwork;
 
   const SpinningDisc({
     super.key,
-    required this.albumArt,
+    this.albumArt,
     required this.spinning,
     this.size = 185,
+    this.artwork,
   });
 
   @override
@@ -80,10 +84,15 @@ class _SpinningDiscState extends ConsumerState<SpinningDisc>
         errorBuilder: (_, _, _) => _fallback(),
       );
     }
-    return _hasArt
-        ? Image.memory(widget.albumArt!,
-            fit: fit, errorBuilder: (_, _, _) => _fallback())
-        : _fallback();
+    final art =
+        widget.artwork ?? (_hasArt ? MemoryImage(widget.albumArt!) : null);
+    if (art == null) return _fallback();
+    return Image(
+      image: art,
+      fit: fit,
+      gaplessPlayback: true,
+      errorBuilder: (_, _, _) => _fallback(),
+    );
   }
 
   // Vinyl + album

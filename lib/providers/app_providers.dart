@@ -32,6 +32,8 @@ final alwaysOnTopProvider =
 T _enumAt<T>(List<T> values, int i) =>
     (i >= 0 && i < values.length) ? values[i] : values[0];
 
+final discDirectionProvider = StateProvider<int>((ref) => 1);
+
 final seekBarStyleProvider = StateProvider<SeekBarStyle>(
     (ref) => _enumAt(SeekBarStyle.values, SettingsService.getInt('seekStyle', 0)),
     name: 'seekStyle');

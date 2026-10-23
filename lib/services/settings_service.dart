@@ -5,6 +5,9 @@ class SettingsService {
   static late File _file;
   static Map<String, dynamic> _data = {};
 
+  /// settings.json was already there at startup: Sona ran before on this PC.
+  static bool existedBeforeLaunch = false;
+
   static Directory get _baseDir {
     final base = Platform.environment['APPDATA'] ?? Directory.systemTemp.path;
     final dir = Directory('$base\\Sona');
@@ -14,7 +17,8 @@ class SettingsService {
 
   static Future<void> init() async {
     _file = File('${_baseDir.path}\\settings.json');
-    if (_file.existsSync()) {
+    existedBeforeLaunch = _file.existsSync();
+    if (existedBeforeLaunch) {
       try {
         _data = jsonDecode(_file.readAsStringSync()) as Map<String, dynamic>;
       } catch (_) {

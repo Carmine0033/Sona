@@ -3,6 +3,8 @@ import 'package:media_overlay/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../providers/app_providers.dart';
+import '../theme/sona_tokens.dart';
+import '../viewmodels/whats_new_view_model.dart';
 
 class Sidebar extends ConsumerWidget {
   const Sidebar({super.key});
@@ -13,6 +15,7 @@ class Sidebar extends ConsumerWidget {
     final isSettingsOpen = ref.watch(settingsOpenProvider);
     final accent = Theme.of(context).colorScheme.primary;
     final l10n = AppLocalizations.of(context)!;
+    final unread = ref.watch(whatsNewProvider.select((s) => s.asData?.value.unread ?? false));
 
     return Container(
       width: 160,
@@ -58,6 +61,7 @@ class Sidebar extends ConsumerWidget {
             icon: Icons.tune,
             label: l10n.options,
             active: isSettingsOpen,
+            badge: unread, // unread release notes
             onTap: () =>
                 ref.read(settingsOpenProvider.notifier).update((v) => !v),
           ),
@@ -72,11 +76,13 @@ class _NavItem extends StatelessWidget {
   final String label;
   final bool active;
   final VoidCallback onTap;
+  final bool badge;
   const _NavItem({
     required this.icon,
     required this.label,
     required this.active,
     required this.onTap,
+    this.badge = false,
   });
 
   @override
@@ -110,6 +116,14 @@ class _NavItem extends StatelessWidget {
                   ),
                 ),
               ),
+              if (badge)
+                Container(
+                  width: 7,
+                  height: 7,
+                  margin: const EdgeInsets.only(left: 8),
+                  decoration: BoxDecoration(
+                      color: SonaColors.light(accent), shape: BoxShape.circle),
+                ),
             ],
           ),
         ),

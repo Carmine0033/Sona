@@ -525,4 +525,61 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get searchTooMany =>
       'Showing the first 200 results: refine your search';
+
+  @override
+  String get colTrack => 'Title';
+
+  @override
+  String get colAlbum => 'Album';
+
+  @override
+  String get colDuration => 'Duration';
+
+  @override
+  String sortBy(String column) {
+    return 'Sort by $column';
+  }
+
+  @override
+  String get sortOriginal => 'Original order';
+
+  @override
+  String get trackMore => 'More actions';
+
+  @override
+  String get trackCopy => 'Copy title and artist';
+
+  @override
+  String get trackCopied => 'Copied to clipboard';
+
+  @override
+  String trackOpenIn(String source) {
+    return 'Open in $source';
+  }
+
+  @override
+  String whatsNewToastTitle(String version) {
+    return 'Sona has been updated to $version.';
+  }
+
+  @override
+  String get whatsNewSeeAll => 'See what\'s new';
+
+  @override
+  String get whatsNewTitle => 'What\'s new';
+
+  @override
+  String get whatsNewAdded => 'New features';
+
+  @override
+  String get whatsNewChanged => 'Changes';
+
+  @override
+  String get whatsNewFixed => 'Fixes';
+
+  @override
+  String get whatsNewInstalled => 'Installed';
+
+  @override
+  String get whatsNewAllReleases => 'All releases on GitHub';
 }

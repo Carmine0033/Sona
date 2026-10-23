@@ -979,6 +979,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Showing the first 200 results: refine your search'**
   String get searchTooMany;
+
+  /// No description provided for @colTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get colTrack;
+
+  /// No description provided for @colAlbum.
+  ///
+  /// In en, this message translates to:
+  /// **'Album'**
+  String get colAlbum;
+
+  /// No description provided for @colDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration'**
+  String get colDuration;
+
+  /// No description provided for @sortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by {column}'**
+  String sortBy(String column);
+
+  /// No description provided for @sortOriginal.
+  ///
+  /// In en, this message translates to:
+  /// **'Original order'**
+  String get sortOriginal;
+
+  /// No description provided for @trackMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More actions'**
+  String get trackMore;
+
+  /// No description provided for @trackCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy title and artist'**
+  String get trackCopy;
+
+  /// No description provided for @trackCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get trackCopied;
+
+  /// No description provided for @trackOpenIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in {source}'**
+  String trackOpenIn(String source);
+
+  /// No description provided for @whatsNewToastTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sona has been updated to {version}.'**
+  String whatsNewToastTitle(String version);
+
+  /// No description provided for @whatsNewSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See what\'s new'**
+  String get whatsNewSeeAll;
+
+  /// No description provided for @whatsNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get whatsNewTitle;
+
+  /// No description provided for @whatsNewAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'New features'**
+  String get whatsNewAdded;
+
+  /// No description provided for @whatsNewChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes'**
+  String get whatsNewChanged;
+
+  /// No description provided for @whatsNewFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixes'**
+  String get whatsNewFixed;
+
+  /// No description provided for @whatsNewInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get whatsNewInstalled;
+
+  /// No description provided for @whatsNewAllReleases.
+  ///
+  /// In en, this message translates to:
+  /// **'All releases on GitHub'**
+  String get whatsNewAllReleases;
 }
 
 class _AppLocalizationsDelegate

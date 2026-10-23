@@ -1,4 +1,21 @@
 ---------------------------
+Release Sona V0.1.8
+---------------------------
+
+<!-- summary:  -->
+
+### Added
+- Record change animation when skipping tracks
+- What's new: update toast, side panel, unread dot on Settings and release history in About
+
+### Changed
+- Playlist tracks shown as a table (title, album, duration), with search highlighting
+- Missing album names are filled in from Deezer
+
+### Fixed
+- Detaching the mini card froze Sona
+- YouTube playlist links failed with an API key error
+---------------------------
 Release Sona V0.1.7
 ---------------------------
 
@@ -112,6 +129,7 @@ Release Sona V0.1.2
 ### Fixed
 
 *
+
 
 
 

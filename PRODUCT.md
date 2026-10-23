@@ -39,8 +39,8 @@ Three things together, which Spotify and other single-source players cannot offe
 
 - **Windows only (10/11).** No macOS, Linux or mobile versions are planned.
 - **Free and open source (MIT).** No accounts, subscriptions or paid features.
-- **Shipped features:** now-playing card with spinning disc, seek bar, playback and volume controls; synced lyrics where the user can click a line to seek to it; detachable mini player; settings for appearance, background, audio, window and about; accent color picker; auto-updater from GitHub releases.
-- **In progress (uncommitted as of 2026-10-14):** Playlist section that reads public playlists from Spotify, YouTube Music, Apple Music and Deezer links, plus a now-playing bar. Reading YouTube needs an API key injected at build time.
+- **Shipped features:** now-playing card with spinning disc, seek bar, playback and volume controls; synced lyrics where the user can click a line to seek to it; detachable mini player; settings for appearance, background, audio, window and about; accent color picker; auto-updater from GitHub releases; single-instance app.
+- **Playlist section (committed since 2026-10):** a library of saved public playlists read from Spotify, YouTube Music, Apple Music and Deezer links (favorites, source filters, sync); a detail page with a sortable track table, in-playlist search and a per-track menu; track search across all playlists; a built-in player that plays these tracks inside Sona, with a floating, customizable player bar; Discord Rich Presence. YouTube playlists are read through youtube.com's own web API without a key; an API key injected at build time (`YT_API_KEY`) switches to the official Data API. Unlike the SMTC features, this is Sona's own playback, not a remote for another app.
 - **Languages:** currently Italian and English (ARB/gen-l10n). The user has not made this a binding commitment.
 - **Undecided:** whether low resource use is a binding constraint. Do not assume it either way.
 

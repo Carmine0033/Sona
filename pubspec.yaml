@@ -1,7 +1,7 @@
 name: media_overlay
 description: "A new Flutter project."
 publish_to: 'none'
-version: 0.1.7+10
+version: 0.1.8+11
 
 environment:
   sdk: ^3.13.5
@@ -32,6 +32,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+    - assets/whats_new.json
   fonts:
     - family: SpaceGrotesk
       fonts:
@@ -55,6 +57,7 @@ flutter:
           weight: 500
         - asset: assets/fonts/JetBrainsMono-SemiBold.ttf
           weight: 600
+
 
 
 

@@ -53,6 +53,18 @@ class PlaylistHttp {
         'Accept-Language': 'it-IT,it;q=0.9,en;q=0.8',
         ...?headers,
     }));
+    return _check(res);
+  }
+
+  /// POST with a JSON body (YouTube's web API).
+  Future<Map<String, dynamic>> postJson(Uri url, Map<String, Object?> body) async {
+    final res = await _net(() => _client.post(url,
+        headers: {'User-Agent': _ua, 'Content-Type': 'application/json'},
+        body: jsonEncode(body)));
+    return _decode(_check(res));
+  }
+
+  String _check(http.Response res) {
     switch (res.statusCode) {
       case 200:
         return utf8.decode(res.bodyBytes, allowMalformed: true);
@@ -67,8 +79,9 @@ class PlaylistHttp {
     }
   }
 
-  Future<Map<String, dynamic>> getJson(Uri url) async {
-    final text = await getText(url);
+  Future<Map<String, dynamic>> getJson(Uri url) async => _decode(await getText(url));
+
+  Map<String, dynamic> _decode(String text) {
     try {
       final decoded = jsonDecode(text);
       if (decoded is Map<String, dynamic>) return decoded;

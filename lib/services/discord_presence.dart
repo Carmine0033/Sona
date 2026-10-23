@@ -110,7 +110,7 @@ final discordPresenceProvider = Provider<void>((ref) {
       if (url != null && url.startsWith('http')) return url;
     }
     try {
-      return await ref.read(artworkServiceProvider).find(n.artist, n.title);
+      return (await ref.read(artworkServiceProvider).find(n.artist, n.title)).cover;
     } catch (_) {
       return null; // offline: fall back to the logo
     }

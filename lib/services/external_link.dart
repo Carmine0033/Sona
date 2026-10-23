@@ -3,6 +3,7 @@ import 'dart:io';
 const _allowedHosts = {
   'open.spotify.com', 'music.youtube.com', 'www.youtube.com',
   'music.apple.com', 'www.deezer.com',
+  'github.com', // release notes (What's new)
 };
 
 Future<void> openExternal(String url) async {

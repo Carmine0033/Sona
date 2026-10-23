@@ -7,6 +7,7 @@ import '../models/now_playing.dart';
 import '../providers/app_providers.dart';
 import '../services/playback_controller.dart';
 import 'marquee_text.dart';
+import 'disc_change_animator.dart';
 import 'seek_bar.dart';
 import 'spinning_disc.dart';
 
@@ -207,11 +208,21 @@ class _VinylCardState extends ConsumerState<VinylCard> {
           ),
           const SizedBox(height: 12),
 
-          // Spinning disc with artwork
-          SpinningDisc(
-            albumArt: widget.info.artwork,
-            spinning: widget.info.isPlaying,
-            size: 185,
+          // Spinning disc with artwork; a track change plays the sleeve animation.
+          SizedBox.square(
+            dimension: 185,
+            child: DiscChangeAnimator(
+              trackKey: '${widget.info.title}|${widget.info.artist}',
+              artwork: widget.info.artwork == null
+                  ? null
+                  : MemoryImage(widget.info.artwork!),
+              direction: ref.watch(discDirectionProvider),
+              builder: (context, art) => SpinningDisc(
+                artwork: art,
+                spinning: widget.info.isPlaying,
+                size: 185,
+              ),
+            ),
           ),
           const SizedBox(height: 22),
 
@@ -256,7 +267,10 @@ class _VinylCardState extends ConsumerState<VinylCard> {
               _CtrlButton(
                 icon: Icons.skip_previous_rounded,
                 tooltip: l10n.previousTrack,
-                onTap: controller.previous,
+                onTap: () {
+                  ref.read(discDirectionProvider.notifier).state = -1;
+                  controller.previous();
+                },
               ),
               const SizedBox(width: 20),
               _CtrlButton(
@@ -271,7 +285,10 @@ class _VinylCardState extends ConsumerState<VinylCard> {
               _CtrlButton(
                 icon: Icons.skip_next_rounded,
                 tooltip: l10n.nextTrack,
-                onTap: controller.next,
+                onTap: () {
+                  ref.read(discDirectionProvider.notifier).state = 1;
+                  controller.next();
+                },
               ),
             ],
           ),

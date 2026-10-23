@@ -188,5 +188,22 @@
 "searchClose": "Chiudi ricerca",
 "searchResults": "{count, plural, =0{Nessun risultato} =1{1 risultato} other{{count} risultati}}",
 "searchNoResults": "Nessun brano trovato",
-"searchTooMany": "Mostrati i primi 200 risultati: affina la ricerca"
+"searchTooMany": "Mostrati i primi 200 risultati: affina la ricerca",
+"colTrack": "Brano",
+"colAlbum": "Album",
+"colDuration": "Durata",
+"sortBy": "Ordina per {column}",
+"sortOriginal": "Ordine originale",
+"trackMore": "Altre azioni",
+"trackCopy": "Copia titolo e artista",
+"trackCopied": "Copiato negli appunti",
+"trackOpenIn": "Apri in {source}",
+"whatsNewToastTitle": "Sona è aggiornata alla {version}.",
+"whatsNewSeeAll": "Vedi novità",
+"whatsNewTitle": "Novità",
+"whatsNewAdded": "Nuove funzioni",
+"whatsNewChanged": "Modifiche",
+"whatsNewFixed": "Correzioni",
+"whatsNewInstalled": "Installata",
+"whatsNewAllReleases": "Tutte le versioni su GitHub"
 }

@@ -6,7 +6,9 @@ import '../widgets/sidebar.dart';
 import '../widgets/settings_card.dart';
 import 'player_screen.dart';
 import 'playlist_view.dart';
+import '../widgets/sona_player_bar.dart' show kPlayerBarReserve;
 import '../widgets/update_banner.dart';
+import '../widgets/whats_new/whats_new_toast.dart';
 
 class HomeShell extends ConsumerWidget {
   const HomeShell({super.key});
@@ -39,6 +41,12 @@ class HomeShell extends ConsumerWidget {
               ),
             ],
           ),
+          // "Sona updated" banner: above the player bar, below Options.
+          const Positioned(
+            right: 24,
+            bottom: 16 + kPlayerBarReserve,
+            child: WhatsNewToast(),
+          ),
           if (isSettingsOpen)
             const Positioned.fill(
               child: SettingsOverlay(),
@@ -48,3 +56,4 @@ class HomeShell extends ConsumerWidget {
     );
   }
 }
+

@@ -7,23 +7,32 @@ import 'package:http/http.dart' as http;
 
 import 'package:media_overlay/models/playlist.dart';
 
+/// Cover and album found on Deezer for a track (either may be missing).
+class TrackMeta {
+  const TrackMeta({this.cover, this.album});
+  final String? cover;
+  final String? album;
+  static const empty = TrackMeta();
+}
+
 class ArtworkService {
   ArtworkService([http.Client? client]) : _client = client ?? http.Client();
 
   final http.Client _client;
-  final _cache = <String, String?>{};
-  final _inflight = <String, Future<String?>>{};
+  final _cache = <String, TrackMeta>{};
+  final _inflight = <String, Future<TrackMeta>>{};
 
-  static const _maxParallel= 4;
-  int _running= 0;
-  final _waiters= <Completer<void>>[];
+  static const _maxParallel = 4;
+  int _running = 0;
+  final _waiters = <Completer<void>>[];
 
-  Future<String?> find(String artist, String title) {
-    final key= '${artist.toLowerCase()}|${title.toLowerCase()}';
-    if (_cache.containsKey(key)) return Future.value(_cache[key]);
-    return _inflight[key] ??= _lookup(artist, title).then((url) {
-      _cache[key] = url;
-      return url;
+  Future<TrackMeta> find(String artist, String title) {
+    final key = '${artist.toLowerCase()}|${title.toLowerCase()}';
+    final hit = _cache[key];
+    if (hit != null) return Future.value(hit);
+    return _inflight[key] ??= _lookup(artist, title).then((m) {
+      _cache[key] = m;
+      return m;
     // Block body, not arrow: remove() returns this same future and
     // whenComplete would wait on itself.
     }).whenComplete(() {
@@ -31,9 +40,10 @@ class ArtworkService {
     });
   }
 
-  /// null = Deezer has no cover (cached). Network errors propagate and
-  /// are not cached, so the next call retries.
-  Future<String?> _lookup(String artist, String title) async {
+  /// [TrackMeta.empty] = Deezer has nothing for this track (cached).
+  /// Network errors and quota errors propagate and are NOT cached, so the
+  /// next call retries instead of remembering "no cover" forever.
+  Future<TrackMeta> _lookup(String artist, String title) async {
     await _acquire();
     try {
       final mainArtist = artist.split(',').first.trim();
@@ -52,11 +62,15 @@ class ArtworkService {
         final data = json is Map ? json['data'] : null;
         if (data is List && data.isNotEmpty) {
           final album = (data.first as Map)['album'];
-          final url = album is Map ? album['cover_medium'] : null;
-          if (url is String) return url;
+          if (album is Map) {
+            return TrackMeta(
+              cover: album['cover_medium'] as String?,
+              album: album['title'] as String?,
+            );
+          }
         }
       }
-      return null;
+      return TrackMeta.empty;
     } finally {
       _release();
     }
@@ -86,7 +100,7 @@ class ArtworkService {
     final uri = Uri.parse(url);
     final res = await _client.get(uri).timeout(const Duration(seconds: 10));
     if (res.statusCode != 200 || res.bodyBytes.isEmpty) {
-      throw http.ClientException('Copertina HTTP ${res.statusCode}', uri);
+      throw http.ClientException('Cover HTTP ${res.statusCode}', uri);
     }
     return res.bodyBytes;
   }
@@ -95,13 +109,24 @@ class ArtworkService {
 }
 
 final artworkServiceProvider = Provider<ArtworkService>((ref) {
-  final s = ArtworkService();
-  ref.onDispose(s.dispose);
-  return s;
+  final service = ArtworkService();
+  ref.onDispose(service.dispose);
+  return service;
+});
+
+/// Cover + album of a track: the source's own data when complete,
+/// otherwise looked up on Deezer.
+final trackMetaProvider = FutureProvider.family<TrackMeta, PlaylistTrack>((ref, t) async {
+  if (t.artworkUrl != null && t.album != null) {
+    return TrackMeta(cover: t.artworkUrl, album: t.album); // no network
+  }
+  final m = await ref.watch(artworkServiceProvider).find(t.artist, t.title);
+  return TrackMeta(cover: t.artworkUrl ?? m.cover, album: t.album ?? m.album);
 });
 
 /// Track artwork: the source's own if present, otherwise looked up.
 final trackArtworkProvider = FutureProvider.family<String?, PlaylistTrack>((ref, t) async {
+  // Known cover: never depend on the Deezer lookup (which may fail offline).
   if (t.artworkUrl != null) return t.artworkUrl;
-  return ref.watch(artworkServiceProvider).find(t.artist, t.title);
+  return (await ref.watch(trackMetaProvider(t).future)).cover;
 });

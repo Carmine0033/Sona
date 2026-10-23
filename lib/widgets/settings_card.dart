@@ -14,6 +14,9 @@ import '../providers/app_providers.dart';
 import '../services/settings_service.dart';
 import '../services/smtc_channel.dart';
 import '../services/update_service.dart';
+import '../theme/sona_tokens.dart';
+import '../viewmodels/whats_new_view_model.dart';
+import 'whats_new/release_notes_view.dart';
 import 'accent_picker.dart';
 import 'player_bar_settings.dart';
 
@@ -474,6 +477,35 @@ class SettingsCard extends ConsumerWidget {
   }
 }
 
+class ReleaseHistory extends ConsumerStatefulWidget {
+  const ReleaseHistory({super.key});
+  @override
+  ConsumerState<ReleaseHistory> createState() => _ReleaseHistoryState();
+}
+
+class _ReleaseHistoryState extends ConsumerState<ReleaseHistory> {
+  @override
+  void initState() {
+    super.initState();
+    // Visiting About marks the notes as read (after the frame, not in build).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) ref.read(whatsNewProvider.notifier).markRead();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = ref.watch(whatsNewProvider).asData?.value;
+    final all = s?.all ?? const [];
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      for (final r in all.take(10)) ...[ // the rest is on GitHub
+        ReleaseNotesView(release: r, installed: s!.isInstalled(r)),
+        const Divider(height: 28, color: SonaColors.outline),
+      ],
+    ]);
+  }
+}
+
 class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -856,6 +888,12 @@ class _AboutContentState extends ConsumerState<_AboutContent> {
             ),
           ],
         ),
+        const SizedBox(height: 20),
+        const Divider(color: Colors.white10),
+        const SizedBox(height: 14),
+        Text(l10n.whatsNewTitle, style: SonaText.headlineMd),
+        const SizedBox(height: 14),
+        const ReleaseHistory(),
       ],
     );
   }
