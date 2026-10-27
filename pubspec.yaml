@@ -1,5 +1,5 @@
 name: media_overlay
-description: "A new Flutter project."
+description: "Sona: a vinyl-style now-playing card and media controller for Windows."
 publish_to: 'none'
 version: 0.1.8+11
 

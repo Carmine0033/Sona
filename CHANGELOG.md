@@ -2,8 +2,6 @@
 Release Sona V0.1.8
 ---------------------------
 
-<!-- summary:  -->
-
 ### Added
 - Record change animation when skipping tracks
 - What's new: update toast, side panel, unread dot on Settings and release history in About
@@ -20,120 +18,87 @@ Release Sona V0.1.7
 ---------------------------
 
 ### Added
-
-* \- Search tracks across all your playlists (Ctrl+F) or inside a single playlist
-* \- Player bar customization: transparent, blurred album cover or custom image/GIF background
-* \- Dim slider for the player bar background
-* \- Icon style selection for the player bar (filled, outlined, rounded, sharp)
-
-### Changed
-
-* 
+- Search tracks across all your playlists (Ctrl+F) or inside a single playlist
+- Player bar customization: transparent, blurred album cover or custom image/GIF background
+- Dim slider for the player bar background
+- Icon style selection for the player bar (filled, outlined, rounded, sharp)
 
 ### Fixed
-
-* Only one instance of Sona can run at a time; reopening it brings the existing window to the front (#N)
+- Only one instance of Sona can run at a time; reopening it brings the existing window to the front
 ---------------------------
 Release Sona V0.1.6
 ---------------------------
 
 ### Added
-
-* Playlist library: save multiple playlists, with favorites and source filters
-* Playlist detail page with sync and remove
-* Floating player bar with rounded corners
+- Playlist library: save multiple playlists, with favorites and source filters
+- Playlist detail page with sync and remove
+- Floating player bar with rounded corners
 
 ### Changed
-
-* Redesigned Playlist page (new colors and typography)
-* Larger default window size
+- Redesigned Playlist page (new colors and typography)
+- Larger default window size
 
 ### Fixed
-
-* Now-playing highlight and prefetch are kept after syncing a playlist
+- Now-playing highlight and prefetch are kept after syncing a playlist
 ---------------------------
 Release Sona V0.1.5
 ---------------------------
 
 ### Added
-
-* \- Playlist import from public links (Spotify, YouTube Music, Apple Music, Deezer)
-* \- Built-in player with shuffle, repeat, volume and wave seek bar
-* \- Album artwork for every track in the playlist
-* \- Discord Rich Presence (opt-in in Settings)
+- Playlist import from public links (Spotify, YouTube Music, Apple Music, Deezer)
+- Built-in player with shuffle, repeat, volume and wave seek bar
+- Album artwork for every track in the playlist
+- Discord Rich Presence (opt-in in Settings)
 
 ### Changed
-
-* Player and playlist error messages are now translated (IT/EN)
+- Player and playlist error messages are now translated (IT/EN)
 
 ### Fixed
-
-* Browser extension and local WebSocket server for playlists
+- Browser extension and local WebSocket server for playlists
 ---------------------------
 Release Sona V0.1.4
 ---------------------------
 
 ### Added
-
-* \- Detachable mini player mode (frameless, resizable, always-on-top window).
-* \- New modern modal settings card with Appearance, Background, Audio, and Window sections.
-* \- Accent color customization with curated color palette.
-* \- Official MIT License.
+- Detachable mini player mode (frameless, resizable, always-on-top window).
+- New modern modal settings card with Appearance, Background, Audio, and Window sections.
+- Accent color customization with curated color palette.
+- Official MIT License.
 
 ### Changed
-
-* \- Refactored UI layout: replaced legacy side panel with the new settings modal.
-* \- Simplified playback controls: removed unsupported shuffle and repeat buttons.
-* \- Optimized SeekBar wave rendering using RepaintBoundary to avoid background blur repaints.
-* \- Unified player volume API (per-app volume for Spotify).
+- Refactored UI layout: replaced legacy side panel with the new settings modal.
+- Simplified playback controls: removed unsupported shuffle and repeat buttons.
+- Optimized SeekBar wave rendering using RepaintBoundary to avoid background blur repaints.
+- Unified player volume API (per-app volume for Spotify).
 
 ### Fixed
-
-* \- Fixed detached mini player not closing and duplicating when reattaching to the main window.
-* \- Fixed auto-updater conflicts using Win32 named mutex and delayed detached installer launch.
-* \- Added `runZonedGuarded` startup error boundary to prevent launch failures on corrupted settings.
-* \- Added defensive clamping on volume sliders and safe enum bounds checking.
-* \- Fixed release script failure on Windows 11 when opening Notepad.
+- Fixed detached mini player not closing and duplicating when reattaching to the main window.
+- Fixed auto-updater conflicts using Win32 named mutex and delayed detached installer launch.
+- Added `runZonedGuarded` startup error boundary to prevent launch failures on corrupted settings.
+- Added defensive clamping on volume sliders and safe enum bounds checking.
+- Fixed release script failure on Windows 11 when opening Notepad.
 ---------------------------
 Release Sona V0.1.3
 ---------------------------
 
 ### Added
-
-* feat: add detachable mini player mode
-* feat: add accent color customization in a Personalization section
-* 
+- Detachable mini player mode
+- Accent color customization in a Personalization section
 
 ### Changed
-
-* refactor: remove non-functional shuffle and repeat buttons
+- Removed non-functional shuffle and repeat buttons
 
 ### Fixed
-
-* Auto Updates
+- Auto updates
 ---------------------------
 Release Sona V0.1.2
 ---------------------------
 
 ### Added
-
-* Three disc styles: classic vinyl, full album, and animated pulse
-* Custom image or GIF in place of the album artwork
-* Per-app volume control for Spotify
-* Settings persist across restarts
+- Three disc styles: classic vinyl, full album, and animated pulse
+- Custom image or GIF in place of the album artwork
+- Per-app volume control for Spotify
+- Settings persist across restarts
 
 ### Changed
-
-* Removed external plugins (native Win32 + dart:io), fixing a build failure
-
-### Fixed
-
-*
-
-
-
-
-
-
-
-
+- Removed external plugins (native Win32 + dart:io), fixing a build failure

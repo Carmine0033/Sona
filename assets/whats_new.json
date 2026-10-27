@@ -86,14 +86,14 @@
     {
       "version": "0.1.3",
       "added": [
-        "Add detachable mini player mode",
-        "Add accent color customization in a Personalization section"
+        "Detachable mini player mode",
+        "Accent color customization in a Personalization section"
       ],
       "changed": [
-        "Remove non-functional shuffle and repeat buttons"
+        "Removed non-functional shuffle and repeat buttons"
       ],
       "fixed": [
-        "Auto Updates"
+        "Auto updates"
       ]
     },
     {

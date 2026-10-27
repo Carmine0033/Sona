@@ -39,8 +39,8 @@ Three things together, which Spotify and other single-source players cannot offe
 
 - **Windows only (10/11).** No macOS, Linux or mobile versions are planned.
 - **Free and open source (MIT).** No accounts, subscriptions or paid features.
-- **Shipped features:** now-playing card with spinning disc, seek bar, playback and volume controls; synced lyrics where the user can click a line to seek to it; detachable mini player; settings for appearance, background, audio, window and about; accent color picker; auto-updater from GitHub releases; single-instance app.
-- **Playlist section (committed since 2026-10):** a library of saved public playlists read from Spotify, YouTube Music, Apple Music and Deezer links (favorites, source filters, sync); a detail page with a sortable track table, in-playlist search and a per-track menu; track search across all playlists; a built-in player that plays these tracks inside Sona, with a floating, customizable player bar; Discord Rich Presence. YouTube playlists are read through youtube.com's own web API without a key; an API key injected at build time (`YT_API_KEY`) switches to the official Data API. Unlike the SMTC features, this is Sona's own playback, not a remote for another app.
+- **Shipped features:** now-playing card with spinning disc and a record-change animation on track change, seek bar, playback and volume controls; synced lyrics where the user can click a line to seek to it, plus a full-size lyrics view; detachable mini player; settings for appearance, background, audio, window and about; accent color picker; auto-updater from GitHub releases with a "what's new" toast, panel and release history; single-instance app.
+- **Playlist section (committed since 2026-10):** a library of saved public playlists read from Spotify, YouTube Music, Apple Music and Deezer links (favorites, source filters, sync); a detail page with a sortable track table, in-playlist search and a per-track menu; track search across all playlists; a built-in player that plays these tracks inside Sona, with a floating, customizable player bar; Discord Rich Presence. YouTube playlists are read through youtube.com's own web API without a key; an API key injected at build time (`YT_API_KEY`) switches to the official Data API. Unlike the SMTC features, this is Sona's own playback, not a remote for another app: each track is matched by title and artist on YouTube and its audio is streamed, so a match can occasionally be the wrong version. Missing album names are filled in from Deezer.
 - **Languages:** currently Italian and English (ARB/gen-l10n). The user has not made this a binding commitment.
 - **Undecided:** whether low resource use is a binding constraint. Do not assume it either way.
 
@@ -52,7 +52,8 @@ Three things together, which Spotify and other single-source players cannot offe
 
 ## Evidence on Hand
 
-- README, CHANGELOG (releases v0.1.2 to v0.1.4) and the MIT LICENSE in the repo.
+- README, CHANGELOG (releases v0.1.2 to v0.1.8) and the MIT LICENSE in the repo.
+- The installer is not code-signed, so SmartScreen warns on first run.
 - No user counts, testimonials, reviews or press exist. Do not fabricate any.
 
 ## Product Principles
