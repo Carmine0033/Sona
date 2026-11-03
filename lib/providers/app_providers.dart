@@ -180,7 +180,7 @@ final barIconStyleProvider = StateProvider<BarIconStyle>(
 final selectedSectionProvider =StateProvider<AppSection>((ref) => AppSection.player);
 final settingsOpenProvider = StateProvider<bool>((ref) => false);
 
-enum SettingsSection { appearance, background, playerBar, audio, window, about }
+enum SettingsSection { appearance, background, playerBar, lyrics, audio, window, about }
 final settingsSectionProvider= StateProvider<SettingsSection>((ref) => SettingsSection.appearance);
 
 class TrackRef {

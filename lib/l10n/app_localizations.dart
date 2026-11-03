@@ -350,12 +350,6 @@ abstract class AppLocalizations {
   /// **'Syncing verses via LRCLIB'**
   String get syncingLyrics;
 
-  /// No description provided for @lyricsUnavailable.
-  ///
-  /// In en, this message translates to:
-  /// **'Lyrics unavailable'**
-  String get lyricsUnavailable;
-
   /// No description provided for @serverTimeout.
   ///
   /// In en, this message translates to:
@@ -1081,6 +1075,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All releases on GitHub'**
   String get whatsNewAllReleases;
+
+  /// No description provided for @lyricsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrics'**
+  String get lyricsTitle;
+
+  /// No description provided for @lyricsResume.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the current line'**
+  String get lyricsResume;
+
+  /// No description provided for @lyricsSearching.
+  ///
+  /// In en, this message translates to:
+  /// **'Looking for lyrics…'**
+  String get lyricsSearching;
+
+  /// No description provided for @lyricsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No lyrics available for this track'**
+  String get lyricsUnavailable;
+
+  /// No description provided for @lyricsNothingPlaying.
+  ///
+  /// In en, this message translates to:
+  /// **'Play a track to see its lyrics'**
+  String get lyricsNothingPlaying;
+
+  /// No description provided for @lyricsStyleKaraoke.
+  ///
+  /// In en, this message translates to:
+  /// **'Karaoke'**
+  String get lyricsStyleKaraoke;
+
+  /// No description provided for @lyricsStyleFocus.
+  ///
+  /// In en, this message translates to:
+  /// **'Focus'**
+  String get lyricsStyleFocus;
+
+  /// No description provided for @lyricsStyleCompact.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get lyricsStyleCompact;
+
+  /// No description provided for @lyricsStyleTwoLines.
+  ///
+  /// In en, this message translates to:
+  /// **'Two lines'**
+  String get lyricsStyleTwoLines;
+
+  /// No description provided for @lyricsStyleHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden'**
+  String get lyricsStyleHidden;
+
+  /// No description provided for @lyricsWherePlayer.
+  ///
+  /// In en, this message translates to:
+  /// **'Now playing'**
+  String get lyricsWherePlayer;
+
+  /// No description provided for @lyricsWherePlaylist.
+  ///
+  /// In en, this message translates to:
+  /// **'Playlist panel'**
+  String get lyricsWherePlaylist;
+
+  /// No description provided for @lyricsWhereMini.
+  ///
+  /// In en, this message translates to:
+  /// **'Mini card'**
+  String get lyricsWhereMini;
+
+  /// No description provided for @lyricsSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get lyricsSize;
+
+  /// No description provided for @lyricsSizeSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get lyricsSizeSmall;
+
+  /// No description provided for @lyricsSizeMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get lyricsSizeMedium;
+
+  /// No description provided for @lyricsSizeLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get lyricsSizeLarge;
+
+  /// No description provided for @lyricsTiming.
+  ///
+  /// In en, this message translates to:
+  /// **'Timing'**
+  String get lyricsTiming;
+
+  /// No description provided for @lyricsInSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrics in sync with the music'**
+  String get lyricsInSync;
+
+  /// No description provided for @lyricsEarlier.
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrics show {seconds}s earlier'**
+  String lyricsEarlier(String seconds);
+
+  /// No description provided for @lyricsLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Lyrics show {seconds}s later'**
+  String lyricsLater(String seconds);
+
+  /// No description provided for @lyricsReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get lyricsReset;
 }
 
 class _AppLocalizationsDelegate

@@ -1,6 +1,22 @@
 {
   "releases": [
     {
+      "version": "0.1.9",
+      "date": "2026-11-03",
+      "added": [
+        "Lyrics side panel on the Playlist page",
+        "Lyrics in the mini card",
+        "Lyrics settings with live preview, text size and timing offset"
+      ],
+      "changed": [
+        "Lyrics follow both the built-in player and SMTC",
+        "Click a line to seek; manual scrolling pauses auto-follow"
+      ],
+      "fixed": [
+        "Old lyrics scroller widget"
+      ]
+    },
+    {
       "version": "0.1.8",
       "date": "2026-10-23",
       "added": [

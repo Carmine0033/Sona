@@ -76,9 +76,8 @@ final sonaVolumeProvider = StreamProvider<double>((ref) {
 });
 
 class SonaPlayerViewModel extends Notifier<SonaPlayerState> {
-  SonaPlayerViewModel({Player Function()? createPlayer, TrackAudioSource? source})
-    : _createPlayer = createPlayer,
-      _injectedSource = source;
+  SonaPlayerViewModel({this._createPlayer, TrackAudioSource? source})
+    : _injectedSource = source;
 
   final Player Function()? _createPlayer;
   final TrackAudioSource? _injectedSource;

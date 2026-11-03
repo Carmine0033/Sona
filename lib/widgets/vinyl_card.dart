@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/theme.dart';
 import '../models/now_playing.dart';
 import '../providers/app_providers.dart';
+import '../providers/lyrics_providers.dart';
 import '../services/playback_controller.dart';
 import 'marquee_text.dart';
 import 'disc_change_animator.dart';
+import 'lyrics/live_lyrics.dart';
 import 'seek_bar.dart';
 import 'spinning_disc.dart';
 
@@ -59,6 +61,7 @@ class _VinylCardState extends ConsumerState<VinylCard> {
     final controller = ref.watch(playbackControllerProvider);
     final seekStyle = ref.watch(seekBarStyleProvider);
     final discStyle = ref.watch(discStyleProvider);
+    final miniLyrics = ref.watch(lyricsStyleMiniProvider);
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
@@ -341,6 +344,16 @@ class _VinylCardState extends ConsumerState<VinylCard> {
               ),
             ],
           ),
+
+          // Mini card only: the main window already shows lyrics beside it.
+          if (widget.isDetached && miniLyrics != LyricsStyle.hidden) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 88,
+              width: double.infinity,
+              child: LiveLyrics(style: miniLyrics, baseFontSize: 15),
+            ),
+          ],
         ],
       ),
     );

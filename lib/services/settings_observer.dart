@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/app_providers.dart';
+import '../providers/lyrics_providers.dart';
 import 'settings_service.dart';
 
 final class SettingsObserver extends ProviderObserver {
@@ -49,6 +50,20 @@ final class SettingsObserver extends ProviderObserver {
         break;
       case 'barIconStyle':
         SettingsService.setInt('barIconStyle', (newValue as BarIconStyle).index);
+        break;
+      case 'lyricsStylePlayer':
+      case 'lyricsStylePlaylist':
+      case 'lyricsStyleMini':
+        SettingsService.setInt(context.provider.name!, (newValue as LyricsStyle).index);
+        break;
+      case 'lyricsSize':
+        SettingsService.setInt('lyricsSize', (newValue as LyricsSize).index);
+        break;
+      case 'lyricsOffset':
+        SettingsService.setInt('lyricsOffset', newValue as int);
+        break;
+      case 'lyricsPanel':
+        SettingsService.setBool('lyricsPanel', newValue as bool);
         break;
     }
   }

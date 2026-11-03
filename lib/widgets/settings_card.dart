@@ -18,6 +18,7 @@ import '../theme/sona_tokens.dart';
 import '../viewmodels/whats_new_view_model.dart';
 import 'whats_new/release_notes_view.dart';
 import 'accent_picker.dart';
+import 'lyrics_settings.dart';
 import 'player_bar_settings.dart';
 
 /// Shared label column for all settings rows,
@@ -170,6 +171,15 @@ class SettingsCard extends ConsumerWidget {
                             SettingsSection.playerBar,
                   ),
                   _NavItem(
+                    icon: Icons.lyrics_outlined,
+                    label: l10n.lyricsTitle,
+                    active: section == SettingsSection.lyrics,
+                    accent: accent,
+                    onTap: () =>
+                        ref.read(settingsSectionProvider.notifier).state =
+                            SettingsSection.lyrics,
+                  ),
+                  _NavItem(
                     icon: Icons.volume_up_outlined,
                     label: l10n.audio,
                     active: section == SettingsSection.audio,
@@ -250,6 +260,7 @@ class SettingsCard extends ConsumerWidget {
     SettingsSection.appearance => l10n.appearance,
     SettingsSection.background => l10n.background,
     SettingsSection.playerBar => l10n.settingsBarTitle,
+    SettingsSection.lyrics => l10n.lyricsTitle,
     SettingsSection.audio => l10n.audio,
     SettingsSection.window => l10n.window,
     SettingsSection.about => l10n.about,
@@ -320,6 +331,7 @@ class SettingsCard extends ConsumerWidget {
       accent: accent,
     ),
     SettingsSection.playerBar => const PlayerBarSettings(),
+    SettingsSection.lyrics => const LyricsSettings(),
     SettingsSection.audio => const _VolumeRow(),
     SettingsSection.window => Column(
       mainAxisSize: MainAxisSize.min,

@@ -1,4 +1,22 @@
 ---------------------------
+Release Sona V0.1.9
+---------------------------
+
+<!-- summary:  -->
+
+### Added
+-Lyrics styles: karaoke, focus, compact with timestamps, two lines
+- Lyrics side panel on the Playlist page
+- Lyrics in the mini card
+- Lyrics settings with live preview, text size and timing offset
+
+### Changed
+- Lyrics follow both the built-in player and SMTC
+- Click a line to seek; manual scrolling pauses auto-follow
+
+### Fixed
+- Old lyrics scroller widget
+---------------------------
 Release Sona V0.1.8
 ---------------------------
 
@@ -102,3 +120,4 @@ Release Sona V0.1.2
 
 ### Changed
 - Removed external plugins (native Win32 + dart:io), fixing a build failure
+

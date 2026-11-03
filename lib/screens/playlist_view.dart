@@ -6,9 +6,14 @@ import 'package:media_overlay/models/saved_playlist.dart';
 import 'package:media_overlay/screens/playlist_detail_page.dart';
 import 'package:media_overlay/screens/playlist_library_page.dart';
 import 'package:media_overlay/theme/sona_tokens.dart';
+import 'package:media_overlay/providers/lyrics_providers.dart';
 import 'package:media_overlay/viewmodels/playlist_library_view_model.dart';
+import 'package:media_overlay/widgets/lyrics/lyrics_side_panel.dart';
 import 'package:media_overlay/widgets/sona_player_bar.dart';
 import 'package:media_overlay/widgets/sona_ui.dart';
+
+/// Below this width the library would be squeezed by the lyrics panel.
+const _kLyricsPanelMinWidth = 900.0;
 
 class PlaylistView extends ConsumerWidget {
   const PlaylistView({super.key});
@@ -32,7 +37,15 @@ class PlaylistView extends ConsumerWidget {
     return ColoredBox(
       color: SonaColors.surface,
       child: Stack(children: [
-        Positioned.fill(child: body),
+        // The side panel only fits next to the library on wide windows.
+        Positioned.fill(
+          child: LayoutBuilder(
+            builder: (context, c) => Row(children: [
+              Expanded(child: body),
+              if (c.maxWidth >= _kLyricsPanelMinWidth) const LyricsSidePanel(),
+            ]),
+          ),
+        ),
         // Floating bar over the content; it hides itself when the internal
         // player is idle. Pages reserve kPlayerBarReserve at the bottom so
         // their last rows can scroll out from under it.
@@ -43,7 +56,10 @@ class PlaylistView extends ConsumerWidget {
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1200),
-              child: const SonaPlayerBar(),
+              child: SonaPlayerBar(
+                onLyrics: () =>
+                    ref.read(lyricsPanelOpenProvider.notifier).update((v) => !v),
+              ),
             ),
           ),
         ),

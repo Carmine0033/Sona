@@ -26,9 +26,8 @@ class LyricsService {
             (jsonDecode(res.body) as Map<String, dynamic>)['syncedLyrics']
                 as String?;
         if (synced != null && synced.isNotEmpty) return parseLrc(synced);
-      } else if (res.statusCode >= 500) {
-        throw TimeoutException('Server error (lrclib.net HTTP ${res.statusCode})');
       }
+      // No exact match (LRCLIB currently answers 503 for that too): search.
 
       final searchUri = Uri.https('lrclib.net', '/api/search', {
         'track_name': title,
@@ -39,11 +38,22 @@ class LyricsService {
           .timeout(_timeout);
 
       if (res.statusCode == 200) {
-        final list = jsonDecode(res.body) as List;
-        for (final item in list) {
+        // A song can have many versions (album, live, remaster) whose timings
+        // differ by tens of seconds: take the one closest in length.
+        String? best;
+        var bestGap = double.infinity;
+        for (final item in (jsonDecode(res.body) as List).whereType<Map>()) {
           final synced = item['syncedLyrics'] as String?;
-          if (synced != null && synced.isNotEmpty) return parseLrc(synced);
+          if (synced == null || synced.isEmpty) continue;
+          if (durationSec <= 0) return parseLrc(synced);
+          final d = (item['duration'] as num?)?.toDouble();
+          final gap = d == null ? double.maxFinite : (d - durationSec).abs();
+          if (gap < bestGap) {
+            best = synced;
+            bestGap = gap;
+          }
         }
+        if (best != null) return parseLrc(best);
       } else if (res.statusCode >= 500) {
         throw TimeoutException('Server error (lrclib.net HTTP ${res.statusCode})');
       }

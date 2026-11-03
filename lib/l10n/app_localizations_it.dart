@@ -143,9 +143,6 @@ class AppLocalizationsIt extends AppLocalizations {
   String get syncingLyrics => 'Sincronizzazione dei versi tramite LRCLIB';
 
   @override
-  String get lyricsUnavailable => 'Testo non disponibile';
-
-  @override
   String get serverTimeout => 'Timeout server (lrclib.net non raggiungibile)';
 
   @override
@@ -585,4 +582,74 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get whatsNewAllReleases => 'Tutte le versioni su GitHub';
+
+  @override
+  String get lyricsTitle => 'Testi';
+
+  @override
+  String get lyricsResume => 'Torna alla riga';
+
+  @override
+  String get lyricsSearching => 'Ricerca del testo…';
+
+  @override
+  String get lyricsUnavailable => 'Testo non disponibile per questo brano';
+
+  @override
+  String get lyricsNothingPlaying => 'Avvia un brano per vedere il testo';
+
+  @override
+  String get lyricsStyleKaraoke => 'Karaoke';
+
+  @override
+  String get lyricsStyleFocus => 'Focus';
+
+  @override
+  String get lyricsStyleCompact => 'Compatto';
+
+  @override
+  String get lyricsStyleTwoLines => 'Due righe';
+
+  @override
+  String get lyricsStyleHidden => 'Nascosto';
+
+  @override
+  String get lyricsWherePlayer => 'Riproduzione';
+
+  @override
+  String get lyricsWherePlaylist => 'Pannello Playlist';
+
+  @override
+  String get lyricsWhereMini => 'Mini-card';
+
+  @override
+  String get lyricsSize => 'Dimensione';
+
+  @override
+  String get lyricsSizeSmall => 'Piccolo';
+
+  @override
+  String get lyricsSizeMedium => 'Medio';
+
+  @override
+  String get lyricsSizeLarge => 'Grande';
+
+  @override
+  String get lyricsTiming => 'Sincronia';
+
+  @override
+  String get lyricsInSync => 'Testo in sincrono con la musica';
+
+  @override
+  String lyricsEarlier(String seconds) {
+    return 'Il testo arriva $seconds s prima';
+  }
+
+  @override
+  String lyricsLater(String seconds) {
+    return 'Il testo arriva $seconds s dopo';
+  }
+
+  @override
+  String get lyricsReset => 'Ripristina';
 }

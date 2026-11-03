@@ -142,9 +142,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncingLyrics => 'Syncing verses via LRCLIB';
 
   @override
-  String get lyricsUnavailable => 'Lyrics unavailable';
-
-  @override
   String get serverTimeout => 'Server timeout (lrclib.net unreachable)';
 
   @override
@@ -582,4 +579,74 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get whatsNewAllReleases => 'All releases on GitHub';
+
+  @override
+  String get lyricsTitle => 'Lyrics';
+
+  @override
+  String get lyricsResume => 'Back to the current line';
+
+  @override
+  String get lyricsSearching => 'Looking for lyrics…';
+
+  @override
+  String get lyricsUnavailable => 'No lyrics available for this track';
+
+  @override
+  String get lyricsNothingPlaying => 'Play a track to see its lyrics';
+
+  @override
+  String get lyricsStyleKaraoke => 'Karaoke';
+
+  @override
+  String get lyricsStyleFocus => 'Focus';
+
+  @override
+  String get lyricsStyleCompact => 'Compact';
+
+  @override
+  String get lyricsStyleTwoLines => 'Two lines';
+
+  @override
+  String get lyricsStyleHidden => 'Hidden';
+
+  @override
+  String get lyricsWherePlayer => 'Now playing';
+
+  @override
+  String get lyricsWherePlaylist => 'Playlist panel';
+
+  @override
+  String get lyricsWhereMini => 'Mini card';
+
+  @override
+  String get lyricsSize => 'Size';
+
+  @override
+  String get lyricsSizeSmall => 'Small';
+
+  @override
+  String get lyricsSizeMedium => 'Medium';
+
+  @override
+  String get lyricsSizeLarge => 'Large';
+
+  @override
+  String get lyricsTiming => 'Timing';
+
+  @override
+  String get lyricsInSync => 'Lyrics in sync with the music';
+
+  @override
+  String lyricsEarlier(String seconds) {
+    return 'Lyrics show ${seconds}s earlier';
+  }
+
+  @override
+  String lyricsLater(String seconds) {
+    return 'Lyrics show ${seconds}s later';
+  }
+
+  @override
+  String get lyricsReset => 'Reset';
 }

@@ -10,7 +10,8 @@ import 'package:media_overlay/services/settings_service.dart';
 import '../core/theme.dart';
 import '../main.dart';
 import '../providers/app_providers.dart';
-import '../widgets/full_lyrics_view.dart';
+import '../providers/lyrics_providers.dart';
+import '../widgets/lyrics/live_lyrics.dart';
 import '../widgets/vinyl_card.dart';
 
 class PlayerScreen extends ConsumerWidget {
@@ -143,6 +144,10 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
     final art = widget.info.artwork;
     final hasArt = art != null && art.isNotEmpty;
 
+    final lyricsStyle = ref.watch(lyricsStylePlayerProvider);
+    final showLyrics = lyricsStyle != LyricsStyle.hidden;
+    final lyrics = LiveLyrics(style: lyricsStyle, baseFontSize: 26);
+
     final leftWidget = detached
         ? _buildDetachedPlaceholder(l10n)
         : _buildPlayerCard();
@@ -192,6 +197,16 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
               builder: (context, constraints) {
                 final isWide = constraints.maxWidth >= 780;
 
+                // Lyrics hidden: the card takes the stage on its own.
+                if (!showLyrics) {
+                  return Center(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(24),
+                      child: leftWidget,
+                    ),
+                  );
+                }
+
                 if (isWide) {
                   return Row(
                     children: [
@@ -208,10 +223,10 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                         ),
                       ),
                       // Right: synced lyrics
-                      const Expanded(
+                      Expanded(
                         child: Padding(
-                          padding: EdgeInsets.only(right: 24, bottom: 12),
-                          child: FullLyricsView(),
+                          padding: const EdgeInsets.only(right: 24, bottom: 12),
+                          child: lyrics,
                         ),
                       ),
                     ],
@@ -227,7 +242,7 @@ class _PlayerViewState extends ConsumerState<_PlayerView> {
                       children: [
                         leftWidget,
                         const SizedBox(height: 24),
-                        const SizedBox(height: 420, child: FullLyricsView()),
+                        SizedBox(height: 420, child: lyrics),
                       ],
                     ),
                   );
